@@ -15,15 +15,6 @@
             </div>
         </div>
 
-        @if (session('status'))
-            <div class="mb-6 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-sm animate-fade-in-down">
-                <div class="flex-shrink-0 mr-3">
-                    <i class="fas fa-check-circle text-emerald-500"></i>
-                </div>
-                <p class="text-sm font-bold text-emerald-800">{{ session('status') }}</p>
-            </div>
-        @endif
-
         <!-- Main Card -->
         <div class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden transform transition-all">
             <!-- Decorative Top Border -->

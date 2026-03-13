@@ -24,6 +24,8 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         // Suppress Tailwind CDN warning in development
         tailwind.config = {
@@ -156,6 +158,20 @@
             color: #4e4f50 !important;
             border-color: #3a3b3c !important;
         }
+        /* Flash message slide-in animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.4s ease-out;
+        }
     </style>
     @stack('styles')
 </head>
@@ -169,6 +185,15 @@
                     @endif
                     <span>{{ $setting->app_name }}</span>
                 </a>
+                @auth
+                @hasanyrole('admin|SuperAdmin')
+                <a href="javascript:void(0)" onclick="document.getElementById('academicYearModal').style.display='flex'" class="inline-flex items-center text-xs font-bold ml-2 gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer {{ isset($currentAcademicYear) ? 'bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100' : 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' }}">
+                    <i class="fas fa-graduation-cap text-[10px]"></i>
+                    {{ isset($currentAcademicYear) ? $currentAcademicYear->year : 'Select Year' }}
+                    <i class="fas fa-chevron-down text-[8px] ml-0.5"></i>
+                </a>
+                @endhasanyrole
+                @endauth
                 <div class="flex items-center space-x-4">
                     @auth
                         @include('components.user-dropdown')
@@ -188,6 +213,23 @@
             @yield('content')
         </main>
     </div>
+
+    <!-- Global Flash Message (bottom-right overlay) -->
+    @if (session('status'))
+    <div id="globalFlashMessage" class="fixed bottom-6 right-6 z-[9999] max-w-sm w-full animate-fade-in-up">
+        <div class="flex items-center p-4 rounded-2xl shadow-2xl backdrop-blur-sm" style="background: rgba(16, 185, 129, 0.85);">
+            <div class="flex-shrink-0 mr-3">
+                <i class="fas fa-check-circle text-white text-xl"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm font-bold text-white">{{ session('status') }}</p>
+            </div>
+            <button onclick="document.getElementById('globalFlashMessage').remove()" class="flex-shrink-0 ml-3 transition-colors hover:opacity-80" style="border:0;background:none;">
+                <i class="fas fa-times text-sm text-rose-400"></i>
+            </button>
+        </div>
+    </div>
+    @endif
     <script>
         // Ensure Bootstrap collapse works correctly
         $(document).ready(function() {
@@ -202,7 +244,77 @@
                 }
             });
         });
+
+        // Auto-fade flash messages after 3 seconds
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('#globalFlashMessage').animate({ opacity: 0, bottom: '-20px' }, 500, function() {
+                    $(this).remove();
+                });
+                $('.flash-message').animate({ opacity: 0 }, 500, function() {
+                    $(this).slideUp(300, function() { $(this).remove(); });
+                });
+            }, 3000);
+        });
     </script>
     @stack('scripts')
+
+    @auth
+    @hasanyrole('admin|SuperAdmin')
+    <!-- Academic Year Selection Modal -->
+    <div id="academicYearModal" style="display:none" class="fixed inset-0 z-[9999] items-center justify-center bg-black/50 backdrop-blur-sm" onclick="if(event.target===this)this.style.display='none'">
+        <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 dark:border-[#3a3b3c]">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-indigo-600 dark:text-indigo-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-900 dark:text-white">Academic Year</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Select current academic year</p>
+                        </div>
+                    </div>
+                    <button onclick="document.getElementById('academicYearModal').style.display='none'" class="transition-colors hover:opacity-80" style="border:0;background:none;">
+                        <i class="fas fa-times text-sm text-rose-400"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 max-h-80 overflow-y-auto">
+                @php
+                    $academicYears = \App\Models\AcademicYear::where('status', 1)->orderBy('year', 'desc')->get();
+                @endphp
+                @forelse($academicYears as $ay)
+                <form method="POST" action="{{ route('admin.academic-years.set-current') }}" class="mb-1">
+                    @csrf
+                    <input type="hidden" name="academic_year_id" value="{{ $ay->id }}">
+                    <button type="submit" class="w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 {{ $ay->is_current_year ? 'bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-300 dark:border-indigo-700' : 'bg-gray-50 dark:bg-[#18191a] hover:bg-gray-100 dark:hover:bg-[#3a3b3c] border-2 border-gray-200 dark:border-[#3a3b3c]' }}">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl {{ $ay->is_current_year ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-gray-400' }} flex items-center justify-center font-bold text-sm">
+                                {{ $ay->year }}
+                            </div>
+                            <div class="text-left">
+                                <span class="font-bold text-sm text-gray-900 dark:text-white">ปีการศึกษา {{ $ay->year }}</span>
+                                @if($ay->is_current_year)
+                                <span class="block text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Current Year</span>
+                                @endif
+                            </div>
+                        </div>
+                        @if($ay->is_current_year)
+                        <i class="fas fa-check-circle text-indigo-600 dark:text-indigo-400"></i>
+                        @endif
+                    </button>
+                </form>
+                @empty
+                <div class="text-center py-8 text-gray-400">
+                    <i class="fas fa-calendar-times text-3xl mb-2"></i>
+                    <p class="text-sm font-medium">No active academic years</p>
+                </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+    @endhasanyrole
+    @endauth
 </body>
 </html>

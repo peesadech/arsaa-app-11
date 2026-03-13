@@ -153,13 +153,6 @@
             </div>
         </div>
 
-        @if (session('status'))
-            <div id="statusAlert" class="fixed bottom-4 right-4 z-50 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-xl transform transition-all duration-500 opacity-100" role="alert">
-                <i class="fas fa-check-circle text-emerald-500 mr-3 text-xl"></i>
-                <p class="text-sm font-bold text-emerald-800">{{ session('status') }}</p>
-            </div>
-        @endif
-
         <!-- Main Content Card -->
         <div class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden transform transition-all">
             <div class="p-4 sm:p-6 lg:p-8">

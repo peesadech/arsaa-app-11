@@ -17,13 +17,6 @@
             </p>
         </div>
 
-        @if (session('status'))
-            <div class="p-4 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 rounded-2xl flex items-center shadow-sm animate-fade-in">
-                <i class="fas fa-check-circle text-emerald-500 mr-3 text-lg"></i>
-                <p class="text-sm font-bold text-emerald-800 dark:text-emerald-400">{{ session('status') }}</p>
-            </div>
-        @endif
-
         <div class="bg-white dark:bg-[#242526] py-10 px-8 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#3a3b3c] rounded-[2.5rem] sm:px-10 transform transition-all">
             <form class="space-y-6" method="POST" action="{{ route('password.email') }}">
                 @csrf

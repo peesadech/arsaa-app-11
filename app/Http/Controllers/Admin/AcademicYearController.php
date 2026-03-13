@@ -82,4 +82,19 @@ class AcademicYearController extends Controller
         $year->delete();
         return redirect()->route('admin.academic-years.index')->with('status', 'Academic Year deleted successfully!');
     }
+
+    public function setCurrent(Request $request)
+    {
+        $request->validate([
+            'academic_year_id' => 'required|exists:academic_years,id',
+        ]);
+
+        // Reset all
+        AcademicYear::where('is_current_year', true)->update(['is_current_year' => false]);
+
+        // Set selected
+        AcademicYear::where('id', $request->academic_year_id)->update(['is_current_year' => true]);
+
+        return back()->with('status', 'Current academic year updated!');
+    }
 }

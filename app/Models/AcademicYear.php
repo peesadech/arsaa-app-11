@@ -9,5 +9,10 @@ class AcademicYear extends Model
     protected $fillable = [
         'year',
         'status',
+        'is_current_year',
+    ];
+
+    protected $casts = [
+        'is_current_year' => 'boolean',
     ];
 }

@@ -154,13 +154,6 @@
             </div>
         </div>
 
-        @if (session('status'))
-            <div id="statusAlert" class="fixed bottom-4 right-4 z-50 flex items-center p-4 bg-emerald-50 dark:bg-emerald-900/30 border-l-4 border-emerald-500 rounded-r-2xl shadow-xl transform transition-all duration-500 opacity-100" role="alert">
-                <i class="fas fa-check-circle text-emerald-500 mr-3 text-xl"></i>
-                <p class="text-sm font-bold text-emerald-800 dark:text-emerald-400">{{ session('status') }}</p>
-            </div>
-        @endif
-
         @if (session('error'))
             <div id="errorAlert" class="fixed bottom-4 right-4 z-50 flex items-center p-4 bg-rose-50 dark:bg-rose-900/30 border-l-4 border-rose-500 rounded-r-2xl shadow-xl transform transition-all duration-500 opacity-100" role="alert">
                 <i class="fas fa-exclamation-circle text-rose-500 mr-3 text-xl"></i>

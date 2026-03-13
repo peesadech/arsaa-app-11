@@ -40,13 +40,6 @@
             </div>
         </div>
 
-        @if (session('status'))
-            <div id="statusAlert" class="fixed bottom-4 right-4 z-50 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-xl transform transition-all duration-500 opacity-100" role="alert">
-                <i class="fas fa-check-circle text-emerald-500 mr-3 text-xl"></i>
-                <p class="text-sm font-bold text-emerald-800">{{ session('status') }}</p>
-            </div>
-        @endif
-
         @if ($errors->any())
             <div class="mb-8 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-2xl shadow-md transform animate-fade-in">
                 <div class="flex items-center mb-2">

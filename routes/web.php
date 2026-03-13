@@ -49,6 +49,10 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
+    Route::get('/admin/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('admin.dashboard');
+
     Route::get('/admin/grades', [GradeController::class, 'index'])->name('admin.grades.index');
     Route::get('/admin/grades/data', [GradeController::class, 'data'])->name('admin.grades.data');
     Route::get('/admin/grades/create', [GradeController::class, 'create'])->name('admin.grades.create');
@@ -57,6 +61,7 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::put('/admin/grades/{id}', [GradeController::class, 'update'])->name('admin.grades.update');
     Route::delete('/admin/grades/{id}', [GradeController::class, 'destroy'])->name('admin.grades.destroy');
 
+    Route::post('/admin/academic-years/set-current', [AcademicYearController::class, 'setCurrent'])->name('admin.academic-years.set-current');
     Route::get('/admin/academic-years', [AcademicYearController::class, 'index'])->name('admin.academic-years.index');
     Route::get('/admin/academic-years/data', [AcademicYearController::class, 'data'])->name('admin.academic-years.data');
     Route::get('/admin/academic-years/create', [AcademicYearController::class, 'create'])->name('admin.academic-years.create');

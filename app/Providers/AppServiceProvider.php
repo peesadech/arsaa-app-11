@@ -23,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
         try {
             $setting = \App\Models\Setting::first() ?? new \App\Models\Setting(['app_name' => 'Laravel']);
             \Illuminate\Support\Facades\View::share('setting', $setting);
+
+            $currentAcademicYear = \App\Models\AcademicYear::where('is_current_year', true)->first();
+            \Illuminate\Support\Facades\View::share('currentAcademicYear', $currentAcademicYear);
         } catch (\Exception $e) {
             // Handle cases where table might not exist yet during migration
         }
