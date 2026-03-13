@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/myWork/arsaa-app/courseio/app/Http/Controllers/Admin/**)",
+      "Bash(\"C:/Users/ADMINS/.config/herd/bin/php82.bat\" artisan:*)",
+      "Read(//d/myWork/arsaa-app/courseio/app/Providers/**)",
+      "Bash(cp \"D:/myWork/arsaa-app/courseio/public/css/app.css\" \"D:/myWork/arsaa-app/arsaa-app/public/css/app.css\")",
+      "Bash(cp \"D:/myWork/arsaa-app/courseio/public/js/app.js\" \"D:/myWork/arsaa-app/arsaa-app/public/js/app.js\")",
+      "Bash(\"C:/Users/ADMINS/.config/herd/bin/herd.bat\" links:*)",
+      "Bash(\"C:/Users/ADMINS/.config/herd/bin/herd.bat\" list:*)",
+      "Read(//c/Users/ADMINS/.config/herd/config/**)",
+      "Bash(\"C:/Users/ADMINS/.config/herd/bin/php82.bat\" artisan tinker --execute=\":*)",
+      "Bash(\"C:/Users/ADMINS/.config/herd/bin/php82.bat\" -r \":*)",
+      "Bash(echo '\\\\App\\\\Models\\\\User::firstOrCreate\\([\"\"\"\"email\"\"\"\" => \"\"\"\"admin@example.com\"\"\"\"], [\"\"\"\"name\"\"\"\" => \"\"\"\"Admin\"\"\"\", \"\"\"\"password\"\"\"\" => \\\\Illuminate\\\\Support\\\\Facades\\\\Hash::make\\(\"\"\"\"password123\"\"\"\"\\), \"\"\"\"role\"\"\"\" => \"\"\"\"admin\"\"\"\", \"\"\"\"status\"\"\"\" => 1, \"\"\"\"email_verified_at\"\"\"\" => now\\(\\)]\\); \\\\Spatie\\\\Permission\\\\Models\\\\Role::firstOrCreate\\([\"\"\"\"name\"\"\"\" => \"\"\"\"SuperAdmin\"\"\"\", \"\"\"\"guard_name\"\"\"\" => \"\"\"\"web\"\"\"\"]\\); \\\\Spatie\\\\Permission\\\\Models\\\\Role::firstOrCreate\\([\"\"\"\"name\"\"\"\" => \"\"\"\"admin\"\"\"\", \"\"\"\"guard_name\"\"\"\" => \"\"\"\"web\"\"\"\"]\\); \\\\App\\\\Models\\\\User::where\\(\"\"\"\"email\"\"\"\",\"\"\"\"admin@example.com\"\"\"\"\\)->first\\(\\)->syncRoles\\([\"\"\"\"SuperAdmin\"\"\"\",\"\"\"\"admin\"\"\"\"]\\); echo \"\"\"\"DONE\"\"\"\";')"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp \"D:/myWork/arsaa-app/courseio/resources/js/components/ExampleComponent.vue\" \"D:/myWork/arsaa-app/arsaa-app/resources/js/components/ExampleComponent.vue\")",
+      "Bash(cp \"D:/myWork/arsaa-app/courseio/resources/js/components/PermissionManager.vue\" \"D:/myWork/arsaa-app/arsaa-app/resources/js/components/PermissionManager.vue\")",
+      "Bash(cp \"D:/myWork/arsaa-app/courseio/resources/js/components/PermissionTypeCreate.vue\" \"D:/myWork/arsaa-app/arsaa-app/resources/js/components/PermissionTypeCreate.vue\")",
+      "Bash(cp \"D:/myWork/arsaa-app/courseio/resources/js/components/PermissionTypeManager.vue\" \"D:/myWork/arsaa-app/arsaa-app/resources/js/components/PermissionTypeManager.vue\")",
+      "Bash(cp \"D:/myWork/arsaa-app/courseio/resources/js/components/RoleManager.vue\" \"D:/myWork/arsaa-app/arsaa-app/resources/js/components/RoleManager.vue\")",
+      "Bash(cp \"D:/myWork/arsaa-app/courseio/resources/js/app.js\" \"D:/myWork/arsaa-app/arsaa-app/resources/js/app.js\")",
+      "Bash(cp \"D:/myWork/arsaa-app/courseio/resources/js/bootstrap.js\" \"D:/myWork/arsaa-app/arsaa-app/resources/js/bootstrap.js\")",
+      "Bash(cp \"D:/myWork/arsaa-app/courseio/resources/css/tailwind.css\" \"D:/myWork/arsaa-app/arsaa-app/resources/css/tailwind.css\")",
+      "Bash(\"C:/Users/ADMINS/AppData/Roaming/Herd/bin/composer.bat\" require:*)",
+      "Bash(where composer:*)",
+      "Bash(where php82:*)"
+    ]
+  }
+}
