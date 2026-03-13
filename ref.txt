@@ -1,1 +1,0 @@
-Set-Alias php82 "C:\Users\ADMINS\.config\herd\bin\php82\php.exe"

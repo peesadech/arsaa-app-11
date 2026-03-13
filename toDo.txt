@@ -1,0 +1,5 @@
+to do
+ต้องเพิ่ม ภาคเรียน ปัจจุบัน ด้วย
+ให้ สร้าง ห้องเรียน , รายวิชา ที่จะเปิด ตามปี การศึกษา
+
+Set-Alias php82 "C:\Users\ADMINS\.config\herd\bin\php82\php.exe"
