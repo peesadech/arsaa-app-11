@@ -27,4 +27,13 @@ class LoginController extends Controller implements HasMiddleware
 
         return $credentials;
     }
+
+    protected function authenticated(\Illuminate\Http\Request $request, $user)
+    {
+        $setting = \App\Models\CurrentAcademicSetting::first();
+        if ($setting) {
+            $request->session()->put('current_academic_year_id', $setting->academic_year_id);
+            $request->session()->put('current_semester_id', $setting->semester_id);
+        }
+    }
 }

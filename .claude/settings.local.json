@@ -11,7 +11,13 @@
       "Bash(cp \"D:/myWork/arsaa-app/courseio/resources/css/tailwind.css\" \"D:/myWork/arsaa-app/arsaa-app/resources/css/tailwind.css\")",
       "Bash(\"C:/Users/ADMINS/AppData/Roaming/Herd/bin/composer.bat\" require:*)",
       "Bash(where composer:*)",
-      "Bash(where php82:*)"
+      "Bash(where php82:*)",
+      "Read(//c/Users/ADMINS/AppData/Roaming/Herd/**)",
+      "Bash(where php:*)",
+      "Read(//c/Users/ADMINS/.config/herd/bin//**)",
+      "Bash(\"/c/Users/ADMINS/.config/herd/bin/php82\" artisan:*)",
+      "Bash(\"/c/Users/ADMINS/.config/herd/bin/php82.bat\" artisan:*)",
+      "Bash(\"/c/Users/ADMINS/.config/herd/bin/php82.bat\" check_roles.php)"
     ]
   }
 }

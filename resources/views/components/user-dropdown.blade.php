@@ -25,7 +25,8 @@
         transition: max-height 0.25s ease-out;
     }
     .setting-submenu.open {
-        max-height: 500px;
+        max-height: 1000px;
+        overflow: visible;
         transition: max-height 0.35s ease-in;
     }
 </style>
@@ -45,7 +46,7 @@
     </div>
 
     <!-- Dropdown Menu -->
-    <div class="user-dropdown-menu absolute right-0 mt-2 w-96 {{ $theme === 'dark' ? 'bg-[#242526] text-white' : 'bg-white text-slate-800' }} rounded-xl shadow-2xl ring-1 ring-black ring-opacity-10 overflow-hidden z-50">
+    <div class="user-dropdown-menu absolute right-0 mt-2 w-96 overflow-y-auto {{ $theme === 'dark' ? 'bg-[#242526] text-white' : 'bg-white text-slate-800' }} rounded-xl shadow-2xl ring-1 ring-black ring-opacity-10 z-50" style="max-height: 80vh;">
         <div class="p-4">
             <!-- Profile Section Card -->
             <a href="{{ route('profile.index') }}" class="block p-2 rounded-xl {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors cursor-pointer shadow-lg mb-4 border {{ $theme === 'dark' ? 'border-gray-700/50' : 'border-gray-100' }}">
@@ -130,14 +131,18 @@
                         </div>
                         <span class="font-medium text-sm">Permission Type</span>
                     </a>
-                    @role('SuperAdmin')
+                    <a href="javascript:void(0)" onclick="document.getElementById('academicYearGlobalModal').style.display='flex'" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">Academic Year & Semester</span>
+                    </a>
                     <a href="{{ route('admin.settings.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-cog text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">App Settings</span>
+                        <span class="font-medium text-sm">General Settings</span>
                     </a>
-                    @endrole
                 </div>
                 @endhasanyrole
 

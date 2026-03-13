@@ -99,6 +99,7 @@ class GoogleController extends Controller
                 }
 
                 Auth::login($finduser);
+                $this->setAcademicSession();
                 $token = auth('api')->login($finduser);
 
                 return view('auth.social_callback', [
@@ -127,6 +128,7 @@ class GoogleController extends Controller
                 $newUser->assignRole('user');
 
                 Auth::login($newUser);
+                $this->setAcademicSession();
                 $token = auth('api')->login($newUser);
 
                 return view('auth.social_callback', [
@@ -137,6 +139,15 @@ class GoogleController extends Controller
 
         } catch (Exception $e) {
             return redirect()->route('login')->with('error', 'Login failed: ' . $e->getMessage());
+        }
+    }
+
+    private function setAcademicSession()
+    {
+        $setting = \App\Models\CurrentAcademicSetting::first();
+        if ($setting) {
+            session(['current_academic_year_id' => $setting->academic_year_id]);
+            session(['current_semester_id' => $setting->semester_id]);
         }
     }
 }

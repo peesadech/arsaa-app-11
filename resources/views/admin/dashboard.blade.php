@@ -219,7 +219,7 @@
                             <i class="fas fa-cogs"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">{{ __('App Settings') }}</h3>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">{{ __('General Settings') }}</h3>
                             <p class="text-gray-500 dark:text-gray-400 text-sm mt-1 leading-relaxed">{{ __('Configure global application identity, name, and branding logo.') }}</p>
                         </div>
                         <div class="pt-4 flex items-center text-slate-600 dark:text-slate-400 text-sm font-bold">

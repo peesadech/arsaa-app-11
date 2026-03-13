@@ -43,7 +43,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
+Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
     Route::post('/admin/settings', [SettingController::class, 'update'])->name('admin.settings.update');
 });
@@ -62,6 +62,7 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::delete('/admin/grades/{id}', [GradeController::class, 'destroy'])->name('admin.grades.destroy');
 
     Route::post('/admin/academic-years/set-current', [AcademicYearController::class, 'setCurrent'])->name('admin.academic-years.set-current');
+    Route::post('/admin/academic-years/set-current-global', [AcademicYearController::class, 'setCurrentGlobal'])->name('admin.academic-years.set-current-global');
     Route::get('/admin/academic-years', [AcademicYearController::class, 'index'])->name('admin.academic-years.index');
     Route::get('/admin/academic-years/data', [AcademicYearController::class, 'data'])->name('admin.academic-years.data');
     Route::get('/admin/academic-years/create', [AcademicYearController::class, 'create'])->name('admin.academic-years.create');

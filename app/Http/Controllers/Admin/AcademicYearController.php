@@ -87,14 +87,37 @@ class AcademicYearController extends Controller
     {
         $request->validate([
             'academic_year_id' => 'required|exists:academic_years,id',
+            'semester_id' => 'required|exists:semesters,id',
         ]);
 
-        // Reset all
-        AcademicYear::where('is_current_year', true)->update(['is_current_year' => false]);
+        // Session only (navbar quick switch)
+        $request->session()->put('current_academic_year_id', $request->academic_year_id);
+        $request->session()->put('current_semester_id', $request->semester_id);
 
-        // Set selected
-        AcademicYear::where('id', $request->academic_year_id)->update(['is_current_year' => true]);
+        return back();
+    }
 
-        return back()->with('status', 'Current academic year updated!');
+    public function setCurrentGlobal(Request $request)
+    {
+        $request->validate([
+            'academic_year_id' => 'required|exists:academic_years,id',
+            'semester_id' => 'required|exists:semesters,id',
+        ]);
+
+        // Save to database (singleton row)
+        \App\Models\CurrentAcademicSetting::query()->delete();
+        \App\Models\CurrentAcademicSetting::create([
+            'academic_year_id' => $request->academic_year_id,
+            'semester_id' => $request->semester_id,
+        ]);
+
+        // Store in session
+        $request->session()->put('current_academic_year_id', $request->academic_year_id);
+        $request->session()->put('current_semester_id', $request->semester_id);
+
+        $year = AcademicYear::find($request->academic_year_id);
+        $semester = \App\Models\Semester::find($request->semester_id);
+
+        return back()->with('status', 'ตั้งค่าปีการศึกษา ' . ($year->year ?? '') . ' ภาคเรียนที่ ' . ($semester->semester_number ?? '') . ' เรียบร้อยแล้ว!');
     }
 }

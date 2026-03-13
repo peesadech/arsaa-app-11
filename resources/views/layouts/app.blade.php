@@ -187,11 +187,21 @@
                 </a>
                 @auth
                 @hasanyrole('admin|SuperAdmin')
-                <a href="javascript:void(0)" onclick="document.getElementById('academicYearModal').style.display='flex'" class="inline-flex items-center text-xs font-bold ml-2 gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer {{ isset($currentAcademicYear) ? 'bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100' : 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' }}">
+                @if(request()->routeIs('admin.dashboard') || request()->routeIs('home'))
+                <a href="javascript:void(0)" onclick="document.getElementById('academicYearModal').style.display='flex'" class="inline-flex items-center text-xs font-bold ml-2 gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer {{ session('current_academic_year_id') ? 'bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100' : 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' }}">
                     <i class="fas fa-graduation-cap text-[10px]"></i>
-                    {{ isset($currentAcademicYear) ? $currentAcademicYear->year : 'Select Year' }}
+                    @if(session('current_academic_year_id') && session('current_semester_id'))
+                        @php
+                            $sessionYear = \App\Models\AcademicYear::find(session('current_academic_year_id'));
+                            $sessionSemester = \App\Models\Semester::find(session('current_semester_id'));
+                        @endphp
+                        {{ $sessionYear->year ?? '' }}/{{ $sessionSemester->semester_number ?? '' }}
+                    @else
+                        เลือกปีการศึกษา
+                    @endif
                     <i class="fas fa-chevron-down text-[8px] ml-0.5"></i>
                 </a>
+                @endif
                 @endhasanyrole
                 @endauth
                 <div class="flex items-center space-x-4">
@@ -261,9 +271,9 @@
 
     @auth
     @hasanyrole('admin|SuperAdmin')
-    <!-- Academic Year Selection Modal -->
+    <!-- Academic Year & Semester Selection Modal -->
     <div id="academicYearModal" style="display:none" class="fixed inset-0 z-[9999] items-center justify-center bg-black/50 backdrop-blur-sm" onclick="if(event.target===this)this.style.display='none'">
-        <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+        <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
             <div class="p-6 border-b border-gray-100 dark:border-[#3a3b3c]">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -271,8 +281,8 @@
                             <i class="fas fa-graduation-cap text-indigo-600 dark:text-indigo-400"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-lg text-gray-900 dark:text-white">Academic Year</h3>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Select current academic year</p>
+                            <h3 class="font-bold text-lg text-gray-900 dark:text-white">ภาคเรียน & ปีการศึกษา</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">เลือกภาคเรียนและปีการศึกษา</p>
                         </div>
                     </div>
                     <button onclick="document.getElementById('academicYearModal').style.display='none'" class="transition-colors hover:opacity-80" style="border:0;background:none;">
@@ -280,38 +290,149 @@
                     </button>
                 </div>
             </div>
-            <div class="p-4 max-h-80 overflow-y-auto">
-                @php
-                    $academicYears = \App\Models\AcademicYear::where('status', 1)->orderBy('year', 'desc')->get();
-                @endphp
-                @forelse($academicYears as $ay)
-                <form method="POST" action="{{ route('admin.academic-years.set-current') }}" class="mb-1">
-                    @csrf
-                    <input type="hidden" name="academic_year_id" value="{{ $ay->id }}">
-                    <button type="submit" class="w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 {{ $ay->is_current_year ? 'bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-300 dark:border-indigo-700' : 'bg-gray-50 dark:bg-[#18191a] hover:bg-gray-100 dark:hover:bg-[#3a3b3c] border-2 border-gray-200 dark:border-[#3a3b3c]' }}">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl {{ $ay->is_current_year ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-gray-400' }} flex items-center justify-center font-bold text-sm">
-                                {{ $ay->year }}
-                            </div>
-                            <div class="text-left">
-                                <span class="font-bold text-sm text-gray-900 dark:text-white">ปีการศึกษา {{ $ay->year }}</span>
-                                @if($ay->is_current_year)
-                                <span class="block text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Current Year</span>
-                                @endif
-                            </div>
+            <form method="POST" action="{{ route('admin.academic-years.set-current') }}">
+                @csrf
+                <div class="p-4">
+                    @php
+                        $academicYears = \App\Models\AcademicYear::where('status', 1)->orderBy('year', 'desc')->get();
+                        $semesters = \App\Models\Semester::where('status', 1)->orderBy('semester_number', 'asc')->get();
+                    @endphp
+
+                    <!-- Semester Selection -->
+                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                        <i class="fas fa-book-open mr-1"></i> ภาคเรียน
+                    </label>
+                    <div class="flex gap-2 mb-4">
+                        @forelse($semesters as $sem)
+                        <label class="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl transition-all duration-200 cursor-pointer border-2 {{ session('current_semester_id') == $sem->id ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700' : 'bg-gray-50 dark:bg-[#18191a] hover:bg-gray-100 dark:hover:bg-[#3a3b3c] border-gray-200 dark:border-[#3a3b3c]' }}">
+                            <input type="radio" name="semester_id" value="{{ $sem->id }}" class="text-emerald-600 focus:ring-emerald-500" {{ session('current_semester_id') == $sem->id ? 'checked' : '' }}>
+                            <span class="font-bold text-sm text-gray-900 dark:text-white">ภาคเรียนที่ {{ $sem->semester_number }}</span>
+                        </label>
+                        @empty
+                        <div class="w-full text-center py-4 text-gray-400">
+                            <p class="text-sm font-medium">ไม่มีภาคเรียนที่เปิดใช้งาน</p>
                         </div>
-                        @if($ay->is_current_year)
-                        <i class="fas fa-check-circle text-indigo-600 dark:text-indigo-400"></i>
-                        @endif
-                    </button>
-                </form>
-                @empty
-                <div class="text-center py-8 text-gray-400">
-                    <i class="fas fa-calendar-times text-3xl mb-2"></i>
-                    <p class="text-sm font-medium">No active academic years</p>
+                        @endforelse
+                    </div>
+
+                    <!-- Academic Year Selection -->
+                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                        <i class="fas fa-calendar-alt mr-1"></i> ปีการศึกษา
+                    </label>
+                    <div class="max-h-48 overflow-y-auto mb-2 space-y-1">
+                        @forelse($academicYears as $ay)
+                        <label class="w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 cursor-pointer border-2 {{ session('current_academic_year_id') == $ay->id ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700' : 'bg-gray-50 dark:bg-[#18191a] hover:bg-gray-100 dark:hover:bg-[#3a3b3c] border-gray-200 dark:border-[#3a3b3c]' }}">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="academic_year_id" value="{{ $ay->id }}" class="text-indigo-600 focus:ring-indigo-500" {{ session('current_academic_year_id') == $ay->id ? 'checked' : '' }}>
+                                <div class="w-10 h-10 rounded-xl {{ session('current_academic_year_id') == $ay->id ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-gray-400' }} flex items-center justify-center font-bold text-sm">
+                                    {{ $ay->year }}
+                                </div>
+                                <span class="font-bold text-sm text-gray-900 dark:text-white">ปีการศึกษา {{ $ay->year }}</span>
+                            </div>
+                            @if(session('current_academic_year_id') == $ay->id)
+                            <i class="fas fa-check-circle text-indigo-600 dark:text-indigo-400"></i>
+                            @endif
+                        </label>
+                        @empty
+                        <div class="text-center py-6 text-gray-400">
+                            <i class="fas fa-calendar-times text-2xl mb-2"></i>
+                            <p class="text-sm font-medium">ไม่มีปีการศึกษาที่เปิดใช้งาน</p>
+                        </div>
+                        @endforelse
+                    </div>
                 </div>
-                @endforelse
+
+                <div class="p-4 border-t border-gray-100 dark:border-[#3a3b3c] flex justify-end gap-2">
+                    <button type="button" onclick="document.getElementById('academicYearModal').style.display='none'" class="px-4 py-2 text-sm font-bold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-[#3a3b3c] rounded-xl hover:bg-gray-200 dark:hover:bg-[#4a4b4c] transition-all">
+                        ยกเลิก
+                    </button>
+                    <button type="submit" class="px-6 py-2 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-none">
+                        <i class="fas fa-check mr-1"></i> เลือก
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Academic Year & Semester Global Setting Modal (saves to DB) -->
+    <div id="academicYearGlobalModal" style="display:none" class="fixed inset-0 z-[9999] items-center justify-center bg-black/50 backdrop-blur-sm" onclick="if(event.target===this)this.style.display='none'">
+        <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 dark:border-[#3a3b3c]">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-indigo-600 dark:text-indigo-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-900 dark:text-white">ภาคเรียน & ปีการศึกษา</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">ตั้งค่าภาคเรียนและปีการศึกษาปัจจุบันของระบบ</p>
+                        </div>
+                    </div>
+                    <button onclick="document.getElementById('academicYearGlobalModal').style.display='none'" class="transition-colors hover:opacity-80" style="border:0;background:none;">
+                        <i class="fas fa-times text-sm text-rose-400"></i>
+                    </button>
+                </div>
             </div>
+            <form method="POST" action="{{ route('admin.academic-years.set-current-global') }}">
+                @csrf
+                <div class="p-4">
+                    @php
+                        $globalSetting = \App\Models\CurrentAcademicSetting::first();
+                    @endphp
+
+                    <!-- Semester Selection -->
+                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                        <i class="fas fa-book-open mr-1"></i> ภาคเรียน
+                    </label>
+                    <div class="flex gap-2 mb-4">
+                        @forelse($semesters as $sem)
+                        <label class="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl transition-all duration-200 cursor-pointer border-2 {{ ($globalSetting && $globalSetting->semester_id == $sem->id) ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700' : 'bg-gray-50 dark:bg-[#18191a] hover:bg-gray-100 dark:hover:bg-[#3a3b3c] border-gray-200 dark:border-[#3a3b3c]' }}">
+                            <input type="radio" name="semester_id" value="{{ $sem->id }}" class="text-emerald-600 focus:ring-emerald-500" {{ ($globalSetting && $globalSetting->semester_id == $sem->id) ? 'checked' : '' }}>
+                            <span class="font-bold text-sm text-gray-900 dark:text-white">ภาคเรียนที่ {{ $sem->semester_number }}</span>
+                        </label>
+                        @empty
+                        <div class="w-full text-center py-4 text-gray-400">
+                            <p class="text-sm font-medium">ไม่มีภาคเรียนที่เปิดใช้งาน</p>
+                        </div>
+                        @endforelse
+                    </div>
+
+                    <!-- Academic Year Selection -->
+                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                        <i class="fas fa-calendar-alt mr-1"></i> ปีการศึกษา
+                    </label>
+                    <div class="max-h-48 overflow-y-auto mb-2 space-y-1">
+                        @forelse($academicYears as $ay)
+                        <label class="w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 cursor-pointer border-2 {{ ($globalSetting && $globalSetting->academic_year_id == $ay->id) ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700' : 'bg-gray-50 dark:bg-[#18191a] hover:bg-gray-100 dark:hover:bg-[#3a3b3c] border-gray-200 dark:border-[#3a3b3c]' }}">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="academic_year_id" value="{{ $ay->id }}" class="text-indigo-600 focus:ring-indigo-500" {{ ($globalSetting && $globalSetting->academic_year_id == $ay->id) ? 'checked' : '' }}>
+                                <div class="w-10 h-10 rounded-xl {{ ($globalSetting && $globalSetting->academic_year_id == $ay->id) ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-gray-400' }} flex items-center justify-center font-bold text-sm">
+                                    {{ $ay->year }}
+                                </div>
+                                <span class="font-bold text-sm text-gray-900 dark:text-white">ปีการศึกษา {{ $ay->year }}</span>
+                            </div>
+                            @if($globalSetting && $globalSetting->academic_year_id == $ay->id)
+                            <i class="fas fa-check-circle text-indigo-600 dark:text-indigo-400"></i>
+                            @endif
+                        </label>
+                        @empty
+                        <div class="text-center py-6 text-gray-400">
+                            <i class="fas fa-calendar-times text-2xl mb-2"></i>
+                            <p class="text-sm font-medium">ไม่มีปีการศึกษาที่เปิดใช้งาน</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="p-4 border-t border-gray-100 dark:border-[#3a3b3c] flex justify-end gap-2">
+                    <button type="button" onclick="document.getElementById('academicYearGlobalModal').style.display='none'" class="px-4 py-2 text-sm font-bold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-[#3a3b3c] rounded-xl hover:bg-gray-200 dark:hover:bg-[#4a4b4c] transition-all">
+                        ยกเลิก
+                    </button>
+                    <button type="submit" class="px-6 py-2 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-none">
+                        <i class="fas fa-save mr-1"></i> บันทึก
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
     @endhasanyrole
