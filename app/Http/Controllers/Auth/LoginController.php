@@ -35,5 +35,11 @@ class LoginController extends Controller implements HasMiddleware
             $request->session()->put('current_academic_year_id', $setting->academic_year_id);
             $request->session()->put('current_semester_id', $setting->semester_id);
         }
+
+        if ($user->hasRole(['SuperAdmin', 'admin'])) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('home');
     }
 }

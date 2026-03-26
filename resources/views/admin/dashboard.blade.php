@@ -169,6 +169,26 @@
                 </div>
             </a>
 
+            <!-- User Assignments Card -->
+            <a href="{{ route('admin.user-assignments') }}" class="group block">
+                <div class="h-full bg-white dark:bg-[#242526] rounded-3xl shadow-lg shadow-gray-200/40 dark:shadow-none border-2 border-transparent hover:border-violet-100 dark:hover:border-violet-900/50 transition-all duration-300 transform hover:-translate-y-2 p-8 overflow-hidden relative">
+                    <div class="absolute -right-4 -bottom-4 w-32 h-32 bg-violet-50 dark:bg-violet-900/20 rounded-full group-hover:scale-150 transition-transform duration-500 opacity-50"></div>
+                    <div class="relative z-10 space-y-4">
+                        <div class="w-14 h-14 rounded-2xl bg-violet-600 shadow-lg shadow-violet-200 dark:shadow-none flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-user-tag"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">{{ __('User Assignments') }}</h3>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1 leading-relaxed">{{ __('Assign and manage roles for each user in the system.') }}</p>
+                        </div>
+                        <div class="pt-4 flex items-center text-violet-600 dark:text-violet-400 text-sm font-bold">
+                            <span>{{ __('Assign Roles') }}</span>
+                            <i class="fas fa-chevron-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
             <!-- Permissions Card -->
             <a href="{{ route('admin.permissions') }}" class="group block">
                 <div class="h-full bg-white dark:bg-[#242526] rounded-3xl shadow-lg shadow-gray-200/40 dark:shadow-none border-2 border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/50 transition-all duration-300 transform hover:-translate-y-2 p-8 overflow-hidden relative">

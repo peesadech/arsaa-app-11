@@ -119,6 +119,12 @@
                         </div>
                         <span class="font-medium text-sm">Role Management</span>
                     </a>
+                    <a href="{{ route('admin.user-assignments') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-user-tag text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">User Assignments</span>
+                    </a>
                     <a href="{{ route('admin.permissions') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-key text-xs text-gray-400"></i>

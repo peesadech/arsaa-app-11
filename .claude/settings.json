@@ -13,7 +13,9 @@
       "Bash(\"C:/Users/ADMINS/.config/herd/bin/php82.bat\" -r \":*)",
       "Bash(echo '\\\\App\\\\Models\\\\User::firstOrCreate\\([\"\"\"\"email\"\"\"\" => \"\"\"\"admin@example.com\"\"\"\"], [\"\"\"\"name\"\"\"\" => \"\"\"\"Admin\"\"\"\", \"\"\"\"password\"\"\"\" => \\\\Illuminate\\\\Support\\\\Facades\\\\Hash::make\\(\"\"\"\"password123\"\"\"\"\\), \"\"\"\"role\"\"\"\" => \"\"\"\"admin\"\"\"\", \"\"\"\"status\"\"\"\" => 1, \"\"\"\"email_verified_at\"\"\"\" => now\\(\\)]\\); \\\\Spatie\\\\Permission\\\\Models\\\\Role::firstOrCreate\\([\"\"\"\"name\"\"\"\" => \"\"\"\"SuperAdmin\"\"\"\", \"\"\"\"guard_name\"\"\"\" => \"\"\"\"web\"\"\"\"]\\); \\\\Spatie\\\\Permission\\\\Models\\\\Role::firstOrCreate\\([\"\"\"\"name\"\"\"\" => \"\"\"\"admin\"\"\"\", \"\"\"\"guard_name\"\"\"\" => \"\"\"\"web\"\"\"\"]\\); \\\\App\\\\Models\\\\User::where\\(\"\"\"\"email\"\"\"\",\"\"\"\"admin@example.com\"\"\"\"\\)->first\\(\\)->syncRoles\\([\"\"\"\"SuperAdmin\"\"\"\",\"\"\"\"admin\"\"\"\"]\\); echo \"\"\"\"DONE\"\"\"\";')",
       "Bash(find /d/myWork/arsaa-app/arsaa-app/app/Livewire -type f -name *.php)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Read(//c/Users/ADMINS/AppData/Local/Herd/**)",
+      "Read(//c/Program Files/Herd/**)"
     ]
   }
 }

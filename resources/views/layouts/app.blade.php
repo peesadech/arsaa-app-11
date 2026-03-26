@@ -219,6 +219,12 @@
             </div>
         </nav>
 
+        @auth
+        @hasanyrole('admin|SuperAdmin')
+        @include('components.admin-nav')
+        @endhasanyrole
+        @endauth
+
         <main class="py-0">
             @yield('content')
         </main>

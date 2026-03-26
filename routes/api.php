@@ -25,11 +25,11 @@ Route::group([
     Route::post('me', [AuthController::class, 'me']);
 });
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware('auth:api,web')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('auth:api')->group(function () {
+Route::middleware('auth:api,web')->group(function () {
     Route::get('/permission-types/search/{keyword}', [PermissionTypeController::class, 'search']);
     Route::apiResource('permission-types', PermissionTypeController::class);
 
