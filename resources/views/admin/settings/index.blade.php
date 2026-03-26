@@ -30,7 +30,7 @@
     <div class="max-w-xl mx-auto">
         <!-- Breadcrumb / Header -->
         <div class="flex items-center space-x-4 mb-8">
-            <a href="{{ route('home') }}" 
+            <a href="{{ route('admin.dashboard') }}" 
                class="group flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-sm border border-gray-200 text-gray-500 hover:text-indigo-600 hover:border-indigo-300 transition-all duration-200">
                 <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
             </a>

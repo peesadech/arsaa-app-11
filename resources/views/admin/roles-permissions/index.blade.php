@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap4.min.css">
-    <style>
+   <style>
         .dataTables_wrapper .dataTables_paginate .paginate_button {
             padding: 0 !important;
             margin: 0 !important;
@@ -135,34 +135,36 @@
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10 space-y-4 md:space-y-0">
             <div class="flex items-center space-x-6">
-                <a href="{{ route('admin.dashboard') }}"
+                <a href="{{ route('admin.dashboard') }}" 
                    class="group flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#242526] shadow-sm border border-gray-200 dark:border-[#3a3b3c] text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 transition-all duration-200">
                     <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
-                </a>
+                </a> 
                 <div>
                     <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Role Management</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1 px-1">Create and manage system roles and their permissions</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1 px-1">Manage system roles and permissions</p>
                 </div>
             </div>
-
-            <div class="flex items-center gap-3">
-                <a href="{{ route('admin.user-assignments') }}"
-                   class="inline-flex items-center px-5 py-2.5 border border-indigo-200 dark:border-indigo-800 text-sm font-bold rounded-2xl text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all duration-200">
-                    <i class="fas fa-user-tag mr-2 opacity-75"></i>
-                    User Assignments
-                </a>
-                <button type="button" onclick="openCreateRoleModal()"
+            
+            <div>
+                <a href="{{ route('admin.roles.create') }}" 
                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-bold rounded-2xl shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5 active:scale-95">
                     <i class="fas fa-plus mr-2 opacity-75"></i>
                     New Role
-                </button>
+                </a>
             </div>
         </div>
+
+        @if (session('error'))
+            <div id="errorAlert" class="fixed bottom-4 right-4 z-50 flex items-center p-4 bg-rose-50 dark:bg-rose-900/30 border-l-4 border-rose-500 rounded-r-2xl shadow-xl transform transition-all duration-500 opacity-100" role="alert">
+                <i class="fas fa-exclamation-circle text-rose-500 mr-3 text-xl"></i>
+                <p class="text-sm font-bold text-rose-800 dark:text-rose-400">{{ session('error') }}</p>
+            </div>
+        @endif
 
         <!-- Main Content Card -->
         <div class="bg-white dark:bg-[#242526] rounded-[2.5rem] shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#3a3b3c] overflow-hidden transition-all duration-300 transform transition-all">
             <div class="p-6 sm:p-8">
-                <!-- Quick Filters -->
+                <!-- Advanced Filters -->
                 <div class="mb-8 p-6 bg-gray-50/50 dark:bg-[#18191a]/30 rounded-[2rem] border border-gray-100 dark:border-[#3a3b3c]/50">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div class="flex items-center space-x-3">
@@ -176,15 +178,6 @@
                         </div>
 
                         <div class="flex flex-wrap items-center gap-3">
-                            <!-- Permission Filter -->
-                            <div class="relative group">
-                                <select id="permissionFilter" class="appearance-none block w-full md:w-56 pl-4 pr-10 py-2.5 bg-white dark:bg-[#242526] border-2 border-gray-100 dark:border-[#3a3b3c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-0 focus:border-indigo-500 transition-all cursor-pointer">
-                                    <option value="">All Permissions</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
-                                    <i class="fas fa-chevron-down text-[10px]"></i>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -209,48 +202,9 @@
             <div class="px-8 py-5 bg-gray-50/50 dark:bg-[#18191a]/30 border-t border-gray-100 dark:border-[#3a3b3c]/50 flex items-center justify-between text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                 <span>Role Management System</span>
                 <span class="flex items-center">
-                    <i class="fas fa-user-shield mr-2"></i> Access Control
+                    <i class="fas fa-layer-group mr-2"></i> Administrative Control
                 </span>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Create Role Modal -->
-<div id="roleModal" class="fixed inset-0 z-50 overflow-y-auto hidden" role="dialog" aria-modal="true">
-    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500/75 dark:bg-black/75 backdrop-blur-sm transition-opacity" onclick="closeRoleModal()"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-        <div class="inline-block align-bottom bg-white dark:bg-[#242526] rounded-[2.5rem] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100 dark:border-[#3a3b3c] animate-modal-pop">
-            <form id="roleForm">
-                @csrf
-                <div class="px-8 pt-8 pb-4">
-                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 mb-6">
-                        <i class="fas fa-plus"></i>
-                    </div>
-                    <h3 class="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-1">Create New Role</h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-6 uppercase tracking-wider font-bold">Role identity and initial permissions</p>
-                    <div class="space-y-5">
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-1">Role Name</label>
-                            <input type="text" name="name" id="roleName" required
-                                class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#18191a] border-2 border-transparent focus:border-indigo-500 focus:bg-white dark:focus:bg-[#3a3b3c] focus:outline-none transition-all text-sm font-medium dark:text-white"
-                                placeholder="e.g. Moderator">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 px-1">Assign Initial Permissions</label>
-                            <select name="permissions[]" id="rolePermissions" multiple
-                                class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#18191a] border-2 border-transparent focus:border-indigo-500 focus:outline-none transition-all text-sm font-medium dark:text-white h-48">
-                            </select>
-                            <p class="mt-2 text-[10px] text-gray-400 px-1 font-medium">Hold Ctrl/Cmd to select multiple</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50/50 dark:bg-[#18191a]/30 px-8 py-6 flex flex-col sm:flex-row-reverse gap-3 border-t border-gray-100 dark:border-[#3a3b3c]">
-                    <button type="submit" class="inline-flex justify-center rounded-2xl border border-transparent shadow-lg shadow-indigo-200/50 px-8 py-3 bg-indigo-600 text-sm font-bold text-white hover:bg-indigo-700 focus:outline-none transition-all active:scale-95 uppercase tracking-wider text-xs">Register Role</button>
-                    <button type="button" onclick="closeRoleModal()" class="inline-flex justify-center rounded-2xl border-2 border-gray-100 dark:border-[#3a3b3c] px-8 py-3 bg-white dark:bg-[#242526] text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#3a3b3c] focus:outline-none transition-all active:scale-95 uppercase tracking-wider text-xs">Cancel</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>
@@ -258,7 +212,7 @@
 <!-- Delete Modal -->
 <div id="deleteModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500/75 dark:bg-black/75 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeDeleteModal()"></div>
+        <div class="fixed inset-0 bg-gray-500/75 dark:bg-black/75 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeModal()"></div>
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
         <div class="inline-block align-bottom bg-white dark:bg-[#242526] rounded-[2.5rem] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100 dark:border-[#3a3b3c] animate-modal-pop">
             <div class="bg-white dark:bg-[#242526] px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -267,16 +221,20 @@
                         <i class="fas fa-exclamation-triangle text-rose-600 text-xl"></i>
                     </div>
                     <div class="mt-3 text-center sm:mt-0 sm:ml-6 sm:text-left">
-                        <h3 class="text-xl leading-6 font-extrabold text-gray-900 dark:text-white tracking-tight" id="modal-title">Remove Role</h3>
+                        <h3 class="text-xl leading-6 font-extrabold text-gray-900 dark:text-white tracking-tight" id="modal-title">Confirm Deletion</h3>
                         <div class="mt-2 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                            Are you sure you want to delete <span id="deleteItemName" class="font-bold text-gray-900 dark:text-white px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-700 rounded-lg"></span>? Users with this role will lose their associated permissions.
+                            Are you sure you want to permanently remove <span id="itemNameToDelete" class="font-bold text-gray-900 dark:text-white px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-700 rounded-lg"></span>? This action cannot be undone.
                         </div>
                     </div>
                 </div>
             </div>
             <div class="bg-gray-50/50 dark:bg-[#18191a]/30 px-4 py-6 sm:px-8 sm:flex sm:flex-row-reverse space-y-3 sm:space-y-0 mt-8">
-                <button type="button" id="confirmDeleteBtn" class="w-full inline-flex justify-center rounded-2xl border border-transparent shadow-lg shadow-rose-200/50 dark:shadow-none px-8 py-3 bg-rose-600 text-base font-bold text-white hover:bg-rose-700 focus:outline-none transition-all duration-200 sm:w-auto transform active:scale-95 uppercase tracking-wider text-xs sm:ml-3">Confirm Delete</button>
-                <button type="button" onclick="closeDeleteModal()" class="w-full inline-flex justify-center rounded-2xl border-2 border-gray-100 dark:border-[#3a3b3c] px-8 py-3 bg-white dark:bg-[#242526] text-base font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#3a3b3c] focus:outline-none transition-all duration-200 sm:w-auto transform active:scale-95 uppercase tracking-wider text-xs">Cancel</button>
+                <form id="deleteForm" method="POST" class="sm:ml-3">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="w-full inline-flex justify-center rounded-2xl border border-transparent shadow-lg shadow-rose-200/50 dark:shadow-none px-8 py-3 bg-rose-600 text-base font-bold text-white hover:bg-rose-700 focus:outline-none transition-all duration-200 sm:w-auto transform active:scale-95 uppercase tracking-wider text-xs">Confirm Delete</button>
+                </form>
+                <button type="button" onclick="closeModal()" class="w-full inline-flex justify-center rounded-2xl border-2 border-gray-100 dark:border-[#3a3b3c] px-8 py-3 bg-white dark:bg-[#242526] text-base font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#3a3b3c] focus:outline-none transition-all duration-200 sm:w-auto transform active:scale-95 uppercase tracking-wider text-xs">Cancel</button>
             </div>
         </div>
     </div>
@@ -311,35 +269,24 @@
                 }
             });
 
-            let currentDeleteRoleId = null;
-
-            var rolesTable = $('#rolesTable').DataTable({
+            $('#rolesTable').DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
                 dom: '<"flex flex-wrap items-center justify-between mb-6"B><"grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6"lf>rt<"flex flex-col md:flex-row md:items-center md:justify-between mt-6"ip>',
                 buttons: [
-                    { extend: 'copy',  className: 'btn btn-sm' },
-                    { extend: 'csv',   className: 'btn btn-sm' },
+                    { extend: 'copy', className: 'btn btn-sm' },
+                    { extend: 'csv', className: 'btn btn-sm' },
                     { extend: 'excel', className: 'btn btn-sm' },
-                    { extend: 'pdf',   className: 'btn btn-sm' },
+                    { extend: 'pdf', className: 'btn btn-sm' },
                     { extend: 'print', className: 'btn btn-sm' }
                 ],
                 ajax: {
-                    url: "{{ route('admin.roles.data') }}",
-                    data: function(d) {
-                        d.permission = $('#permissionFilter').val();
-                    }
+                    url: "{{ route('admin.roles.data') }}"
                 },
                 columns: [
-                    {
-                        data: 'name', name: 'name',
-                        className: 'px-6 py-4 font-extrabold text-indigo-600 dark:text-indigo-400 tracking-tight uppercase text-xs',
-                        render: function(data) {
-                            return '<span class="font-extrabold text-indigo-600 tracking-tight uppercase">' + data + '</span>';
-                        }
-                    },
-                    { data: 'permissions_list', name: 'permissions_list', className: 'px-6 py-4' },
+                    { data: 'name', name: 'name', className: 'px-6 py-4 font-bold text-gray-800 dark:text-gray-200' },
+                    { data: 'permissions_list', name: 'permissions_list', orderable: false, searchable: false, className: 'px-6 py-4' },
                     { data: 'action', name: 'action', orderable: false, searchable: false, className: 'px-6 py-4 text-right' }
                 ],
                 language: {
@@ -357,64 +304,20 @@
                 }
             });
 
-            function loadPermissions() {
-                $.get('{{ route('admin.ajax.permissions') }}', function(data) {
-                    let options = '<option value="">All Permissions</option>';
-                    data.forEach(p => { options += '<option value="' + p.name + '">' + p.name + '</option>'; });
-                    $('#permissionFilter').html(options);
-                    $('#rolePermissions').html(data.map(p => '<option value="' + p.name + '">' + p.name + '</option>').join(''));
-                });
-            }
-            loadPermissions();
-
             // Handle Filter Change
-            $('#permissionFilter').on('change', function() {
-                rolesTable.ajax.reload();
-            });
-
-            window.openCreateRoleModal = function() {
-                $('#roleForm')[0].reset();
-                $('#roleModal').removeClass('hidden');
-                $('body').css('overflow', 'hidden');
-            };
-            window.closeRoleModal = function() {
-                $('#roleModal').addClass('hidden');
-                $('body').css('overflow', 'auto');
-            };
-
-            window.confirmDeleteRole = function(id, name) {
-                currentDeleteRoleId = id;
-                $('#deleteItemName').text(name);
-                $('#deleteModal').removeClass('hidden');
-                $('body').css('overflow', 'hidden');
-            };
-            window.closeDeleteModal = function() {
-                $('#deleteModal').addClass('hidden');
-                $('body').css('overflow', 'auto');
-            };
-
-            $('#roleForm').on('submit', function(e) {
-                e.preventDefault();
-                $.post('{{ route('admin.ajax.roles.store') }}', $(this).serialize(), function() {
-                    closeRoleModal();
-                    rolesTable.ajax.reload();
-                });
-            });
-
-            $('#confirmDeleteBtn').on('click', function() {
-                if (currentDeleteRoleId) {
-                    $.ajax({
-                        url: '{{ url('admin/ajax/roles') }}/' + currentDeleteRoleId,
-                        method: 'DELETE',
-                        data: { _token: '{{ csrf_token() }}' },
-                        success: function() {
-                            closeDeleteModal();
-                            rolesTable.ajax.reload();
-                        }
-                    });
-                }
-            });
         });
+
+        function confirmDelete(id, name) {
+            $('#itemNameToDelete').text(name);
+            $('#deleteForm').attr('action', '/admin/roles/' + id);
+            $('#deleteModal').removeClass('hidden');
+            $('body').css('overflow', 'hidden');
+        }
+
+        function closeModal() {
+            $('#deleteModal').addClass('hidden');
+            $('body').css('overflow', 'auto');
+        }
     </script>
 @endpush
 @endsection

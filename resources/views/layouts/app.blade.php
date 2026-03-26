@@ -36,9 +36,13 @@
         }
     </script>
     <style>
-        /* Global Dark Mode Transitions */
+        /* Global Transitions & Reset */
         body {
             transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        a {
+            text-decoration: none !important;
         }
         
         /* Dark Mode Global Overrides */

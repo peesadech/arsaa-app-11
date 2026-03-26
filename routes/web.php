@@ -143,7 +143,7 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
 
     // Admin Data (DataTables)
     Route::prefix('admin/data')->group(function () {
-        Route::get('/roles', [AdminDataController::class, 'roles'])->name('admin.roles.data');
+        Route::get('/roles', [AdminDataController::class, 'roles'])->name('admin.data.roles');
         Route::get('/users', [AdminDataController::class, 'users'])->name('admin.users.data');
     });
 
