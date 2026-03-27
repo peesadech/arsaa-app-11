@@ -83,7 +83,7 @@ class AcademicYearController extends Controller
         return redirect()->route('admin.academic-years.index')->with('status', 'Academic Year deleted successfully!');
     }
 
-    public function setCurrent(Request $request)
+    public function selectCurrent(Request $request)
     {
         $request->validate([
             'academic_year_id' => 'required|exists:academic_years,id',
@@ -97,7 +97,7 @@ class AcademicYearController extends Controller
         return back();
     }
 
-    public function setCurrentGlobal(Request $request)
+    public function selectCurrentGlobal(Request $request)
     {
         $request->validate([
             'academic_year_id' => 'required|exists:academic_years,id',

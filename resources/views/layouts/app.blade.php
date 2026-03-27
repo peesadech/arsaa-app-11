@@ -45,6 +45,41 @@
             text-decoration: none !important;
         }
         
+        /* Global Button Style */
+        .btn-app {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 1rem;
+            background-color: #111827;
+            color: #ffffff !important;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 9999px;
+            border: 1px solid #374151;
+            cursor: pointer;
+            text-decoration: none !important;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+            line-height: 1.5;
+        }
+        .btn-app:hover {
+            background-color: #1f2937;
+            border-color: #4b5563;
+            color: #ffffff !important;
+            text-decoration: none !important;
+        }
+        .btn-app:disabled, .btn-app[disabled] {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+        .dark .btn-app {
+            background-color: #1f2937;
+            border-color: #374151;
+        }
+        .dark .btn-app:hover {
+            background-color: #111827;
+        }
+
         /* Dark Mode Global Overrides */
         .dark body {
             background-color: #18191a !important;
@@ -190,7 +225,7 @@
                     <span>{{ $setting->app_name }}</span>
                 </a>
                 @auth
-                @hasanyrole('admin|SuperAdmin')
+                @if(collect(auth()->user()?->getRoleNames() ?? [])->map(fn($r) => strtoupper($r))->intersect(['ADMIN', 'SUPERADMIN'])->isNotEmpty())
                 @if(request()->routeIs('admin.dashboard') || request()->routeIs('home'))
                 <a href="javascript:void(0)" onclick="document.getElementById('academicYearModal').style.display='flex'" class="inline-flex items-center text-xs font-bold ml-2 gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer {{ session('current_academic_year_id') ? 'bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100' : 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' }}">
                     <i class="fas fa-graduation-cap text-[10px]"></i>
@@ -206,7 +241,7 @@
                     <i class="fas fa-chevron-down text-[8px] ml-0.5"></i>
                 </a>
                 @endif
-                @endhasanyrole
+                @endif
                 @endauth
                 <div class="flex items-center space-x-4">
                     @auth
@@ -224,9 +259,9 @@
         </nav>
 
         @auth
-        @hasanyrole('admin|SuperAdmin')
+        @if(collect(auth()->user()?->getRoleNames() ?? [])->map(fn($r) => strtoupper($r))->intersect(['ADMIN', 'SUPERADMIN'])->isNotEmpty())
         @include('components.admin-nav')
-        @endhasanyrole
+        @endif
         @endauth
 
         <main class="py-0">
@@ -280,7 +315,7 @@
     @stack('scripts')
 
     @auth
-    @hasanyrole('admin|SuperAdmin')
+    @if(collect(auth()->user()?->getRoleNames() ?? [])->map(fn($r) => strtoupper($r))->intersect(['ADMIN', 'SUPERADMIN'])->isNotEmpty())
     <!-- Academic Year & Semester Selection Modal -->
     <div id="academicYearModal" style="display:none" class="fixed inset-0 z-[9999] items-center justify-center bg-black/50 backdrop-blur-sm" onclick="if(event.target===this)this.style.display='none'">
         <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
@@ -300,7 +335,7 @@
                     </button>
                 </div>
             </div>
-            <form method="POST" action="{{ route('admin.academic-years.set-current') }}">
+            <form method="POST" action="{{ route('admin.academic-years.select-current') }}">
                 @csrf
                 <div class="p-4">
                     @php
@@ -383,7 +418,7 @@
                     </button>
                 </div>
             </div>
-            <form method="POST" action="{{ route('admin.academic-years.set-current-global') }}">
+            <form method="POST" action="{{ route('admin.academic-years.select-current-global') }}">
                 @csrf
                 <div class="p-4">
                     @php
@@ -445,7 +480,7 @@
             </form>
         </div>
     </div>
-    @endhasanyrole
+    @endif
     @endauth
 </body>
 </html>

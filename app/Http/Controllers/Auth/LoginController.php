@@ -36,7 +36,8 @@ class LoginController extends Controller implements HasMiddleware
             $request->session()->put('current_semester_id', $setting->semester_id);
         }
 
-        if ($user->hasRole(['SuperAdmin', 'admin'])) {
+        $userRoles = $user->getRoleNames()->map(fn($r) => strtoupper($r));
+        if ($userRoles->intersect(['SUPERADMIN', 'ADMIN'])->isNotEmpty()) {
             return redirect()->route('admin.dashboard');
         }
 

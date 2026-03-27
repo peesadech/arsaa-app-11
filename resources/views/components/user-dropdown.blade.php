@@ -63,7 +63,7 @@
 
             <!-- Management Section -->
             <div class="space-y-1">
-                @hasanyrole('admin|SuperAdmin')
+                @if(collect(auth()->user()?->getRoleNames() ?? [])->map(fn($r) => strtoupper($r))->intersect(['ADMIN', 'SUPERADMIN'])->isNotEmpty())
                 <!-- Setting toggle button -->
                 <a href="javascript:void(0)" onclick="document.getElementById('setting-submenu').classList.toggle('open'); this.querySelector('.setting-arrow').classList.toggle('rotate-180')" class="flex items-center justify-between p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors group cursor-pointer">
                     <div class="flex items-center space-x-3">
@@ -113,17 +113,12 @@
                         </div>
                         <span class="font-medium text-sm">Semester</span>
                     </a>
+                    @if(collect(auth()->user()?->getRoleNames() ?? [])->contains(fn($r) => strtoupper($r) === 'SUPERADMIN'))
                     <a href="{{ route('admin.roles-permissions') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-user-shield text-xs text-gray-400"></i>
                         </div>
                         <span class="font-medium text-sm">Role Management</span>
-                    </a>
-                    <a href="{{ route('admin.user-assignments') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
-                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
-                            <i class="fas fa-user-tag text-xs text-gray-400"></i>
-                        </div>
-                        <span class="font-medium text-sm">User Assignments</span>
                     </a>
                     <a href="{{ route('admin.permissions') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
@@ -149,8 +144,9 @@
                         </div>
                         <span class="font-medium text-sm">General Settings</span>
                     </a>
+                    @endif
                 </div>
-                @endhasanyrole
+                @endif
 
                 <a
                    href=""
