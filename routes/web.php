@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\AdminDataController;
 use App\Http\Controllers\Admin\RoleManagementController;
 use App\Http\Controllers\Admin\UserAssignmentController;
 use App\Http\Controllers\Admin\OpenedCourseController;
+use App\Http\Controllers\Admin\GlobalScheduleController;
 use App\Http\Controllers\Api\RoleController as ApiRoleController;
 use App\Http\Controllers\Api\PermissionController as ApiPermissionController;
 use App\Http\Controllers\Api\UserRoleController as ApiUserRoleController;
@@ -53,6 +54,10 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
     // Settings
     Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
     Route::post('/admin/settings', [SettingController::class, 'update'])->name('admin.settings.update');
+
+    // Global Schedule
+    Route::get('/admin/global-schedule', [GlobalScheduleController::class, 'index'])->name('admin.global-schedule.index');
+    Route::put('/admin/global-schedule', [GlobalScheduleController::class, 'update'])->name('admin.global-schedule.update');
 
     // Role Management
     Route::get('/admin/roles-permissions', [RoleManagementController::class, 'index'])->name('admin.roles-permissions');
