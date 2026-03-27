@@ -114,11 +114,17 @@
                         <span class="font-medium text-sm">Semester</span>
                     </a>
                     @if(collect(auth()->user()?->getRoleNames() ?? [])->contains(fn($r) => strtoupper($r) === 'SUPERADMIN'))
+                    <a href="{{ route('admin.education-levels.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-school text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">Education Level</span>
+                    </a>
                     <a href="{{ route('admin.global-schedule.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-calendar-check text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">กำหนดการเรียนการสอน</span>
+                        <span class="font-medium text-sm">Global Schedule</span>
                     </a>
                     <a href="{{ route('admin.roles-permissions') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">

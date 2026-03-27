@@ -29,7 +29,7 @@ class RoleManagementController extends Controller
             })
             ->addColumn('action', function ($role) {
                 $editUrl = route('admin.roles.edit', $role->id);
-                $btn = '<div class="flex space-x-2">';
+                $btn = '<div class="flex justify-end space-x-2">';
                 $btn .= '<a href="' . $editUrl . '" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white border border-gray-100 text-amber-500 hover:bg-amber-50 transition-all duration-200 shadow-sm" title="Edit"><i class="fas fa-edit text-xs"></i></a>';
                 $btn .= '<button type="button" onclick="confirmDelete(' . $role->id . ', \'' . addslashes($role->name) . '\')" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white border border-gray-100 text-rose-500 hover:bg-rose-50 transition-all duration-200 shadow-sm" title="Delete"><i class="fas fa-trash-alt text-xs"></i></button>';
                 $btn .= '</div>';

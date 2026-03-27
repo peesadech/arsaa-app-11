@@ -1,30 +1,30 @@
 @extends('layouts.app')
 
 @php
-    $isEdit = isset($grade);
-    $actionUrl = $isEdit ? route('admin.grades.update', $grade->id) : route('admin.grades.store');
-    
-    $title = $isEdit ? 'Edit Grade' : 'Create New Grade';
-    $subtitle = $isEdit ? 'Update grade details' : 'Grade Registration';
-    
+    $isEdit = isset($educationLevel);
+    $actionUrl = $isEdit ? route('admin.education-levels.update', $educationLevel->id) : route('admin.education-levels.store');
+
+    $title = $isEdit ? 'Edit Education Level' : 'Create New Education Level';
+    $subtitle = $isEdit ? 'Update education level details' : 'Education Level Registration';
+
     // Theme Configuration
     $gradientClass = $isEdit ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500' : 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500';
     $blurClass = $isEdit ? 'bg-amber-500/20' : 'bg-indigo-500/20';
     $iconBgClass = $isEdit ? 'bg-amber-50 border-amber-100' : 'bg-indigo-50 border-indigo-100 shadow-inner';
     $iconClass = $isEdit ? 'fa-edit text-amber-600 rotate-3' : 'fa-plus text-indigo-600 -rotate-3';
-    $cardTitle = $isEdit ? 'Modify Grade' : 'Grade Details';
-    $cardDesc = $isEdit 
-        ? "You are updating grade #{$grade->id}. Ensure all details are correct."
-        : 'Define a new system grade and its descriptions.';
-    
+    $cardTitle = $isEdit ? 'Modify Education Level' : 'Education Level Details';
+    $cardDesc = $isEdit
+        ? "You are updating education level #{$educationLevel->id}. Ensure all details are correct."
+        : 'Define a new education level and its descriptions.';
+
     $focusRing = $isEdit ? 'focus:border-amber-400' : 'focus:border-indigo-500';
     $focusText = $isEdit ? 'group-focus-within:text-amber-500' : 'group-focus-within:text-indigo-500';
-    
-    $btnClass = $isEdit 
+
+    $btnClass = $isEdit
         ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-amber-200'
         : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200';
-    
-    $btnText = $isEdit ? 'Save Changes' : 'Create Grade';
+
+    $btnText = $isEdit ? 'Save Changes' : 'Create Education Level';
     $btnIcon = $isEdit ? 'fa-save' : 'fa-check-circle';
 @endphp
 
@@ -33,7 +33,7 @@
     <div class="max-w-2xl mx-auto">
         <!-- Breadcrumb / Header -->
         <div class="flex items-center space-x-4 mb-8">
-            <a href="{{ route('admin.grades.index') }}" 
+            <a href="{{ route('admin.education-levels.index') }}"
                class="group flex items-center justify-center w-10 h-10 rounded-xl bg-white dark:bg-[#242526] shadow-sm border border-gray-200 dark:border-[#3a3b3c] text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 transition-all duration-200">
                 <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
             </a>
@@ -47,7 +47,7 @@
         <div class="bg-white dark:bg-[#242526] rounded-[2.5rem] shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#3a3b3c] overflow-hidden transform transition-all">
             <!-- Decorative Top Border -->
             <div class="h-2 {{ $gradientClass }}"></div>
-            
+
             <div class="p-8 sm:p-10">
                 <!-- Visual Identity Section -->
                 <div class="flex flex-col items-center text-center mb-10">
@@ -64,47 +64,17 @@
                 </div>
 
                 <!-- Form -->
-                <form action="{{ $actionUrl }}" method="POST" class="space-y-6" id="gradeForm">
+                <form action="{{ $actionUrl }}" method="POST" class="space-y-6" id="educationLevelForm">
                     @csrf
                     @if($isEdit)
                         @method('PUT')
                     @endif
-                    
-                    <!-- Education Level -->
-                    <div class="space-y-2">
-                        <label for="education_level_id" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                            Education Level
-                        </label>
-                        <div class="group relative">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
-                                <i class="fas fa-school text-sm"></i>
-                            </div>
-                            <select
-                                id="education_level_id"
-                                name="education_level_id"
-                                class="block w-full pl-10 pr-10 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 appearance-none @error('education_level_id') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
-                            >
-                                <option value="">-- Select Education Level --</option>
-                                @foreach($educationLevels as $level)
-                                    <option value="{{ $level->id }}" {{ old('education_level_id', $isEdit ? $grade->education_level_id : '') == $level->id ? 'selected' : '' }}>
-                                        {{ $level->name_th }} ({{ $level->name_en }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
-                                <i class="fas fa-chevron-down text-xs"></i>
-                            </div>
-                        </div>
-                        @error('education_level_id')
-                            <p class="text-[10px] font-bold text-rose-500 mt-1 px-1">{{ $message }}</p>
-                        @enderror
-                    </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Name TH -->
                         <div class="space-y-2">
                             <label for="name_th" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                                Name (Thai)
+                                Name 
                             </label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -115,8 +85,8 @@
                                     id="name_th"
                                     name="name_th"
                                     class="block w-full pl-10 pr-4 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('name_th') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
-                                    placeholder="เช่น มัธยมศึกษาปีที่ 1"
-                                    value="{{ old('name_th', $isEdit ? $grade->name_th : '') }}"
+                                    placeholder="เช่น ประถมศึกษา"
+                                    value="{{ old('name_th', $isEdit ? $educationLevel->name_th : '') }}"
                                     required
                                 />
                             </div>
@@ -139,8 +109,8 @@
                                     id="name_en"
                                     name="name_en"
                                     class="block w-full pl-10 pr-4 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('name_en') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
-                                    placeholder="e.g. Grade 7"
-                                    value="{{ old('name_en', $isEdit ? $grade->name_en : '') }}"
+                                    placeholder="e.g. Primary Education"
+                                    value="{{ old('name_en', $isEdit ? $educationLevel->name_en : '') }}"
                                     required
                                 />
                             </div>
@@ -165,7 +135,7 @@
                                 rows="4"
                                 class="block w-full pl-10 pr-4 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('description') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
                                 placeholder="รายละเอียดเพิ่มเติม..."
-                            >{{ old('description', $isEdit ? $grade->description : '') }}</textarea>
+                            >{{ old('description', $isEdit ? $educationLevel->description : '') }}</textarea>
                         </div>
                         @error('description')
                             <p class="text-[10px] font-bold text-rose-500 mt-1 px-1">{{ $message }}</p>
@@ -180,7 +150,7 @@
                         <div class="flex flex-wrap gap-2">
                             <!-- Active Status -->
                             <label class="relative group cursor-pointer">
-                                <input type="radio" name="status" value="1" class="peer hidden" {{ old('status', $isEdit ? $grade->status : 1) == 1 ? 'checked' : '' }}>
+                                <input type="radio" name="status" value="1" class="peer hidden" {{ old('status', $isEdit ? $educationLevel->status : 1) == 1 ? 'checked' : '' }}>
                                 <div class="px-4 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] bg-white dark:bg-[#242526] text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-600 dark:peer-checked:text-emerald-400 group-hover:border-gray-200 dark:group-hover:border-[#4a4b4c]">
                                     <div class="flex items-center">
                                         <i class="fas fa-check-circle mr-2 text-[10px] opacity-50"></i>
@@ -191,10 +161,10 @@
                                     <i class="fas fa-check"></i>
                                 </div>
                             </label>
-                            
+
                             <!-- Not Active Status -->
                             <label class="relative group cursor-pointer">
-                                <input type="radio" name="status" value="2" class="peer hidden" {{ old('status', $isEdit ? $grade->status : 1) == 2 ? 'checked' : '' }}>
+                                <input type="radio" name="status" value="2" class="peer hidden" {{ old('status', $isEdit ? $educationLevel->status : 1) == 2 ? 'checked' : '' }}>
                                 <div class="px-4 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] bg-white dark:bg-[#242526] text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:border-rose-500 peer-checked:bg-rose-50 dark:peer-checked:bg-rose-900/30 peer-checked:text-rose-600 dark:peer-checked:text-rose-400 group-hover:border-gray-200 dark:group-hover:border-[#4a4b4c]">
                                     <div class="flex items-center">
                                         <i class="fas fa-times-circle mr-2 text-[10px] opacity-50"></i>
@@ -213,7 +183,7 @@
 
                     <!-- Actions -->
                     <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-6">
-                        <button 
+                        <button
                             type="submit"
                             class="flex-1 group relative flex items-center justify-center px-8 py-4 {{ $btnClass }} font-bold rounded-2xl active:scale-95 transition-all duration-200 shadow-lg overflow-hidden"
                         >
@@ -223,8 +193,8 @@
                             </span>
                             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
                         </button>
-                        
-                        <a href="{{ route('admin.grades.index') }}" 
+
+                        <a href="{{ route('admin.education-levels.index') }}"
                            class="flex-1 flex items-center justify-center px-8 py-4 bg-white dark:bg-[#242526] text-gray-700 dark:text-gray-300 font-bold rounded-2xl border-2 border-gray-100 dark:border-[#3a3b3c] hover:border-gray-200 dark:hover:border-[#4a4b4c] hover:bg-gray-50 dark:hover:bg-[#3a3b3c] active:scale-95 transition-all duration-200">
                             {{ $isEdit ? 'Cancel' : 'Back to List' }}
                         </a>

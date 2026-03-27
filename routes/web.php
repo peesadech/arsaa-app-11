@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\RoleManagementController;
 use App\Http\Controllers\Admin\UserAssignmentController;
 use App\Http\Controllers\Admin\OpenedCourseController;
 use App\Http\Controllers\Admin\GlobalScheduleController;
+use App\Http\Controllers\Admin\EducationLevelController;
 use App\Http\Controllers\Api\RoleController as ApiRoleController;
 use App\Http\Controllers\Api\PermissionController as ApiPermissionController;
 use App\Http\Controllers\Api\UserRoleController as ApiUserRoleController;
@@ -57,7 +58,8 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
 
     // Global Schedule
     Route::get('/admin/global-schedule', [GlobalScheduleController::class, 'index'])->name('admin.global-schedule.index');
-    Route::put('/admin/global-schedule', [GlobalScheduleController::class, 'update'])->name('admin.global-schedule.update');
+    Route::get('/admin/global-schedule/{educationLevelId}/edit', [GlobalScheduleController::class, 'edit'])->name('admin.global-schedule.edit');
+    Route::put('/admin/global-schedule/{educationLevelId}', [GlobalScheduleController::class, 'update'])->name('admin.global-schedule.update');
 
     // Role Management
     Route::get('/admin/roles-permissions', [RoleManagementController::class, 'index'])->name('admin.roles-permissions');
@@ -85,6 +87,15 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
     Route::get('/admin/permission-types/{id}/edit', [PermissionTypeWebController::class, 'edit'])->name('admin.permission-types.edit');
     Route::put('/admin/permission-types/{id}', [PermissionTypeWebController::class, 'update'])->name('admin.permission-types.update');
     Route::delete('/admin/permission-types/{id}', [PermissionTypeWebController::class, 'destroy'])->name('admin.permission-types.destroy');
+
+    // Education Levels
+    Route::get('/admin/education-levels', [EducationLevelController::class, 'index'])->name('admin.education-levels.index');
+    Route::get('/admin/education-levels/data', [EducationLevelController::class, 'data'])->name('admin.education-levels.data');
+    Route::get('/admin/education-levels/create', [EducationLevelController::class, 'create'])->name('admin.education-levels.create');
+    Route::post('/admin/education-levels', [EducationLevelController::class, 'store'])->name('admin.education-levels.store');
+    Route::get('/admin/education-levels/{id}/edit', [EducationLevelController::class, 'edit'])->name('admin.education-levels.edit');
+    Route::put('/admin/education-levels/{id}', [EducationLevelController::class, 'update'])->name('admin.education-levels.update');
+    Route::delete('/admin/education-levels/{id}', [EducationLevelController::class, 'destroy'])->name('admin.education-levels.destroy');
 
     // Academic Years (CRUD — SuperAdmin only)
     Route::get('/admin/academic-years', [AcademicYearController::class, 'index'])->name('admin.academic-years.index');

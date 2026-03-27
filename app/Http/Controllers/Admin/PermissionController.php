@@ -20,9 +20,9 @@ class PermissionController extends Controller
             return datatables()->of($query)
                 ->addColumn('action', function ($row) {
                     $editUrl = route('admin.permissions.edit', $row->id);
-                    $btn = '<div class="space-x-2">';
-                    $btn .= '<a href="' . $editUrl . '" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-gray-200 text-amber-500 hover:border-amber-400 hover:bg-amber-50 transition-all duration-200 shadow-sm hover:shadow-md" title="Edit Permission"><i class="fas fa-pen-nib text-sm"></i></a>';
-                    $btn .= '<button type="button" onclick="confirmDelete(' . $row->id . ', \'' . addslashes($row->name) . '\')" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-gray-200 text-rose-500 hover:border-rose-400 hover:bg-rose-50 transition-all duration-200 shadow-sm hover:shadow-md" title="Delete Permission"><i class="fas fa-trash-alt text-sm"></i></button>';
+                    $btn = '<div class="flex justify-end space-x-2">';
+                    $btn .= '<a href="' . $editUrl . '" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white border border-gray-100 text-amber-500 hover:bg-amber-50 transition-all duration-200 shadow-sm" title="Edit"><i class="fas fa-edit text-xs"></i></a>';
+                    $btn .= '<button type="button" onclick="confirmDelete(' . $row->id . ', \'' . addslashes($row->name) . '\')" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white border border-gray-100 text-rose-500 hover:bg-rose-50 transition-all duration-200 shadow-sm" title="Delete"><i class="fas fa-trash-alt text-xs"></i></button>';
                     $btn .= '</div>';
                     return $btn;
                 })

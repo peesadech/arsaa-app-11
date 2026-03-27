@@ -9,6 +9,7 @@ class GlobalSchedule extends Model
     protected $table = 'global_schedules';
 
     protected $fillable = [
+        'education_level_id',
         'teaching_days',
         'start_time',
         'period_duration',
@@ -19,4 +20,9 @@ class GlobalSchedule extends Model
         'teaching_days' => 'array',
         'day_configs'   => 'array',
     ];
+
+    public function educationLevel()
+    {
+        return $this->belongsTo(EducationLevel::class);
+    }
 }

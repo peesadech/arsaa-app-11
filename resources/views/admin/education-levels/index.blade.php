@@ -135,21 +135,21 @@
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10 space-y-4 md:space-y-0">
             <div class="flex items-center space-x-6">
-                <a href="{{ route('admin.dashboard') }}" 
+                <a href="{{ route('admin.dashboard') }}"
                    class="group flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#242526] shadow-sm border border-gray-200 dark:border-[#3a3b3c] text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 transition-all duration-200">
                     <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
-                </a> 
+                </a>
                 <div>
-                    <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Grade Management</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1 px-1">Manage system grades and levels</p>
+                    <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Education Level Management</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1 px-1">Manage education levels and categories</p>
                 </div>
             </div>
-            
+
             <div>
-                <a href="{{ route('admin.grades.create') }}" 
+                <a href="{{ route('admin.education-levels.create') }}"
                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-bold rounded-2xl shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5 active:scale-95">
                     <i class="fas fa-plus mr-2 opacity-75"></i>
-                    New Grade
+                    New Education Level
                 </a>
             </div>
         </div>
@@ -173,23 +173,11 @@
                             </div>
                             <div>
                                 <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Quick Filters</h3>
-                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Refine grade list</p>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Refine education level list</p>
                             </div>
                         </div>
 
                         <div class="flex flex-wrap items-center gap-3">
-                            <!-- Education Level Filter -->
-                            <div class="relative group">
-                                <select id="educationLevelFilter" class="appearance-none block w-full md:w-56 pl-4 pr-10 py-2.5 bg-white dark:bg-[#242526] border-2 border-gray-100 dark:border-[#3a3b3c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-0 focus:border-indigo-500 transition-all cursor-pointer">
-                                    <option value="">All Education Levels</option>
-                                    @foreach(\App\Models\EducationLevel::where('status', 1)->get() as $level)
-                                        <option value="{{ $level->id }}">{{ $level->name_th }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
-                                    <i class="fas fa-chevron-down text-[10px]"></i>
-                                </div>
-                            </div>
                             <!-- Status Filter -->
                             <div class="relative group">
                                 <select id="statusFilter" class="appearance-none block w-full md:w-48 pl-4 pr-10 py-2.5 bg-white dark:bg-[#242526] border-2 border-gray-100 dark:border-[#3a3b3c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-0 focus:border-indigo-500 transition-all cursor-pointer">
@@ -206,11 +194,10 @@
                 </div>
 
                 <div class="overflow-x-auto lg:overflow-visible">
-                    <table id="gradesTable" class="w-full text-left border-collapse whitespace-nowrap lg:whitespace-normal">
+                    <table id="educationLevelsTable" class="w-full text-left border-collapse whitespace-nowrap lg:whitespace-normal">
                         <thead>
                             <tr class="bg-gray-50/50 dark:bg-[#18191a]/30 border-b border-gray-100 dark:border-[#3a3b3c]/50">
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest first:rounded-tl-2xl">Education Level</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Name (Thai)</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest first:rounded-tl-2xl">Name </th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Name (English)</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Description</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center">Status</th>
@@ -226,9 +213,9 @@
 
             <!-- Contextual Footer -->
             <div class="px-8 py-5 bg-gray-50/50 dark:bg-[#18191a]/30 border-t border-gray-100 dark:border-[#3a3b3c]/50 flex items-center justify-between text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                <span>Grade Management System</span>
+                <span>Education Level Management System</span>
                 <span class="flex items-center">
-                    <i class="fas fa-layer-group mr-2"></i> Administrative Control
+                    <i class="fas fa-graduation-cap mr-2"></i> Administrative Control
                 </span>
             </div>
         </div>
@@ -295,7 +282,7 @@
                 }
             });
 
-            $('#gradesTable').DataTable({
+            $('#educationLevelsTable').DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
@@ -308,14 +295,12 @@
                     { extend: 'print', className: 'btn btn-sm' }
                 ],
                 ajax: {
-                    url: "{{ route('admin.grades.data') }}",
+                    url: "{{ route('admin.education-levels.data') }}",
                     data: function (d) {
                         d.status = $('#statusFilter').val();
-                        d.education_level_id = $('#educationLevelFilter').val();
                     }
                 },
                 columns: [
-                    { data: 'education_level_name', name: 'education_level_name', orderable: false, searchable: false, className: 'px-6 py-4' },
                     { data: 'name_th', name: 'name_th', className: 'px-6 py-4 font-bold text-gray-800 dark:text-gray-200' },
                     { data: 'name_en', name: 'name_en', className: 'px-6 py-4' },
                     { data: 'description', name: 'description', className: 'px-6 py-4 text-xs' },
@@ -324,7 +309,7 @@
                 ],
                 language: {
                     search: "",
-                    searchPlaceholder: "Search grades...",
+                    searchPlaceholder: "Search education levels...",
                     lengthMenu: "Show _MENU_",
                     paginate: {
                         previous: '<i class="fas fa-chevron-left"></i>',
@@ -338,14 +323,14 @@
             });
 
             // Handle Filter Change
-            $('#statusFilter, #educationLevelFilter').on('change', function() {
-                $('#gradesTable').DataTable().draw();
+            $('#statusFilter').on('change', function() {
+                $('#educationLevelsTable').DataTable().draw();
             });
         });
 
         function confirmDelete(id, name) {
             $('#itemNameToDelete').text(name);
-            $('#deleteForm').attr('action', '/admin/grades/' + id);
+            $('#deleteForm').attr('action', '/admin/education-levels/' + id);
             $('#deleteModal').removeClass('hidden');
             $('body').css('overflow', 'hidden');
         }
