@@ -220,7 +220,7 @@
             <div class="container">
                 <a class="navbar-brand flex items-center gap-2" href="{{ url('/') }}">
                     @if($setting->app_logo)
-                        <img src="{{ asset('storage/' . $setting->app_logo) }}" alt="Logo" class="h-8 w-auto">
+                        <img src="{{ asset('storage/' . $setting->app_logo) }}" alt="Logo" class="h-8 w-8 rounded-full object-cover">
                     @endif
                     <span>{{ $setting->app_name }}</span>
                 </a>

@@ -8,7 +8,7 @@
                 @if($setting->app_logo)
                     <div class="relative inline-block group">
                         <div class="absolute inset-0 bg-indigo-500 blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 rounded-full"></div>
-                        <img src="{{ asset('storage/' . $setting->app_logo) }}" alt="Logo" class="relative hover:-translate-y-2 transition-transform duration-500 drop-shadow-2xl" style="height: 120px; width: auto; display: block; margin: 0 auto 20px;">
+                        <img src="{{ asset('storage/' . $setting->app_logo) }}" alt="Logo" class="relative hover:-translate-y-2 transition-transform duration-500 drop-shadow-2xl" style="height: 120px; width: auto; display: block; margin: 0 auto 20px; border-radius: 50%;">
                     </div>
                 @endif
                 <h1 class="text-6xl font-black tracking-tighter text-slate-800 mb-8 drop-shadow-sm">
