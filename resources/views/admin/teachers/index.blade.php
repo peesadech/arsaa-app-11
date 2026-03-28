@@ -135,21 +135,21 @@
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10 space-y-4 md:space-y-0">
             <div class="flex items-center space-x-6">
-                <a href="{{ route('admin.dashboard') }}" 
+                <a href="{{ route('admin.dashboard') }}"
                    class="group flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#242526] shadow-sm border border-gray-200 dark:border-[#3a3b3c] text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 transition-all duration-200">
                     <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
-                </a> 
+                </a>
                 <div>
-                    <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Course Management</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1 px-1">Manage system courses</p>
+                    <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Teacher Management</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1 px-1">Manage teachers and their assigned courses</p>
                 </div>
             </div>
-            
+
             <div>
-                <a href="{{ route('admin.courses.create') }}" 
+                <a href="{{ route('admin.teachers.create') }}"
                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-bold rounded-2xl shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5 active:scale-95">
-                    <i class="fas fa-plus mr-2 opacity-75"></i>
-                    New Course
+                    <i class="fas fa-chalkboard-teacher mr-2 opacity-75"></i>
+                    New Teacher
                 </a>
             </div>
         </div>
@@ -173,24 +173,11 @@
                             </div>
                             <div>
                                 <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Quick Filters</h3>
-                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Refine course list</p>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Refine teacher list by criteria</p>
                             </div>
                         </div>
 
                         <div class="flex flex-wrap items-center gap-3">
-                            <!-- Subject Group Filter -->
-                            <div class="relative group">
-                                <select id="subjectGroupFilter" class="appearance-none block w-full md:w-48 pl-4 pr-10 py-2.5 bg-white dark:bg-[#242526] border-2 border-gray-100 dark:border-[#3a3b3c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-0 focus:border-indigo-500 transition-all cursor-pointer">
-                                    <option value="">All Subject Groups</option>
-                                    @foreach($subjectGroups as $sg)
-                                        <option value="{{ $sg->id }}">{{ $sg->name_th }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
-                                    <i class="fas fa-chevron-down text-[10px]"></i>
-                                </div>
-                            </div>
-
                             <!-- Status Filter -->
                             <div class="relative group">
                                 <select id="statusFilter" class="appearance-none block w-full md:w-48 pl-4 pr-10 py-2.5 bg-white dark:bg-[#242526] border-2 border-gray-100 dark:border-[#3a3b3c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-0 focus:border-indigo-500 transition-all cursor-pointer">
@@ -207,29 +194,26 @@
                 </div>
 
                 <div class="overflow-x-auto lg:overflow-visible">
-                    <table id="coursesTable" class="w-full text-left border-collapse whitespace-nowrap lg:whitespace-normal">
+                    <table id="teachersTable" class="w-full text-left border-collapse whitespace-nowrap lg:whitespace-normal">
                         <thead>
                             <tr class="bg-gray-50/50 dark:bg-[#18191a]/30 border-b border-gray-100 dark:border-[#3a3b3c]/50">
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest first:rounded-tl-2xl">Course Name</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Subject Group</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Grade</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Semester</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center">Status</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest first:rounded-tl-2xl">Avatar</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Teacher Details</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Courses</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Status</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-right last:rounded-tr-2xl">Action</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50 dark:divide-[#3a3b3c]/50 text-gray-600 dark:text-gray-400 text-sm">
-                            <!-- DataTables will fill this -->
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Contextual Footer -->
             <div class="px-8 py-5 bg-gray-50/50 dark:bg-[#18191a]/30 border-t border-gray-100 dark:border-[#3a3b3c]/50 flex items-center justify-between text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                <span>Course Management System</span>
+                <span>Teacher Management System</span>
                 <span class="flex items-center">
-                    <i class="fas fa-layer-group mr-2"></i> Administrative Control
+                    <i class="fas fa-chalkboard-teacher mr-2"></i> Administrative Control
                 </span>
             </div>
         </div>
@@ -250,7 +234,7 @@
                     <div class="mt-3 text-center sm:mt-0 sm:ml-6 sm:text-left">
                         <h3 class="text-xl leading-6 font-extrabold text-gray-900 dark:text-white tracking-tight" id="modal-title">Confirm Deletion</h3>
                         <div class="mt-2 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                            Are you sure you want to permanently remove <span id="itemNameToDelete" class="font-bold text-gray-900 dark:text-white px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-700 rounded-lg"></span>? This action cannot be undone.
+                            Are you sure you want to permanently remove <span id="teacherNameToDelete" class="font-bold text-gray-900 dark:text-white px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-700 rounded-lg"></span>? This action cannot be undone.
                         </div>
                     </div>
                 </div>
@@ -281,9 +265,8 @@
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
 
-    <script>
+    <script shadow>
         $(document).ready(function() {
-            // Auto-dismiss alert
             const alerts = ['statusAlert', 'errorAlert'];
             alerts.forEach(alertId => {
                 const alert = document.getElementById(alertId);
@@ -296,7 +279,7 @@
                 }
             });
 
-            $('#coursesTable').DataTable({
+            $('#teachersTable').DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
@@ -309,23 +292,33 @@
                     { extend: 'print', className: 'btn btn-sm' }
                 ],
                 ajax: {
-                    url: "{{ route('admin.courses.data') }}",
+                    url: "{{ route('admin.teachers.data') }}",
                     data: function (d) {
                         d.status = $('#statusFilter').val();
-                        d.subject_group_id = $('#subjectGroupFilter').val();
                     }
                 },
                 columns: [
-                    { data: 'name', name: 'name', className: 'px-6 py-4 font-bold text-gray-800 dark:text-gray-200' },
-                    { data: 'subject_group_name', name: 'subject_group_id', orderable: false, searchable: false, className: 'px-6 py-4' },
-                    { data: 'grade_name', name: 'grade.name_th', orderable: false, searchable: false, className: 'px-6 py-4' },
-                    { data: 'semester_name', name: 'semester.semester_number', orderable: false, searchable: false, className: 'px-6 py-4' },
+                    { data: 'avatar', name: 'avatar', orderable: false, searchable: false, className: 'px-6 py-4' },
+                    {
+                        data: null,
+                        name: 'name',
+                        className: 'px-6 py-4',
+                        render: function(data) {
+                            var phone = data.phone ? '<div class="text-xs text-gray-400 dark:text-gray-500"><i class="fas fa-phone text-[10px] mr-1"></i>' + data.phone + '</div>' : '';
+                            return '<div>' +
+                                   '<div class="text-base font-bold text-gray-800 dark:text-gray-200 tracking-tight">' + data.name + '</div>' +
+                                   '<div class="text-xs text-gray-500 dark:text-gray-400">' + data.email + '</div>' +
+                                   phone +
+                                   '</div>';
+                        }
+                    },
+                    { data: 'courses_list', name: 'courses_list', orderable: false, className: 'px-6 py-4' },
                     { data: 'status', name: 'status', orderable: true, className: 'px-6 py-4 text-center' },
                     { data: 'action', name: 'action', orderable: false, searchable: false, className: 'px-6 py-4 text-right' }
                 ],
                 language: {
                     search: "",
-                    searchPlaceholder: "Search courses...",
+                    searchPlaceholder: "Search teachers...",
                     lengthMenu: "Show _MENU_",
                     paginate: {
                         previous: '<i class="fas fa-chevron-left"></i>',
@@ -338,15 +331,14 @@
                 }
             });
 
-            // Handle Filter Change
-            $('#statusFilter, #subjectGroupFilter').on('change', function() {
-                $('#coursesTable').DataTable().draw();
+            $('#statusFilter').on('change', function() {
+                $('#teachersTable').DataTable().draw();
             });
         });
 
         function confirmDelete(id, name) {
-            $('#itemNameToDelete').text(name);
-            $('#deleteForm').attr('action', '/admin/courses/' + id);
+            $('#teacherNameToDelete').text(name);
+            $('#deleteForm').attr('action', '/admin/teachers/' + id);
             $('#deleteModal').removeClass('hidden');
             $('body').css('overflow', 'hidden');
         }

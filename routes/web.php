@@ -24,6 +24,8 @@ use App\Http\Controllers\Admin\OpenedCourseController;
 use App\Http\Controllers\Admin\GlobalScheduleController;
 use App\Http\Controllers\Admin\YearlyScheduleController;
 use App\Http\Controllers\Admin\EducationLevelController;
+use App\Http\Controllers\Admin\SubjectGroupController;
+use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Api\RoleController as ApiRoleController;
 use App\Http\Controllers\Api\PermissionController as ApiPermissionController;
 use App\Http\Controllers\Api\UserRoleController as ApiUserRoleController;
@@ -97,6 +99,15 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
     Route::get('/admin/education-levels/{id}/edit', [EducationLevelController::class, 'edit'])->name('admin.education-levels.edit');
     Route::put('/admin/education-levels/{id}', [EducationLevelController::class, 'update'])->name('admin.education-levels.update');
     Route::delete('/admin/education-levels/{id}', [EducationLevelController::class, 'destroy'])->name('admin.education-levels.destroy');
+
+    // Subject Groups
+    Route::get('/admin/subject-groups', [SubjectGroupController::class, 'index'])->name('admin.subject-groups.index');
+    Route::get('/admin/subject-groups/data', [SubjectGroupController::class, 'data'])->name('admin.subject-groups.data');
+    Route::get('/admin/subject-groups/create', [SubjectGroupController::class, 'create'])->name('admin.subject-groups.create');
+    Route::post('/admin/subject-groups', [SubjectGroupController::class, 'store'])->name('admin.subject-groups.store');
+    Route::get('/admin/subject-groups/{id}/edit', [SubjectGroupController::class, 'edit'])->name('admin.subject-groups.edit');
+    Route::put('/admin/subject-groups/{id}', [SubjectGroupController::class, 'update'])->name('admin.subject-groups.update');
+    Route::delete('/admin/subject-groups/{id}', [SubjectGroupController::class, 'destroy'])->name('admin.subject-groups.destroy');
 
     // Academic Years (CRUD — SuperAdmin only)
     Route::get('/admin/academic-years', [AcademicYearController::class, 'index'])->name('admin.academic-years.index');
@@ -180,6 +191,17 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::get('/admin/courses/{id}/edit', [CourseController::class, 'edit'])->name('admin.courses.edit');
     Route::put('/admin/courses/{id}', [CourseController::class, 'update'])->name('admin.courses.update');
     Route::delete('/admin/courses/{id}', [CourseController::class, 'destroy'])->name('admin.courses.destroy');
+
+    // Teacher Management
+    Route::get('/admin/teachers', [TeacherController::class, 'index'])->name('admin.teachers.index');
+    Route::get('/admin/teachers/data', [TeacherController::class, 'data'])->name('admin.teachers.data');
+    Route::get('/admin/teachers/search-courses', [TeacherController::class, 'searchCourses'])->name('admin.teachers.search-courses');
+    Route::get('/admin/teachers/schedule-data', [TeacherController::class, 'scheduleData'])->name('admin.teachers.schedule-data');
+    Route::get('/admin/teachers/create', [TeacherController::class, 'create'])->name('admin.teachers.create');
+    Route::post('/admin/teachers', [TeacherController::class, 'store'])->name('admin.teachers.store');
+    Route::get('/admin/teachers/{id}/edit', [TeacherController::class, 'edit'])->name('admin.teachers.edit');
+    Route::put('/admin/teachers/{id}', [TeacherController::class, 'update'])->name('admin.teachers.update');
+    Route::delete('/admin/teachers/{id}', [TeacherController::class, 'destroy'])->name('admin.teachers.destroy');
 
     // User Management
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');

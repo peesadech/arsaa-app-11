@@ -346,7 +346,7 @@
                     { data: 'roles_list', name: 'roles_list', orderable: false, className: 'px-6 py-4' },
                     { data: 'status', name: 'status', orderable: true, className: 'px-6 py-4 text-center' },
                     { data: 'email_verified', name: 'email_verified', orderable: false, searchable: true, className: 'px-6 py-4 text-center' },
-                    { data: 'action', name: 'action', orderable: false, searchable: false, className: 'px-6 py-4 text-right' }
+                    { data: 'action', name: 'action', orderable: false, searchable: false, className: 'px-6 py-4 text-right ' }
                 ],
                 language: {
                     search: "",

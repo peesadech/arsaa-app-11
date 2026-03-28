@@ -77,6 +77,12 @@
 
                 <!-- Setting Sub-menu -->
                 <div id="setting-submenu" class="setting-submenu ml-5 border-l-2 {{ $theme === 'dark' ? 'border-zinc-700' : 'border-gray-200' }} pl-2 space-y-0.5">
+                    <a href="{{ route('admin.teachers.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-chalkboard-teacher text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">Teacher Management</span>
+                    </a>
                     <a href="{{ route('admin.users.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-users text-xs text-gray-400"></i>
@@ -119,6 +125,12 @@
                             <i class="fas fa-school text-xs text-gray-400"></i>
                         </div>
                         <span class="font-medium text-sm">Education Level</span>
+                    </a>
+                    <a href="{{ route('admin.subject-groups.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-th-large text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">Subject Group</span>
                     </a>
                     <a href="{{ route('admin.global-schedule.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">

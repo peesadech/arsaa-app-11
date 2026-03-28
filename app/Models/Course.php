@@ -10,6 +10,7 @@ class Course extends Model
         'name',
         'grade_id',
         'semester_id',
+        'subject_group_id',
         'status',
     ];
 
@@ -21,5 +22,10 @@ class Course extends Model
     public function semester()
     {
         return $this->belongsTo(Semester::class, 'semester_id');
+    }
+
+    public function subjectGroup()
+    {
+        return $this->belongsTo(SubjectGroup::class, 'subject_group_id');
     }
 }
