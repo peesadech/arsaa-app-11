@@ -11,7 +11,18 @@ class LoginController extends Controller implements HasMiddleware
 {
     use AuthenticatesUsers;
 
-    protected $redirectTo = '/home';
+    protected function redirectTo(): string
+    {
+        $user = auth()->user();
+        if ($user) {
+            $roles = $user->getRoleNames()->map(fn($r) => strtoupper($r));
+            if ($roles->intersect(['SUPERADMIN', 'ADMIN'])->isNotEmpty()) {
+                return route('admin.dashboard');
+            }
+        }
+
+        return route('profile.index');
+    }
 
     public static function middleware(): array
     {
@@ -41,6 +52,6 @@ class LoginController extends Controller implements HasMiddleware
             return redirect()->route('admin.dashboard');
         }
 
-        return redirect()->route('home');
+        return redirect()->route('profile.index');
     }
 }

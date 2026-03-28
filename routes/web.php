@@ -47,7 +47,17 @@ Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallba
 Route::get('auth/facebook', [FacebookController::class, 'redirectToFacebook'])->name('auth.facebook');
 Route::get('auth/facebook/callback', [FacebookController::class, 'handleFacebookCallback']);
 
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+// Role-based redirect (replaces old /home route)
+Route::get('/home', function () {
+    $user = auth()->user();
+    if ($user) {
+        $roles = $user->getRoleNames()->map(fn($r) => strtoupper($r));
+        if ($roles->intersect(['SUPERADMIN', 'ADMIN'])->isNotEmpty()) {
+            return redirect()->route('admin.dashboard');
+        }
+    }
+    return redirect()->route('profile.index');
+})->middleware('auth')->name('home');
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');

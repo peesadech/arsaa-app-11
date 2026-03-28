@@ -20,6 +20,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
+        $middleware->redirectUsersTo(function () {
+            $user = auth()->user();
+            if ($user) {
+                $roles = $user->getRoleNames()->map(fn($r) => strtoupper($r));
+                if ($roles->intersect(['SUPERADMIN', 'ADMIN'])->isNotEmpty()) {
+                    return route('admin.dashboard');
+                }
+            }
+            return route('profile.index');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
