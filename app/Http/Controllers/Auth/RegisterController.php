@@ -8,20 +8,16 @@ use App\Models\Setting;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
 
-class RegisterController extends Controller implements HasMiddleware
+class RegisterController extends Controller
 {
     use RegistersUsers;
 
     protected $redirectTo = '/home';
 
-    public static function middleware(): array
+    public function __construct()
     {
-        return [
-            new Middleware('guest'),
-        ];
+        $this->middleware('guest');
     }
 
     public function showRegistrationForm()

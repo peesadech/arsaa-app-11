@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
 
-class LoginController extends Controller implements HasMiddleware
+class LoginController extends Controller
 {
     use AuthenticatesUsers;
 
@@ -24,11 +22,9 @@ class LoginController extends Controller implements HasMiddleware
         return route('profile.index');
     }
 
-    public static function middleware(): array
+    public function __construct()
     {
-        return [
-            new Middleware('guest', except: ['logout']),
-        ];
+        $this->middleware('guest')->except('logout');
     }
 
     protected function credentials(\Illuminate\Http\Request $request)
