@@ -2,13 +2,13 @@
 
 @php
     $dayMeta = [
-        1 => ['th' => 'จันทร์',   'short' => 'จ',   'en' => 'Mon'],
-        2 => ['th' => 'อังคาร',   'short' => 'อ',   'en' => 'Tue'],
-        3 => ['th' => 'พุธ',      'short' => 'พ',   'en' => 'Wed'],
-        4 => ['th' => 'พฤหัส',   'short' => 'พฤ',  'en' => 'Thu'],
-        5 => ['th' => 'ศุกร์',    'short' => 'ศ',   'en' => 'Fri'],
-        6 => ['th' => 'เสาร์',    'short' => 'ส',   'en' => 'Sat'],
-        7 => ['th' => 'อาทิตย์',  'short' => 'อา',  'en' => 'Sun'],
+        1 => ['label' => __('Monday'),    'short' => __('Mon')],
+        2 => ['label' => __('Tuesday'),   'short' => __('Tue')],
+        3 => ['label' => __('Wednesday'), 'short' => __('Wed')],
+        4 => ['label' => __('Thursday'),  'short' => __('Thu')],
+        5 => ['label' => __('Friday'),    'short' => __('Fri')],
+        6 => ['label' => __('Saturday'),  'short' => __('Sat')],
+        7 => ['label' => __('Sunday'),    'short' => __('Sun')],
     ];
     $savedConfigs = $schedule->day_configs ?? [];
 @endphp
@@ -40,7 +40,7 @@
             <div>
                 <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ $educationLevel->name_th }}</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">
-                    {{ $educationLevel->name_en }} — ปีการศึกษา {{ $academicYear->year }} / ภาคเรียนที่ {{ $semester->semester_number }}
+                    {{ $educationLevel->name_en }} — {{ __('Academic Year :year', ['year' => $academicYear->year]) }} / {{ __('Semester Number') }} {{ $semester->semester_number }}
                 </p>
             </div>
         </div>
@@ -59,10 +59,10 @@
 
             {{-- Global Settings --}}
             <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-6 mb-5">
-                <h3 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4">ตั้งค่าทั่วไป</h3>
+                <h3 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4">{{ __('General Settings') }}</h3>
                 <div class="flex flex-wrap gap-6">
                     <div class="space-y-2">
-                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">เวลาเริ่มสอน</label>
+                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">{{ __('Start Time') }}</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400"><i class="fas fa-clock text-sm"></i></div>
                             <input type="time" id="start_time" name="start_time"
@@ -72,14 +72,14 @@
                         </div>
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">ความยาวต่อคาบ</label>
+                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">{{ __('Period Duration') }}</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400"><i class="fas fa-hourglass-half text-sm"></i></div>
                             <input type="number" id="period_duration" name="period_duration" min="1" max="240"
                                 value="{{ old('period_duration', $schedule->period_duration ?? 50) }}"
                                 class="pl-10 pr-14 py-3 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white focus:outline-none focus:border-indigo-500 transition-all w-40"
                                 oninput="renderTable()" required>
-                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400 text-xs font-bold">นาที</div>
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400 text-xs font-bold">{{ __('minutes') }}</div>
                         </div>
                     </div>
                 </div>
@@ -88,8 +88,8 @@
             {{-- Schedule Table --}}
             <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] overflow-hidden mb-5">
                 <div class="px-6 py-3 border-b border-gray-100 dark:border-[#3a3b3c] flex items-center justify-between">
-                    <h3 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">ตารางเวลา</h3>
-                    <span class="text-[10px] text-amber-500 font-bold">คลิกแถวพักเพื่อเปิด/ปิด | [-/+] เพิ่ม-ลดคาบของแต่ละวัน</span>
+                    <h3 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ __('Timetable') }}</h3>
+                    <span class="text-[10px] text-amber-500 font-bold">{{ __('Click break row to toggle') }} | [-/+] {{ __('Add/remove periods per day') }}</span>
                 </div>
                 <div class="overflow-x-auto p-4">
                     <table id="scheduleTable" class="schedule-table">
@@ -103,7 +103,7 @@
                 class="w-full group relative flex items-center justify-center px-8 py-4 bg-indigo-600 text-white hover:bg-indigo-700 font-bold rounded-2xl active:scale-95 transition-all duration-200 shadow-lg shadow-indigo-200 dark:shadow-none overflow-hidden">
                 <span class="relative z-10 flex items-center">
                     <i class="fas fa-save mr-2 opacity-50 group-hover:opacity-100 transition-opacity"></i>
-                    บันทึกกำหนดการ
+                    {{ __('Save Schedule') }}
                 </span>
                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
             </button>
@@ -115,6 +115,12 @@
 <script>
 const DAY_META = @json($dayMeta);
 const ALL_DAYS = ['1','2','3','4','5','6','7'];
+const LANG_OFF = @json(__('Off'));
+const LANG_PERIOD = @json(__('Period'));
+const LANG_BREAK = @json(__('Break'));
+const LANG_CLICK_REMOVE_BREAK = @json(__('Click to remove break'));
+const LANG_CLICK_ADD_BREAK = @json(__('Click to add break'));
+const LANG_MIN = @json(__('min'));
 
 let state = {
     teaching_days: ALL_DAYS,
@@ -197,8 +203,8 @@ function renderTable() {
         const dayTime = cfg.start_time || globalStartTime();
         rows += `
         <td class="day-col" style="padding:10px 8px;text-align:center;background:${C.bgAlt};border:1px solid ${C.border};border-bottom:2px solid ${isOff ? C.border : C.indigo};opacity:${isOff ? '.5' : '1'}">
-            <div style="font-size:13px;font-weight:800;color:${isOff ? C.muted : C.indigo}">${meta.th}</div>
-            <div style="font-size:9px;color:${C.muted};text-transform:uppercase;margin-bottom:4px">${meta.en}</div>
+            <div style="font-size:13px;font-weight:800;color:${isOff ? C.muted : C.indigo}">${meta.label}</div>
+            <div style="font-size:9px;color:${C.muted};text-transform:uppercase;margin-bottom:4px">${meta.short}</div>
             <div style="margin-bottom:8px">
                 <input type="time" value="${dayTime}"
                     onchange="setDayStartTime('${d}',this.value)"
@@ -216,7 +222,7 @@ function renderTable() {
                     onmouseover="this.style.borderColor='${C.indigo}';this.style.color='${C.indigo}'"
                     onmouseout="this.style.borderColor='${C.border}';this.style.color='${C.muted}'">+</button>
             </div>
-            <div style="font-size:9px;color:${C.muted};margin-top:2px">${isOff ? 'หยุด' : 'คาบ'}</div>
+            <div style="font-size:9px;color:${C.muted};margin-top:2px">${isOff ? LANG_OFF : LANG_PERIOD}</div>
         </td>`;
     });
     rows += '</tr>';
@@ -224,7 +230,7 @@ function renderTable() {
     for (let p = 1; p <= maxP; p++) {
         rows += '<tr>';
         rows += `<td class="col-label" style="padding:8px;border-right:2px solid ${C.border};white-space:nowrap">
-            <span style="font-size:11px;font-weight:800;color:${C.indigo}">คาบ ${p}</span>
+            <span style="font-size:11px;font-weight:800;color:${C.indigo}">${LANG_PERIOD} ${p}</span>
         </td>`;
         days.forEach(d => {
             const cfg = state.day_configs[d] || {};
@@ -245,7 +251,7 @@ function renderTable() {
         if (p < maxP) {
             rows += `<tr class="break-row">`;
             rows += `<td class="col-label" style="padding:3px 8px;border-right:2px solid ${C.border}">
-                <span style="font-size:10px;color:${C.amber};font-weight:700">พัก</span>
+                <span style="font-size:10px;color:${C.amber};font-weight:700">${LANG_BREAK}</span>
             </td>`;
             days.forEach(d => {
                 const cfg    = state.day_configs[d] || { periods: 0, breaks: {} };
@@ -258,14 +264,14 @@ function renderTable() {
                 const bDur = cfg.breaks[String(p)] || 10;
                 rows += `<td style="padding:3px 6px;border:1px solid ${has ? C.amberBdr : C.border};background:${has ? C.amberBg : C.bgAlt};cursor:pointer;transition:all .2s;text-align:center"
                     onclick="toggleBreak('${d}',${p})"
-                    title="${has ? 'คลิกเพื่อลบช่วงพัก' : 'คลิกเพื่อเพิ่มช่วงพัก'}">
+                    title="${has ? LANG_CLICK_REMOVE_BREAK : LANG_CLICK_ADD_BREAK}">
                     ${has ? `
                     <div style="display:flex;align-items:center;justify-content:center;gap:4px">
                         <input type="number" min="1" max="120" value="${bDur}"
                             onclick="event.stopPropagation()"
                             onchange="setBreakDur('${d}',${p},this.value)"
                             style="width:40px;border:1px solid ${C.amberBdr};border-radius:6px;padding:1px 4px;font-size:11px;font-weight:700;text-align:center;background:transparent;color:#d97706;outline:none">
-                        <span style="font-size:9px;color:#d97706;font-weight:700">น.</span>
+                        <span style="font-size:9px;color:#d97706;font-weight:700">${LANG_MIN}</span>
                     </div>` : `<span style="font-size:11px;color:${C.muted}">—</span>`}
                 </td>`;
             });

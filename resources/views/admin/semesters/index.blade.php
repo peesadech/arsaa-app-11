@@ -140,8 +140,8 @@
                     <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
                 </a> 
                 <div>
-                    <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Semester Management</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1 px-1">Manage system semesters</p>
+                    <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ __('Semester Management') }}</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1 px-1">{{ __('Manage system semesters') }}</p>
                 </div>
             </div>
             
@@ -149,7 +149,7 @@
                 <a href="{{ route('admin.semesters.create') }}" 
                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-bold rounded-2xl shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5 active:scale-95">
                     <i class="fas fa-plus mr-2 opacity-75"></i>
-                    New Semester
+                    {{ __('New Semester') }}
                 </a>
             </div>
         </div>
@@ -172,8 +172,8 @@
                                 <i class="fas fa-filter text-sm"></i>
                             </div>
                             <div>
-                                <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Quick Filters</h3>
-                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Refine semester list</p>
+                                <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">{{ __('Quick Filters') }}</h3>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">{{ __('Refine semester list') }}</p>
                             </div>
                         </div>
 
@@ -181,9 +181,9 @@
                             <!-- Status Filter -->
                             <div class="relative group">
                                 <select id="statusFilter" class="appearance-none block w-full md:w-48 pl-4 pr-10 py-2.5 bg-white dark:bg-[#242526] border-2 border-gray-100 dark:border-[#3a3b3c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-0 focus:border-indigo-500 transition-all cursor-pointer">
-                                    <option value="">All Status</option>
-                                    <option value="1">Active</option>
-                                    <option value="2">Not Active</option>
+                                    <option value="">{{ __('All Status') }}</option>
+                                    <option value="1">{{ __('Active') }}</option>
+                                    <option value="2">{{ __('Not Active') }}</option>
                                 </select>
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
                                     <i class="fas fa-chevron-down text-[10px]"></i>
@@ -197,9 +197,9 @@
                     <table id="semestersTable" class="w-full text-left border-collapse whitespace-nowrap lg:whitespace-normal">
                         <thead>
                             <tr class="bg-gray-50/50 dark:bg-[#18191a]/30 border-b border-gray-100 dark:border-[#3a3b3c]/50">
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest first:rounded-tl-2xl">ภาคเรียนที่ (Semester)</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center">Status</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-right last:rounded-tr-2xl">Action</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest first:rounded-tl-2xl">{{ __('Semester Number') }}</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center">{{ __('Status') }}</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-right last:rounded-tr-2xl">{{ __('Action') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50 dark:divide-[#3a3b3c]/50 text-gray-600 dark:text-gray-400 text-sm">
@@ -211,9 +211,9 @@
 
             <!-- Contextual Footer -->
             <div class="px-8 py-5 bg-gray-50/50 dark:bg-[#18191a]/30 border-t border-gray-100 dark:border-[#3a3b3c]/50 flex items-center justify-between text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                <span>Semester Management System</span>
+                <span>{{ __('Semester Management System') }}</span>
                 <span class="flex items-center">
-                    <i class="fas fa-list-ol mr-2"></i> Administrative Control
+                    <i class="fas fa-list-ol mr-2"></i> {{ __('Administrative Control') }}
                 </span>
             </div>
         </div>
@@ -232,9 +232,9 @@
                         <i class="fas fa-exclamation-triangle text-rose-600 text-xl"></i>
                     </div>
                     <div class="mt-3 text-center sm:mt-0 sm:ml-6 sm:text-left">
-                        <h3 class="text-xl leading-6 font-extrabold text-gray-900 dark:text-white tracking-tight" id="modal-title">Confirm Deletion</h3>
+                        <h3 class="text-xl leading-6 font-extrabold text-gray-900 dark:text-white tracking-tight" id="modal-title">{{ __('Confirm Deletion') }}</h3>
                         <div class="mt-2 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                            Are you sure you want to permanently remove semester <span id="itemNameToDelete" class="font-bold text-gray-900 dark:text-white px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-700 rounded-lg"></span>? This action cannot be undone.
+                            {{ __('Are you sure you want to permanently remove') }} {{ __('Semester') }} <span id="itemNameToDelete" class="font-bold text-gray-900 dark:text-white px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-700 rounded-lg"></span>? {{ __('This action cannot be undone.') }}
                         </div>
                     </div>
                 </div>
@@ -243,9 +243,9 @@
                 <form id="deleteForm" method="POST" class="sm:ml-3">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="w-full inline-flex justify-center rounded-2xl border border-transparent shadow-lg shadow-rose-200/50 dark:shadow-none px-8 py-3 bg-rose-600 text-base font-bold text-white hover:bg-rose-700 focus:outline-none transition-all duration-200 sm:w-auto transform active:scale-95 uppercase tracking-wider text-xs">Confirm Delete</button>
+                    <button type="submit" class="w-full inline-flex justify-center rounded-2xl border border-transparent shadow-lg shadow-rose-200/50 dark:shadow-none px-8 py-3 bg-rose-600 text-base font-bold text-white hover:bg-rose-700 focus:outline-none transition-all duration-200 sm:w-auto transform active:scale-95 uppercase tracking-wider text-xs">{{ __('Confirm Delete') }}</button>
                 </form>
-                <button type="button" onclick="closeModal()" class="w-full inline-flex justify-center rounded-2xl border-2 border-gray-100 dark:border-[#3a3b3c] px-8 py-3 bg-white dark:bg-[#242526] text-base font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#3a3b3c] focus:outline-none transition-all duration-200 sm:w-auto transform active:scale-95 uppercase tracking-wider text-xs">Cancel</button>
+                <button type="button" onclick="closeModal()" class="w-full inline-flex justify-center rounded-2xl border-2 border-gray-100 dark:border-[#3a3b3c] px-8 py-3 bg-white dark:bg-[#242526] text-base font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#3a3b3c] focus:outline-none transition-all duration-200 sm:w-auto transform active:scale-95 uppercase tracking-wider text-xs">{{ __('Cancel') }}</button>
             </div>
         </div>
     </div>
@@ -266,6 +266,9 @@
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
 
     <script>
+        const LANG_SEARCH = @json(__('Search...'));
+        const LANG_SHOW = @json(__('Show'));
+
         $(document).ready(function() {
             // Auto-dismiss alert
             const alerts = ['statusAlert', 'errorAlert'];
@@ -305,8 +308,8 @@
                 ],
                 language: {
                     search: "",
-                    searchPlaceholder: "Search...",
-                    lengthMenu: "Show _MENU_",
+                    searchPlaceholder: LANG_SEARCH,
+                    lengthMenu: LANG_SHOW + " _MENU_",
                     paginate: {
                         previous: '<i class="fas fa-chevron-left"></i>',
                         next: '<i class="fas fa-chevron-right"></i>'

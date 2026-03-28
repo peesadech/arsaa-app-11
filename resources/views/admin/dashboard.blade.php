@@ -19,22 +19,22 @@
             {{-- Opened Grades Block (30%) --}}
             <div class="w-[30%] bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-[#3a3b3c] px-5 py-4 flex flex-col gap-1">
                 <div class="flex items-center justify-between">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">ระดับชั้นที่เปิดสอน</p>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ __('Opened Grade Levels') }}</p>
                     @if($currentYear && $currentSemester)
                     <button onclick="openAddGradeModal()" class="btn-app">
-                        <i class="fas fa-cog text-[10px]"></i> จัดการ
+                        <i class="fas fa-cog text-[10px]"></i> {{ __('Manage') }}
                     </button>
                     @endif
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="flex items-baseline gap-1.5">
                         <span id="openedGradeCount" class="text-3xl font-bold text-slate-800 dark:text-white">{{ $openedGrades->count() }}</span>
-                        <span class="text-xs text-gray-400">ระดับชั้น</span>
+                        <span class="text-xs text-gray-400">{{ __('Grade Level') }}</span>
                     </div>
                     <div class="w-px h-6 bg-gray-200 dark:bg-[#3a3b3c]"></div>
                     <div class="flex items-baseline gap-1.5">
                         <span id="openedClassroomCount" class="text-3xl font-bold text-slate-800 dark:text-white">{{ $openedClassroomCount }}</span>
-                        <span class="text-xs text-gray-400">ห้องเรียน</span>
+                        <span class="text-xs text-gray-400">{{ __('Classrooms') }}</span>
                     </div>
                 </div>
             </div>
@@ -42,22 +42,22 @@
             {{-- Opened Courses Block (30%) --}}
             <div class="w-[30%] bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-[#3a3b3c] px-5 py-4 flex flex-col gap-1">
                 <div class="flex items-center justify-between">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">รายวิชาที่เปิดสอน</p>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ __('Opened Courses') }}</p>
                     @if($currentYear && $currentSemester)
                     <a href="{{ route('admin.opened-courses.index') }}" class="btn-app" id="btn-open-course">
-                        <i class="fas fa-cog text-[10px]"></i> จัดการ
+                        <i class="fas fa-cog text-[10px]"></i> {{ __('Manage') }}
                     </a>
                     @endif
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="flex items-baseline gap-1.5">
                         <span id="openedCourseCount" class="text-3xl font-bold text-slate-800 dark:text-white">{{ $openedCourseCount }}</span>
-                        <span class="text-xs text-gray-400">รายวิชา</span>
+                        <span class="text-xs text-gray-400">{{ __('Courses') }}</span>
                     </div>
                     <div class="w-px h-6 bg-gray-200 dark:bg-[#3a3b3c]"></div>
                     <div class="flex items-baseline gap-1.5">
                         <span id="openedCourseTotalCount" class="text-3xl font-bold text-slate-800 dark:text-white">{{ $openedCourseTotalCount }}</span>
-                        <span class="text-xs text-gray-400">ห้องเรียน</span>
+                        <span class="text-xs text-gray-400">{{ __('Classrooms') }}</span>
                     </div>
                 </div>
             </div>
@@ -65,37 +65,37 @@
             {{-- Yearly Schedule Block (30%) --}}
             <div class="w-[30%] bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-[#3a3b3c] px-5 py-4 flex flex-col gap-1">
                 <div class="flex items-center justify-between">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">ตารางสอนประจำภาค</p>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ __('Semester Schedule') }}</p>
                     @if($currentYear && $currentSemester)
                     <a href="{{ route('admin.yearly-schedule.index') }}" class="btn-app">
-                        <i class="fas fa-cog text-[10px]"></i> จัดการ
+                        <i class="fas fa-cog text-[10px]"></i> {{ __('Manage') }}
                     </a>
                     @endif
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="flex items-baseline gap-1.5">
                         <span class="text-3xl font-bold text-slate-800 dark:text-white">{{ $yearlyScheduleConfigured }}</span>
-                        <span class="text-xs text-gray-400">ตั้งค่าแล้ว</span>
+                        <span class="text-xs text-gray-400">{{ __('Configured') }}</span>
                     </div>
                     <div class="w-px h-6 bg-gray-200 dark:bg-[#3a3b3c]"></div>
                     <div class="flex items-baseline gap-1.5">
                         <span class="text-3xl font-bold text-slate-800 dark:text-white">{{ $yearlyScheduleTotal }}</span>
-                        <span class="text-xs text-gray-400">ทั้งหมด</span>
+                        <span class="text-xs text-gray-400">{{ __('Grade Level') }}</span>
                     </div>
                 </div>
                 @if($currentYear && $currentSemester)
                 <div class="mt-1">
                     @if($yearlyScheduleTotal > 0 && $yearlyScheduleConfigured >= $yearlyScheduleTotal)
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[11px] font-bold">
-                            <i class="fas fa-check-circle text-[9px]"></i> ตั้งค่าครบแล้ว
+                            <i class="fas fa-check-circle text-[9px]"></i> {{ __('Configured All') }}
                         </span>
                     @elseif($yearlyScheduleConfigured > 0)
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[11px] font-bold">
-                            <i class="fas fa-exclamation-circle text-[9px]"></i> ยังตั้งค่าไม่ครบ
+                            <i class="fas fa-exclamation-circle text-[9px]"></i> {{ __('Not All Configured') }}
                         </span>
                     @else
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-[#3a3b3c] text-gray-400 text-[11px]">
-                            ยังไม่ได้ตั้งค่า
+                            {{ __('Not Yet Configured') }}
                         </span>
                     @endif
                 </div>
@@ -125,8 +125,8 @@
         {{-- Header --}}
         <div class="px-5 py-4 border-b border-gray-100 dark:border-[#3a3b3c] flex items-center justify-between shrink-0">
             <div>
-                <h3 class="font-bold text-slate-800 dark:text-white text-base">จัดการระดับชั้นที่เปิดสอน</h3>
-                <p class="text-xs text-gray-400 mt-0.5">คลิก <i class="fas fa-chevron-right text-[9px]"></i> เพื่อจัดการห้องเรียนของแต่ละระดับชั้น</p>
+                <h3 class="font-bold text-slate-800 dark:text-white text-base">{{ __('Manage Opened Grade Levels') }}</h3>
+                <p class="text-xs text-gray-400 mt-0.5">{{ __('Click') }} <i class="fas fa-chevron-right text-[9px]"></i> {{ __('to manage classrooms for each grade level') }}</p>
             </div>
             <button onclick="closeAddGradeModal()" class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-[#3a3b3c] flex items-center justify-center text-gray-400">
                 <i class="fas fa-times text-sm"></i>
@@ -141,23 +141,23 @@
                         <th class="px-4 py-2.5 w-10">
                             <input type="checkbox" id="checkAll" onchange="toggleCheckAll(this)" class="rounded accent-indigo-600 cursor-pointer">
                         </th>
-                        <th class="px-4 py-2.5 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">ระดับชั้น / ห้องเรียน</th>
-                        <th class="px-4 py-2.5 text-center text-xs font-bold text-gray-400 uppercase tracking-wider w-20">สถานะ</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">{{ __('Grade Level / Classrooms') }}</th>
+                        <th class="px-4 py-2.5 text-center text-xs font-bold text-gray-400 uppercase tracking-wider w-20">{{ __('Status') }}</th>
                         <th class="w-10"></th>
                     </tr>
                 </thead>
                 <tbody id="gradeTableBody">
-                    <tr><td colspan="4" class="text-center py-8 text-gray-400 text-xs">กำลังโหลด...</td></tr>
+                    <tr><td colspan="4" class="text-center py-8 text-gray-400 text-xs">{{ __('Loading...') }}</td></tr>
                 </tbody>
             </table>
         </div>
 
         {{-- Footer --}}
         <div class="px-5 py-3 border-t border-gray-100 dark:border-[#3a3b3c] flex items-center justify-between shrink-0">
-            <span id="selectedCount" class="text-xs text-gray-400">เปลี่ยนแปลง 0 รายการ</span>
+            <span id="selectedCount" class="text-xs text-gray-400">{{ __('changed 0 items') }}</span>
             <div class="flex gap-2">
-                <button onclick="closeAddGradeModal()" class="btn-app" style="background:#6b7280;border-color:#6b7280;">ปิด</button>
-                <button id="saveGradeBtn" onclick="saveGrades()" disabled class="btn-app">บันทึก</button>
+                <button onclick="closeAddGradeModal()" class="btn-app" style="background:#6b7280;border-color:#6b7280;">{{ __('Close') }}</button>
+                <button id="saveGradeBtn" onclick="saveGrades()" disabled class="btn-app">{{ __('Save') }}</button>
             </div>
         </div>
     </div>
@@ -170,8 +170,18 @@ const ACADEMIC_YEAR_ID = {{ $academicYearId ?? 'null' }};
 const SEMESTER_ID      = {{ $semesterId ?? 'null' }};
 const CSRF             = '{{ csrf_token() }}';
 
-const OPEN_BADGE  = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[11px] font-bold"><i class="fas fa-check text-[9px]"></i> เปิด</span>`;
-const CLOSE_BADGE = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-[#3a3b3c] text-gray-400 text-[11px]">ปิด</span>`;
+const LANG_OPEN    = @json(__('Open'));
+const LANG_CLOSE   = @json(__('Close'));
+const LANG_LOADING = @json(__('Loading...'));
+const LANG_NO_DATA = @json(__('No grade data'));
+const LANG_SELECT_ALL = @json(__('Select All Rooms'));
+const LANG_CHANGED = @json(__('changed 0 items'));
+const LANG_SAVING  = @json(__('Saving...'));
+const LANG_SAVED   = @json(__('Saved successfully'));
+const LANG_SAVE    = @json(__('Save'));
+
+const OPEN_BADGE  = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[11px] font-bold"><i class="fas fa-check text-[9px]"></i> ${LANG_OPEN}</span>`;
+const CLOSE_BADGE = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-[#3a3b3c] text-gray-400 text-[11px]">${LANG_CLOSE}</span>`;
 
 function openAddGradeModal() {
     document.getElementById('addGradeModal').style.display = 'flex';
@@ -184,7 +194,7 @@ function closeAddGradeModal() {
 
 function loadGradeTable() {
     const tbody = document.getElementById('gradeTableBody');
-    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-400 text-xs">กำลังโหลด...</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-gray-400 text-xs">${LANG_LOADING}</td></tr>`;
     document.getElementById('checkAll').checked = false;
     updateSelectedCount();
 
@@ -194,7 +204,7 @@ function loadGradeTable() {
     .then(r => r.json())
     .then(grades => {
         if (grades.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-400 text-xs">ไม่มีข้อมูลระดับชั้น</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-gray-400 text-xs">${LANG_NO_DATA}</td></tr>`;
             return;
         }
         tbody.innerHTML = grades.map(g => buildGradeRows(g)).join('');
@@ -250,7 +260,7 @@ function buildGradeRows(g) {
                         ${allChecked ? 'checked' : ''}
                         onchange="toggleGradeClassrooms(${g.id}, this)"
                         class="rounded accent-indigo-600 cursor-pointer">
-                    <span class="text-[11px] font-bold text-indigo-400 uppercase tracking-wider">เลือกทุกห้อง</span>
+                    <span class="text-[11px] font-bold text-indigo-400 uppercase tracking-wider">${LANG_SELECT_ALL}</span>
                 </label>
             </td>
         </tr>`;
@@ -289,17 +299,14 @@ function toggleClassrooms(gradeId) {
 
 function onGradeChange(gradeId, cb) {
     if (!cb.checked) {
-        // Uncheck all classrooms for this grade (they'll be deleted with the grade)
         document.querySelectorAll(`.classroom-cb[data-grade-id="${gradeId}"]`)
             .forEach(room => room.checked = false);
         const masterCb = document.getElementById(`ca-${gradeId}`);
         if (masterCb) masterCb.checked = false;
-        // Collapse classroom rows
         document.querySelectorAll(`.cr-${gradeId}`).forEach(r => r.style.display = 'none');
         const chevron = document.getElementById(`chev-${gradeId}`);
         if (chevron) chevron.style.transform = '';
     } else {
-        // Check all classrooms and expand
         const roomCbs = document.querySelectorAll(`.classroom-cb[data-grade-id="${gradeId}"]`);
         roomCbs.forEach(room => room.checked = true);
         const masterCb = document.getElementById(`ca-${gradeId}`);
@@ -326,7 +333,6 @@ function onClassroomChange(gradeId) {
 
 function toggleCheckAll(master) {
     document.querySelectorAll('.grade-cb').forEach(cb => cb.checked = master.checked);
-    // Mirror to all classrooms and their check-all masters
     document.querySelectorAll('.classroom-cb').forEach(cb => cb.checked = master.checked);
     document.querySelectorAll('[id^="ca-"]').forEach(ca => ca.checked = master.checked);
     updateSelectedCount();
@@ -336,14 +342,13 @@ function updateSelectedCount() {
     const gradeCbs     = [...document.querySelectorAll('.grade-cb')];
     const gradeChanged = gradeCbs.filter(cb => (cb.checked ? '1' : '0') !== cb.dataset.wasOpened).length;
 
-    // Only count classroom changes for grades that are currently open
     const openedGradeIds = new Set(gradeCbs.filter(cb => cb.checked).map(cb => cb.value));
     const classroomCbs   = [...document.querySelectorAll('.classroom-cb')]
         .filter(cb => openedGradeIds.has(cb.dataset.gradeId));
     const classChanged   = classroomCbs.filter(cb => (cb.checked ? '1' : '0') !== cb.dataset.wasOpened).length;
     const total = gradeChanged + classChanged;
 
-    document.getElementById('selectedCount').textContent = `เปลี่ยนแปลง ${total} รายการ`;
+    document.getElementById('selectedCount').textContent = LANG_CHANGED.replace('0', total);
     document.getElementById('saveGradeBtn').disabled = total === 0;
 
     const checkedG = gradeCbs.filter(cb => cb.checked).length;
@@ -362,7 +367,7 @@ function saveGrades() {
 
     const btn = document.getElementById('saveGradeBtn');
     btn.disabled = true;
-    btn.textContent = 'กำลังบันทึก...';
+    btn.textContent = LANG_SAVING;
 
     const openRequests = toOpen.map(cb =>
         fetch('{{ route('admin.dashboard.open-grade') }}', {
@@ -379,7 +384,6 @@ function saveGrades() {
         }).then(r => r.json()).then(d => ({ type: 'close', success: d.success }))
     );
 
-    // Step 1: grade changes
     Promise.all([...openRequests, ...closeRequests])
     .then(gradeResults => {
         const opened = gradeResults.filter(d => d.success && d.type === 'open');
@@ -387,7 +391,6 @@ function saveGrades() {
         document.getElementById('openedGradeCount').textContent =
             parseInt(document.getElementById('openedGradeCount').textContent) + opened.length - closed.length;
 
-        // Step 2: sync classrooms per grade (for all currently-opened grades)
         const hasClassroomWork = classroomChanged || opened.length > 0;
         if (!hasClassroomWork || openedGradeCbs.length === 0) return Promise.resolve(null);
 
@@ -414,11 +417,11 @@ function saveGrades() {
         document.getElementById('openedCourseCount').textContent      = stats.course_distinct_count;
         document.getElementById('openedCourseTotalCount').textContent = stats.course_total_count;
         closeAddGradeModal();
-        showFlash('บันทึกเรียบร้อยแล้ว');
+        showFlash(LANG_SAVED);
     })
     .finally(() => {
         btn.disabled = false;
-        btn.textContent = 'บันทึก';
+        btn.textContent = LANG_SAVE;
     });
 }
 

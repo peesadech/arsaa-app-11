@@ -87,7 +87,7 @@
                         <div class="w-full border-t border-gray-200"></div>
                     </div>
                     <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-white text-gray-500 font-medium">Or continue with</span>
+                        <span class="px-2 bg-white text-gray-500 font-medium">{{ __('Or continue with') }}</span>
                     </div>
                 </div>
 
@@ -111,7 +111,7 @@
                             <div class="w-full border-t border-gray-200"></div>
                         </div>
                         <div class="relative flex justify-center text-sm">
-                            <span class="px-2 bg-white text-gray-500 font-medium">Or continue with</span>
+                            <span class="px-2 bg-white text-gray-500 font-medium">{{ __('Or continue with') }}</span>
                         </div>
                     </div>
                     @endif

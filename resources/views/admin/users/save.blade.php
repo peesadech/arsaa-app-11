@@ -4,18 +4,18 @@
     $isEdit = isset($user);
     $actionUrl = $isEdit ? route('admin.users.update', $user->id) : route('admin.users.store');
     
-    $title = $isEdit ? 'Edit User' : 'Create New User';
-    $subtitle = $isEdit ? 'Update account details' : 'User Registration';
+    $title = $isEdit ? __('Edit User') : __('Create New User');
+    $subtitle = $isEdit ? __('Update account details') : __('User Registration');
     
     // Theme Configuration
     $gradientClass = $isEdit ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500' : 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500';
     $blurClass = $isEdit ? 'bg-amber-500/20' : 'bg-indigo-500/20';
     $iconBgClass = $isEdit ? 'bg-amber-50 border-amber-100' : 'bg-indigo-50 border-indigo-100 shadow-inner';
     $iconClass = $isEdit ? 'fa-user-edit text-amber-600 rotate-3' : 'fa-user-plus text-indigo-600 -rotate-3';
-    $cardTitle = $isEdit ? 'Modify Account' : 'Account Details';
-    $cardDesc = $isEdit 
-        ? "You are updating account #{$user->id}. Ensure all details are correct."
-        : 'Define a new system user and assign appropriate access roles.';
+    $cardTitle = $isEdit ? __('Modify Account') : __('Account Details');
+    $cardDesc = $isEdit
+        ? __('You are updating account #:id. Ensure all details are correct.', ['id' => $user->id])
+        : __('Define a new system user and assign appropriate access roles.');
     
     $focusRing = $isEdit ? 'focus:border-amber-400' : 'focus:border-indigo-500';
     $focusText = $isEdit ? 'group-focus-within:text-amber-500' : 'group-focus-within:text-indigo-500';
@@ -24,7 +24,7 @@
         ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-amber-200'
         : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200';
     
-    $btnText = $isEdit ? 'Save Changes' : 'Create User';
+    $btnText = $isEdit ? __('Save Changes') : __('Create User');
     $btnIcon = $isEdit ? 'fa-save' : 'fa-check-circle';
 
     $existingImage = $isEdit && $user->image_path ? $user->image_path : null;
@@ -86,7 +86,7 @@
                         <!-- Name -->
                         <div class="space-y-2">
                             <label for="name" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                                Full Name
+                                {{ __('Full Name') }}
                             </label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -97,7 +97,7 @@
                                     id="name"
                                     name="name"
                                     class="block w-full pl-10 pr-4 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('name') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
-                                    placeholder="Enter full name"
+                                    placeholder="{{ __('Enter full name') }}"
                                     value="{{ old('name', $isEdit ? $user->name : '') }}"
                                     required
                                 />
@@ -110,7 +110,7 @@
                         <!-- Email -->
                         <div class="space-y-2">
                             <label for="email" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                                Email Address
+                                {{ __('Email Address') }}
                             </label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -136,7 +136,7 @@
                         <!-- Password -->
                         <div class="space-y-2">
                             <label for="password" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                                {{ $isEdit ? 'Change Password' : 'Password' }}
+                                {{ $isEdit ? __('Change Password') : __('Password') }}
                             </label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -147,7 +147,7 @@
                                     id="password"
                                     name="password"
                                     class="block w-full pl-10 pr-4 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('password') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
-                                    placeholder="{{ $isEdit ? 'Leave blank to keep current' : 'Enter secure password' }}"
+                                    placeholder="{{ $isEdit ? __('Leave blank to keep current') : __('Enter secure password') }}"
                                     {{ $isEdit ? '' : 'required' }}
                                 />
                             </div>
@@ -159,7 +159,7 @@
                         <!-- Confirm Password -->
                         <div class="space-y-2">
                             <label for="password_confirmation" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                                Confirm Password
+                                {{ __('Confirm Password') }}
                             </label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -170,7 +170,7 @@
                                     id="password_confirmation"
                                     name="password_confirmation"
                                     class="block w-full pl-10 pr-4 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200"
-                                    placeholder="Confirm password"
+                                    placeholder="{{ __('Confirm password') }}"
                                     {{ $isEdit ? '' : 'required' }}
                                 />
                             </div>
@@ -180,7 +180,7 @@
                     <!-- Roles -->
                     <div class="space-y-3">
                         <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                            Assign Roles
+                            {{ __('Assign Roles') }}
                         </label>
                         <div class="flex flex-wrap gap-2">
                             @foreach($roles as $role)
@@ -204,7 +204,7 @@
                     <!-- Status -->
                     <div class="space-y-3">
                         <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                            Account Status
+                            {{ __('Account Status') }}
                         </label>
                         <div class="flex flex-wrap gap-2">
                             <!-- Active Status -->
@@ -213,7 +213,7 @@
                                 <div class="px-4 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] bg-white dark:bg-[#242526] text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-600 dark:peer-checked:text-emerald-400 group-hover:border-gray-200 dark:group-hover:border-[#4a4b4c]">
                                     <div class="flex items-center">
                                         <i class="fas fa-check-circle mr-2 text-[10px] opacity-50"></i>
-                                        Active
+                                        {{ __('Active') }}
                                     </div>
                                 </div>
                                 <div class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center text-[8px] text-white opacity-0 peer-checked:opacity-100 transition-all scale-50 peer-checked:scale-100">
@@ -227,7 +227,7 @@
                                 <div class="px-4 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] bg-white dark:bg-[#242526] text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:border-rose-500 peer-checked:bg-rose-50 dark:peer-checked:bg-rose-900/30 peer-checked:text-rose-600 dark:peer-checked:text-rose-400 group-hover:border-gray-200 dark:group-hover:border-[#4a4b4c]">
                                     <div class="flex items-center">
                                         <i class="fas fa-times-circle mr-2 text-[10px] opacity-50"></i>
-                                        Not Active
+                                        {{ __('Not Active') }}
                                     </div>
                                 </div>
                                 <div class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 rounded-full flex items-center justify-center text-[8px] text-white opacity-0 peer-checked:opacity-100 transition-all scale-50 peer-checked:scale-100">
@@ -256,7 +256,7 @@
                         
                         <a href="{{ route('admin.users.index') }}" 
                            class="flex-1 flex items-center justify-center px-8 py-4 bg-white dark:bg-[#242526] text-gray-700 dark:text-gray-300 font-bold rounded-2xl border-2 border-gray-100 dark:border-[#3a3b3c] hover:border-gray-200 dark:hover:border-[#4a4b4c] hover:bg-gray-50 dark:hover:bg-[#3a3b3c] active:scale-95 transition-all duration-200">
-                            {{ $isEdit ? 'Cancel' : 'Back to List' }}
+                            {{ $isEdit ? __('Cancel') : __('Back to List') }}
                         </a>
                     </div>
                 </form>

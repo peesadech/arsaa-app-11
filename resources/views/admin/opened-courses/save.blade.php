@@ -14,7 +14,7 @@
     $iconClass   = $isEdit ? 'fa-book text-amber-600' : 'fa-book-open text-indigo-600';
     $focusRing   = $isEdit ? 'focus:border-amber-400' : 'focus:border-indigo-500';
     $focusText   = $isEdit ? 'group-focus-within:text-amber-500' : 'group-focus-within:text-indigo-500';
-    $btnText     = $isEdit ? 'บันทึกการแก้ไข' : 'เพิ่มรายวิชา';
+    $btnText     = $isEdit ? __('Save Changes') : __('Add Course');
     $btnIcon     = $isEdit ? 'fa-save' : 'fa-check-circle';
     $btnClass    = $isEdit
         ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-amber-200'
@@ -37,13 +37,13 @@
             </a>
             <div>
                 <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-                    {{ $isEdit ? 'แก้ไขรายวิชาที่เปิดสอน' : 'เพิ่มรายวิชาที่เปิดสอน' }}
+                    {{ $isEdit ? __('Edit Opened Course') : __('Add Opened Course') }}
                 </h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">
                     @if($currentYear && $currentSemester)
-                        ปีการศึกษา {{ $currentYear->year }} &bull; ภาคเรียนที่ {{ $currentSemester->semester_number }}
+                        {{ __('Academic Year') }} {{ $currentYear->year }} &bull; {{ __('Semester') }} {{ $currentSemester->semester_number }}
                     @else
-                        ยังไม่ได้เลือกปีการศึกษา
+                        {{ __('No academic year selected') }}
                     @endif
                 </p>
             </div>
@@ -63,10 +63,10 @@
                         </div>
                     </div>
                     <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2">
-                        {{ $isEdit ? 'แก้ไขข้อมูล' : 'เพิ่มรายวิชาใหม่' }}
+                        {{ $isEdit ? __('Edit Information') : __('Add New Course') }}
                     </h2>
                     <p class="text-sm text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-                        {{ $isEdit ? 'อัปเดตข้อมูลรายวิชาที่เปิดสอน' : 'เลือกระดับชั้น ห้องเรียน และรายวิชาที่ต้องการเปิดสอน' }}
+                        {{ $isEdit ? __('Update opened course information') : __('Select grade level, classroom, and course to open') }}
                     </p>
                 </div>
 
@@ -78,7 +78,7 @@
                     {{-- Grade --}}
                     <div class="space-y-2">
                         <label for="grade_id" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                            ระดับชั้น
+                            {{ __('Grade Level') }}
                         </label>
                         <div class="group relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -86,7 +86,7 @@
                             </div>
                             <select id="grade_id" name="grade_id"
                                 class="block w-full pl-10 pr-10 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 appearance-none @error('grade_id') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror">
-                                <option value="">-- เลือกระดับชั้น --</option>
+                                <option value="">{{ __('-- Select Grade Level --') }}</option>
                                 @foreach($openedGrades as $og)
                                     <option value="{{ $og->grade_id }}"
                                         {{ $selectedGrade == $og->grade_id ? 'selected' : '' }}>
@@ -106,7 +106,7 @@
                     {{-- Classroom --}}
                     <div class="space-y-2">
                         <label for="classroom_id" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                            ห้องเรียน
+                            {{ __('Classroom') }}
                         </label>
                         <div class="group relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -114,7 +114,7 @@
                             </div>
                             <select id="classroom_id" name="classroom_id"
                                 class="block w-full pl-10 pr-10 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 appearance-none @error('classroom_id') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror">
-                                <option value="">-- เลือกระดับชั้นก่อน --</option>
+                                <option value="">{{ __('-- Select grade level first --') }}</option>
                                 @if($isEdit && isset($classrooms))
                                     @foreach($classrooms as $oc)
                                         <option value="{{ $oc->classroom_id }}"
@@ -136,7 +136,7 @@
                     {{-- Course --}}
                     <div class="space-y-2">
                         <label for="course_id" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                            รายวิชา
+                            {{ __('Course') }}
                         </label>
                         <div class="group relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -144,7 +144,7 @@
                             </div>
                             <select id="course_id" name="course_id"
                                 class="block w-full pl-10 pr-10 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 appearance-none @error('course_id') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror">
-                                <option value="">-- เลือกระดับชั้นก่อน --</option>
+                                <option value="">{{ __('-- Select grade level first --') }}</option>
                                 @if($isEdit && isset($courses))
                                     @foreach($courses as $course)
                                         <option value="{{ $course->id }}"
@@ -175,7 +175,7 @@
                         </button>
                         <a href="{{ route('admin.opened-courses.index') }}"
                            class="flex-1 flex items-center justify-center px-8 py-4 bg-white dark:bg-[#242526] text-gray-700 dark:text-gray-300 font-bold rounded-2xl border-2 border-gray-100 dark:border-[#3a3b3c] hover:border-gray-200 dark:hover:border-[#4a4b4c] hover:bg-gray-50 dark:hover:bg-[#3a3b3c] active:scale-95 transition-all duration-200">
-                            {{ $isEdit ? 'ยกเลิก' : 'ย้อนกลับ' }}
+                            {{ $isEdit ? __('Cancel') : __('Go Back') }}
                         </a>
                     </div>
                 </form>
@@ -190,6 +190,10 @@ const CLASSROOMS_URL = "{{ route('admin.opened-courses.classrooms-by-grade') }}"
 const COURSES_URL    = "{{ route('admin.opened-courses.courses-by-grade') }}";
 const SELECTED_CLASSROOM = "{{ $selectedClassroom }}";
 const SELECTED_COURSE    = "{{ $selectedCourse }}";
+const LANG_SELECT_GRADE_FIRST = @json(__('-- Select grade level first --'));
+const LANG_LOADING = @json(__('Loading...'));
+const LANG_SELECT_CLASSROOM = @json(__('-- Select Classroom --'));
+const LANG_SELECT_COURSE = @json(__('-- Select Course --'));
 
 document.getElementById('grade_id').addEventListener('change', function() {
     const gradeId      = this.value;
@@ -197,22 +201,22 @@ document.getElementById('grade_id').addEventListener('change', function() {
     const courseSel    = document.getElementById('course_id');
 
     if (!gradeId) {
-        classroomSel.innerHTML = '<option value="">-- เลือกระดับชั้นก่อน --</option>';
-        courseSel.innerHTML    = '<option value="">-- เลือกระดับชั้นก่อน --</option>';
+        classroomSel.innerHTML = '<option value="">' + LANG_SELECT_GRADE_FIRST + '</option>';
+        courseSel.innerHTML    = '<option value="">' + LANG_SELECT_GRADE_FIRST + '</option>';
         return;
     }
 
-    classroomSel.innerHTML = '<option value="">กำลังโหลด...</option>';
-    courseSel.innerHTML    = '<option value="">กำลังโหลด...</option>';
+    classroomSel.innerHTML = '<option value="">' + LANG_LOADING + '</option>';
+    courseSel.innerHTML    = '<option value="">' + LANG_LOADING + '</option>';
 
     Promise.all([
         fetch(`${CLASSROOMS_URL}?grade_id=${gradeId}`).then(r => r.json()),
         fetch(`${COURSES_URL}?grade_id=${gradeId}`).then(r => r.json()),
     ]).then(([classrooms, courses]) => {
-        classroomSel.innerHTML = '<option value="">-- เลือกห้องเรียน --</option>' +
+        classroomSel.innerHTML = '<option value="">' + LANG_SELECT_CLASSROOM + '</option>' +
             classrooms.map(c => `<option value="${c.id}"${c.id == SELECTED_CLASSROOM ? ' selected' : ''}>${c.name}</option>`).join('');
 
-        courseSel.innerHTML = '<option value="">-- เลือกรายวิชา --</option>' +
+        courseSel.innerHTML = '<option value="">' + LANG_SELECT_COURSE + '</option>' +
             courses.map(c => `<option value="${c.id}"${c.id == SELECTED_COURSE ? ' selected' : ''}>${c.name}</option>`).join('');
     });
 });

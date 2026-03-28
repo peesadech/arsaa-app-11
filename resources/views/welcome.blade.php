@@ -22,32 +22,32 @@
                 <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-110 transition-transform">
                     <i class="fas fa-book text-xl"></i>
                 </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-2">Documentation</h3>
-                <p class="text-sm text-gray-500">Comprehensive guides and documentation.</p>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">{{ __('Documentation') }}</h3>
+                <p class="text-sm text-gray-500">{{ __('Comprehensive guides and documentation.') }}</p>
             </a>
 
             <a href="https://laracasts.com" class="block p-6 bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-50 hover:border-sky-100 group transition-all duration-300 hover:-translate-y-1">
                 <div class="w-12 h-12 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-600 mb-4 group-hover:scale-110 transition-transform">
                     <i class="fas fa-video text-xl"></i>
                 </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-2">Laracasts</h3>
-                <p class="text-sm text-gray-500">Amazing video tutorials for Laravel.</p>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">{{ __('Laracasts') }}</h3>
+                <p class="text-sm text-gray-500">{{ __('Amazing video tutorials for Laravel.') }}</p>
             </a>
 
             <a href="https://laravel-news.com" class="block p-6 bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-50 hover:border-rose-100 group transition-all duration-300 hover:-translate-y-1">
                 <div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600 mb-4 group-hover:scale-110 transition-transform">
                     <i class="fas fa-newspaper text-xl"></i>
                 </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-2">Laravel News</h3>
-                <p class="text-sm text-gray-500">Latest news and ecosystem updates.</p>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">{{ __('Laravel News') }}</h3>
+                <p class="text-sm text-gray-500">{{ __('Latest news and ecosystem updates.') }}</p>
             </a>
 
             <a href="https://github.com/laravel/laravel" class="block p-6 bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-50 hover:border-gray-200 group transition-all duration-300 hover:-translate-y-1">
                 <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-600 mb-4 group-hover:scale-110 transition-transform">
                     <i class="fab fa-github text-xl"></i>
                 </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-2">GitHub</h3>
-                <p class="text-sm text-gray-500">Contribute to the framework code.</p>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">{{ __('GitHub') }}</h3>
+                <p class="text-sm text-gray-500">{{ __('Contribute to the framework code.') }}</p>
             </a>
         </div>
         

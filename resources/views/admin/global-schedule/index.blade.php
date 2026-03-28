@@ -11,8 +11,8 @@
                 <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
             </a>
             <div>
-                <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">Global Schedule</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">Select an education level to configure its schedule</p>
+                <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ __('Global Schedule') }}</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">{{ __('Select an education level to configure its schedule') }}</p>
             </div>
         </div>
 
@@ -39,11 +39,11 @@
             <div class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-[#3a3b3c] flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-school text-2xl text-gray-300 dark:text-gray-600"></i>
             </div>
-            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2">No Education Levels Found</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Please create education levels first before configuring schedules.</p>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2">{{ __('No Education Levels Found') }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{ __('Please create education levels first before configuring schedules.') }}</p>
             <a href="{{ route('admin.education-levels.create') }}"
                class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 transition-all duration-200">
-                <i class="fas fa-plus mr-2"></i> Create Education Level
+                <i class="fas fa-plus mr-2"></i> {{ __('Create Education Level') }}
             </a>
         </div>
         @else
@@ -84,11 +84,11 @@
                         <div class="flex items-center gap-3 mb-4">
                             <div class="flex items-center px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-900/20">
                                 <i class="fas fa-calendar-day text-[10px] text-indigo-500 mr-1.5"></i>
-                                <span class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">{{ $activeDays }} days</span>
+                                <span class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">{{ $activeDays }} {{ __('days') }}</span>
                             </div>
                             <div class="flex items-center px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-900/20">
                                 <i class="fas fa-clock text-[10px] text-purple-500 mr-1.5"></i>
-                                <span class="text-[11px] font-bold text-purple-600 dark:text-purple-400">{{ $periods }} periods max</span>
+                                <span class="text-[11px] font-bold text-purple-600 dark:text-purple-400">{{ $periods }} {{ __('periods max') }}</span>
                             </div>
                         </div>
                         @endif
@@ -97,11 +97,11 @@
                         <div class="flex items-center justify-between">
                             @if($hasSchedule)
                                 <span class="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                                    <i class="fas fa-check-circle mr-1"></i>Configured
+                                    <i class="fas fa-check-circle mr-1"></i>{{ __('Configured') }}
                                 </span>
                             @else
                                 <span class="px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                                    <i class="fas fa-exclamation-circle mr-1"></i>Not Configured
+                                    <i class="fas fa-exclamation-circle mr-1"></i>{{ __('Not Configured') }}
                                 </span>
                             @endif
                             <span class="text-xs font-bold text-gray-300 dark:text-gray-600 group-hover:text-indigo-400 transition-colors">

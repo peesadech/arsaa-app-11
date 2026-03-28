@@ -4,17 +4,17 @@
     $isEdit = isset($teacher);
     $actionUrl = $isEdit ? route('admin.teachers.update', $teacher->id) : route('admin.teachers.store');
 
-    $title = $isEdit ? 'Edit Teacher' : 'Create New Teacher';
-    $subtitle = $isEdit ? 'Update teacher details' : 'Teacher Registration';
+    $title = $isEdit ? __('Edit Teacher') : __('Create New Teacher');
+    $subtitle = $isEdit ? __('Update teacher details') : __('Teacher Registration');
 
     $gradientClass = $isEdit ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500' : 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500';
     $blurClass = $isEdit ? 'bg-amber-500/20' : 'bg-indigo-500/20';
     $iconBgClass = $isEdit ? 'bg-amber-50 border-amber-100' : 'bg-indigo-50 border-indigo-100 shadow-inner';
     $iconClass = $isEdit ? 'fa-user-edit text-amber-600 rotate-3' : 'fa-chalkboard-teacher text-indigo-600 -rotate-3';
-    $cardTitle = $isEdit ? 'Modify Teacher' : 'Teacher Details';
+    $cardTitle = $isEdit ? __('Modify Teacher') : __('Teacher Details');
     $cardDesc = $isEdit
-        ? "You are updating teacher #{$teacher->id}. Ensure all details are correct."
-        : 'Register a new teacher and assign courses.';
+        ? __('You are updating teacher #:id. Ensure all details are correct.', ['id' => $teacher->id])
+        : __('Register a new teacher and assign courses.');
 
     $focusRing = $isEdit ? 'focus:border-amber-400' : 'focus:border-indigo-500';
     $focusText = $isEdit ? 'group-focus-within:text-amber-500' : 'group-focus-within:text-indigo-500';
@@ -23,7 +23,7 @@
         ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-amber-200'
         : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200';
 
-    $btnText = $isEdit ? 'Save Changes' : 'Create Teacher';
+    $btnText = $isEdit ? __('Save Changes') : __('Create Teacher');
     $btnIcon = $isEdit ? 'fa-save' : 'fa-check-circle';
 
     $existingImage = $isEdit && $teacher->image_path ? $teacher->image_path : null;
@@ -82,14 +82,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Name -->
                         <div class="space-y-2">
-                            <label for="name" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">Full Name</label>
+                            <label for="name" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">{{ __('Full Name') }}</label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
                                     <i class="fas fa-user text-sm"></i>
                                 </div>
                                 <input type="text" id="name" name="name"
                                     class="block w-full pl-10 pr-4 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('name') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
-                                    placeholder="Enter full name"
+                                    placeholder="{{ __('Enter full name') }}"
                                     value="{{ old('name', $isEdit ? $teacher->name : '') }}"
                                     required />
                             </div>
@@ -100,7 +100,7 @@
 
                         <!-- Email -->
                         <div class="space-y-2">
-                            <label for="email" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">Email Address</label>
+                            <label for="email" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">{{ __('Email Address') }}</label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
                                     <i class="fas fa-envelope text-sm"></i>
@@ -121,7 +121,7 @@
                         <!-- Password -->
                         <div class="space-y-2">
                             <label for="password" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                                {{ $isEdit ? 'Change Password' : 'Password' }}
+                                {{ $isEdit ? __('Change Password') : __('Password') }}
                             </label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -129,7 +129,7 @@
                                 </div>
                                 <input type="password" id="password" name="password"
                                     class="block w-full pl-10 pr-4 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('password') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
-                                    placeholder="{{ $isEdit ? 'Leave blank to keep current' : 'Enter secure password' }}"
+                                    placeholder="{{ $isEdit ? __('Leave blank to keep current') : __('Enter secure password') }}"
                                     {{ $isEdit ? '' : 'required' }} />
                             </div>
                             @error('password')
@@ -140,7 +140,7 @@
                         <!-- Confirm Password -->
                         <div class="space-y-2">
                             <label for="password_confirmation" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                                Confirm Password
+                                {{ __('Confirm Password') }}
                             </label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -148,7 +148,7 @@
                                 </div>
                                 <input type="password" id="password_confirmation" name="password_confirmation"
                                     class="block w-full pl-10 pr-4 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200"
-                                    placeholder="Confirm password"
+                                    placeholder="{{ __('Confirm password') }}"
                                     {{ $isEdit ? '' : 'required' }} />
                             </div>
                         </div>
@@ -156,14 +156,14 @@
 
                     <!-- Phone -->
                     <div class="space-y-2">
-                        <label for="phone" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">Phone Number</label>
+                        <label for="phone" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">{{ __('Phone Number') }}</label>
                         <div class="group relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
                                 <i class="fas fa-phone text-sm"></i>
                             </div>
                             <input type="text" id="phone" name="phone"
                                 class="block w-full pl-10 pr-4 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('phone') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
-                                placeholder="Phone number (optional)"
+                                placeholder="{{ __('Phone number (optional)') }}"
                                 value="{{ old('phone', $isEdit ? $teacher->phone : '') }}" />
                         </div>
                         @error('phone')
@@ -173,23 +173,23 @@
 
                     <!-- Assigned Courses -->
                     <div class="space-y-3">
-                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">Assigned Courses</label>
+                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">{{ __('Assigned Courses') }}</label>
                         <div id="selectedCoursesContainer" class="flex flex-wrap gap-2 min-h-[40px] p-3 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl transition-all">
                             <!-- Selected courses will appear here -->
                         </div>
                         <button type="button" onclick="openCourseModal()"
                             class="inline-flex items-center px-4 py-2.5 bg-white dark:bg-[#242526] border-2 border-gray-100 dark:border-[#3a3b3c] rounded-xl text-sm font-bold text-gray-600 dark:text-gray-400 hover:border-indigo-500 hover:text-indigo-600 transition-all duration-200">
                             <i class="fas fa-plus-circle mr-2 text-xs"></i>
-                            Select Courses
+                            {{ __('Select Courses') }}
                         </button>
                     </div>
 
                     <!-- Unavailable Periods Schedule -->
                     <div id="scheduleSection" class="space-y-3" style="display:none">
                         <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                            <i class="fas fa-calendar-times mr-1 text-rose-400"></i> คาบที่ไม่ต้องการสอน
+                            <i class="fas fa-calendar-times mr-1 text-rose-400"></i> {{ __('Unavailable Teaching Periods') }}
                         </label>
-                        <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium px-1">คลิกเลือกคาบที่ไม่ต้องการสอน (แสดงตาม Education Level ของรายวิชาที่เลือก)</p>
+                        <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium px-1">{{ __('Click to select periods you do not want to teach (shown by Education Level of selected courses)') }}</p>
                         <div id="scheduleGridContainer">
                             <!-- Schedule grids will be rendered here per education level -->
                         </div>
@@ -197,14 +197,14 @@
 
                     <!-- Status -->
                     <div class="space-y-3">
-                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">Account Status</label>
+                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">{{ __('Account Status') }}</label>
                         <div class="flex flex-wrap gap-2">
                             <label class="relative group cursor-pointer">
                                 <input type="radio" name="status" value="1" class="peer hidden" {{ old('status', $isEdit ? $teacher->status : 1) == 1 ? 'checked' : '' }}>
                                 <div class="px-4 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] bg-white dark:bg-[#242526] text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-600 dark:peer-checked:text-emerald-400 group-hover:border-gray-200 dark:group-hover:border-[#4a4b4c]">
                                     <div class="flex items-center">
                                         <i class="fas fa-check-circle mr-2 text-[10px] opacity-50"></i>
-                                        Active
+                                        {{ __('Active') }}
                                     </div>
                                 </div>
                                 <div class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center text-[8px] text-white opacity-0 peer-checked:opacity-100 transition-all scale-50 peer-checked:scale-100">
@@ -217,7 +217,7 @@
                                 <div class="px-4 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] bg-white dark:bg-[#242526] text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:border-rose-500 peer-checked:bg-rose-50 dark:peer-checked:bg-rose-900/30 peer-checked:text-rose-600 dark:peer-checked:text-rose-400 group-hover:border-gray-200 dark:group-hover:border-[#4a4b4c]">
                                     <div class="flex items-center">
                                         <i class="fas fa-times-circle mr-2 text-[10px] opacity-50"></i>
-                                        Not Active
+                                        {{ __('Not Active') }}
                                     </div>
                                 </div>
                                 <div class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 rounded-full flex items-center justify-center text-[8px] text-white opacity-0 peer-checked:opacity-100 transition-all scale-50 peer-checked:scale-100">
@@ -243,7 +243,7 @@
 
                         <a href="{{ route('admin.teachers.index') }}"
                            class="flex-1 flex items-center justify-center px-8 py-4 bg-white dark:bg-[#242526] text-gray-700 dark:text-gray-300 font-bold rounded-2xl border-2 border-gray-100 dark:border-[#3a3b3c] hover:border-gray-200 dark:hover:border-[#4a4b4c] hover:bg-gray-50 dark:hover:bg-[#3a3b3c] active:scale-95 transition-all duration-200">
-                            {{ $isEdit ? 'Cancel' : 'Back to List' }}
+                            {{ $isEdit ? __('Cancel') : __('Back to List') }}
                         </a>
                     </div>
                 </form>
@@ -261,7 +261,7 @@
             <div class="px-6 pt-6 pb-4 border-b border-gray-100 dark:border-[#3a3b3c]">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-extrabold text-gray-900 dark:text-white tracking-tight">
-                        <i class="fas fa-book mr-2 text-indigo-500"></i>Select Courses
+                        <i class="fas fa-book mr-2 text-indigo-500"></i>{{ __('Select Courses') }}
                     </h3>
                     <button onclick="closeCourseModal()" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-[#3a3b3c] flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors">
                         <i class="fas fa-times text-sm"></i>
@@ -272,7 +272,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="relative">
                         <select id="modalEducationLevelFilter" class="appearance-none block w-full pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-gray-100 dark:border-[#4a4b4c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:border-indigo-500 transition-all cursor-pointer">
-                            <option value="">All Education Levels</option>
+                            <option value="">{{ __('All Education Levels') }}</option>
                             @foreach($educationLevels as $el)
                                 <option value="{{ $el->id }}">{{ $el->name_th }}</option>
                             @endforeach
@@ -283,7 +283,7 @@
                     </div>
                     <div class="relative">
                         <select id="modalSubjectGroupFilter" class="appearance-none block w-full pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-gray-100 dark:border-[#4a4b4c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:border-indigo-500 transition-all cursor-pointer">
-                            <option value="">All Subject Groups</option>
+                            <option value="">{{ __('All Subject Groups') }}</option>
                             @foreach($subjectGroups as $sg)
                                 <option value="{{ $sg->id }}">{{ $sg->name_th }}</option>
                             @endforeach
@@ -294,9 +294,9 @@
                     </div>
                     <div class="relative">
                         <select id="modalSemesterFilter" class="appearance-none block w-full pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-gray-100 dark:border-[#4a4b4c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:border-indigo-500 transition-all cursor-pointer">
-                            <option value="">All Semesters</option>
+                            <option value="">{{ __('All Semesters') }}</option>
                             @foreach($semesters as $sem)
-                                <option value="{{ $sem->id }}">Semester {{ $sem->semester_number }}</option>
+                                <option value="{{ $sem->id }}">{{ __('Semester') }} {{ $sem->semester_number }}</option>
                             @endforeach
                         </select>
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
@@ -307,7 +307,7 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                             <i class="fas fa-search text-xs"></i>
                         </div>
-                        <input type="text" id="modalSearchInput" placeholder="Search course name..."
+                        <input type="text" id="modalSearchInput" placeholder="{{ __('Search course name...') }}"
                             class="block w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-gray-100 dark:border-[#4a4b4c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 placeholder-gray-400 focus:outline-none focus:border-indigo-500 transition-all">
                     </div>
                 </div>
@@ -317,15 +317,15 @@
             <div class="px-6 py-4 max-h-[400px] overflow-y-auto" id="courseListContainer">
                 <div class="text-center py-8 text-gray-400">
                     <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                    <p class="text-xs font-bold">Loading courses...</p>
+                    <p class="text-xs font-bold">{{ __('Loading courses...') }}</p>
                 </div>
             </div>
 
             <!-- Modal Footer -->
             <div class="px-6 py-4 border-t border-gray-100 dark:border-[#3a3b3c] bg-gray-50/50 dark:bg-[#18191a]/30 flex items-center justify-between">
-                <span class="text-xs font-bold text-gray-400"><span id="selectedCount">0</span> courses selected</span>
+                <span class="text-xs font-bold text-gray-400"><span id="selectedCount">0</span> {{ __('courses selected') }}</span>
                 <button onclick="closeCourseModal()" class="px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-xl text-xs hover:bg-indigo-700 transition-all active:scale-95 uppercase tracking-wider">
-                    Done
+                    {{ __('Done') }}
                 </button>
             </div>
         </div>
@@ -337,6 +337,21 @@
 
 @push('scripts')
 <script shadow>
+    const LANG_NO_COURSES_SELECTED = @json(__('No courses selected. Click "Select Courses" to add.'));
+    const LANG_LOADING = @json(__('Loading...'));
+    const LANG_NO_COURSES_FOUND = @json(__('No courses found'));
+    const LANG_LOADING_SCHEDULE = @json(__('Loading schedule...'));
+    const LANG_SCHEDULE_NOT_CONFIGURED = @json(__('Schedule not yet configured'));
+    const LANG_CLICK_TO_DESELECT = @json(__('Click to deselect'));
+    const LANG_CLICK_TO_MARK_UNAVAILABLE = @json(__('Click to mark as unavailable'));
+    const LANG_NOT_TEACHING = @json(__('Not teaching'));
+    const LANG_PERIOD = @json(__('Period'));
+    const LANG_BREAK = @json(__('Break'));
+    const LANG_MINUTES_SHORT = @json(__('min.'));
+    const LANG_PERIODS_UNIT = @json(__('periods'));
+    const LANG_CLICK_UNAVAILABLE_PERIODS = @json(__('Click periods you do not want to teach'));
+    const LANG_ALL_SEMESTERS = @json(__('All Semesters'));
+
     // Image upload handling
     const imageInput = document.getElementById('image_input');
     const imagePreview = document.getElementById('preview-img');
@@ -384,13 +399,13 @@
     let scheduleConfigs = {};
 
     const DAY_META = {
-        1: {th: 'จันทร์', en: 'Mon'},
-        2: {th: 'อังคาร', en: 'Tue'},
-        3: {th: 'พุธ', en: 'Wed'},
-        4: {th: 'พฤหัส', en: 'Thu'},
-        5: {th: 'ศุกร์', en: 'Fri'},
-        6: {th: 'เสาร์', en: 'Sat'},
-        7: {th: 'อาทิตย์', en: 'Sun'},
+        1: {th: @json(__('Monday')), en: 'Mon'},
+        2: {th: @json(__('Tuesday')), en: 'Tue'},
+        3: {th: @json(__('Wednesday')), en: 'Wed'},
+        4: {th: @json(__('Thursday')), en: 'Thu'},
+        5: {th: @json(__('Friday')), en: 'Fri'},
+        6: {th: @json(__('Saturday')), en: 'Sat'},
+        7: {th: @json(__('Sunday')), en: 'Sun'},
     };
 
     @if($isEdit && isset($teacherCourseIds))
@@ -415,7 +430,7 @@
         const ids = Object.keys(selectedCourses);
 
         if (ids.length === 0) {
-            container.innerHTML = '<span class="text-gray-400 text-xs italic">No courses selected. Click "Select Courses" to add.</span>';
+            container.innerHTML = '<span class="text-gray-400 text-xs italic">' + LANG_NO_COURSES_SELECTED + '</span>';
             return;
         }
 
@@ -477,13 +492,13 @@
         if (search) params.append('search', search);
 
         const container = document.getElementById('courseListContainer');
-        container.innerHTML = '<div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><p class="text-xs font-bold">Loading...</p></div>';
+        container.innerHTML = '<div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><p class="text-xs font-bold">' + LANG_LOADING + '</p></div>';
 
         fetch("{{ route('admin.teachers.search-courses') }}?" + params.toString())
             .then(function(r) { return r.json(); })
             .then(function(courses) {
                 if (courses.length === 0) {
-                    container.innerHTML = '<div class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2"></i><p class="text-xs font-bold">No courses found</p></div>';
+                    container.innerHTML = '<div class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-2xl mb-2"></i><p class="text-xs font-bold">' + LANG_NO_COURSES_FOUND + '</p></div>';
                     return;
                 }
 
@@ -584,7 +599,7 @@
             return;
         }
 
-        container.innerHTML = '<div class="text-center py-6 text-gray-400"><i class="fas fa-spinner fa-spin text-xl mb-2"></i><p class="text-xs font-bold">Loading schedule...</p></div>';
+        container.innerHTML = '<div class="text-center py-6 text-gray-400"><i class="fas fa-spinner fa-spin text-xl mb-2"></i><p class="text-xs font-bold">' + LANG_LOADING_SCHEDULE + '</p></div>';
 
         const params = new URLSearchParams();
         elIds.forEach(function(id) { params.append('education_level_ids[]', id); });
@@ -697,7 +712,7 @@
 
         if (activeDays.length === 0) {
             return '<div class="p-4 mb-3 bg-gray-50 dark:bg-[#18191a]/30 rounded-2xl border border-gray-100 dark:border-[#3a3b3c]/50">' +
-                '<div class="text-xs font-bold text-gray-400">' + config.education_level_name + ' — ยังไม่ได้ตั้งค่าตารางสอน</div></div>';
+                '<div class="text-xs font-bold text-gray-400">' + config.education_level_name + ' — ' + LANG_SCHEDULE_NOT_CONFIGURED + '</div></div>';
         }
 
         const maxP = activeDays.reduce(function(m, d) {
@@ -707,7 +722,7 @@
         let html = '<div class="mb-4 bg-white dark:bg-[#242526] rounded-2xl border border-gray-100 dark:border-[#3a3b3c] overflow-hidden">';
         html += '<div class="px-4 py-3 border-b border-gray-100 dark:border-[#3a3b3c] flex items-center justify-between">';
         html += '<span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider"><i class="fas fa-school mr-1"></i> ' + config.education_level_name + '</span>';
-        html += '<span class="text-[10px] text-rose-400 font-bold">คลิกคาบที่ไม่ต้องการสอน</span>';
+        html += '<span class="text-[10px] text-rose-400 font-bold">' + LANG_CLICK_UNAVAILABLE_PERIODS + '</span>';
         html += '</div>';
         html += '<div class="overflow-x-auto p-3">';
         html += '<table style="border-collapse:separate;border-spacing:0;width:100%">';
@@ -721,7 +736,7 @@
             html += '<td style="padding:8px 6px;text-align:center;background:' + C.bgAlt + ';border:1px solid ' + C.border + ';border-bottom:2px solid ' + C.indigo + ';min-width:90px">';
             html += '<div style="font-size:12px;font-weight:800;color:' + C.indigo + '">' + meta.th + '</div>';
             html += '<div style="font-size:9px;color:' + C.muted + ';text-transform:uppercase">' + meta.en + '</div>';
-            html += '<div style="font-size:9px;color:' + C.muted + ';margin-top:2px">' + dc.periods + ' คาบ</div>';
+            html += '<div style="font-size:9px;color:' + C.muted + ';margin-top:2px">' + dc.periods + ' ' + LANG_PERIODS_UNIT + '</div>';
             html += '</td>';
         });
         html += '</tr>';
@@ -730,7 +745,7 @@
         for (let p = 1; p <= maxP; p++) {
             html += '<tr>';
             html += '<td style="padding:6px 8px;border-right:2px solid ' + C.border + ';white-space:nowrap">';
-            html += '<span style="font-size:11px;font-weight:800;color:' + C.indigo + '">คาบ ' + p + '</span>';
+            html += '<span style="font-size:11px;font-weight:800;color:' + C.indigo + '">' + LANG_PERIOD + ' ' + p + '</span>';
             html += '</td>';
 
             activeDays.forEach(function(d) {
@@ -744,11 +759,11 @@
 
                     html += '<td style="padding:5px 4px;border:1.5px solid ' + cellBorder + ';background:' + cellBg + ';text-align:center;' + cursor + ';transition:all .15s;user-select:none" ';
                     html += 'onclick="toggleUnavailable(' + elId + ',' + d + ',' + p + ')" ';
-                    html += 'title="' + (checked ? 'คลิกเพื่อยกเลิก' : 'คลิกเพื่อเลือกว่าไม่สอน') + '">';
+                    html += 'title="' + (checked ? LANG_CLICK_TO_DESELECT : LANG_CLICK_TO_MARK_UNAVAILABLE) + '">';
 
                     if (checked) {
                         html += '<div style="font-size:11px;font-weight:800;color:' + C.rose + '"><i class="fas fa-times-circle"></i></div>';
-                        html += '<div style="font-size:9px;color:' + C.rose + ';font-weight:700">ไม่สอน</div>';
+                        html += '<div style="font-size:9px;color:' + C.rose + ';font-weight:700">' + LANG_NOT_TEACHING + '</div>';
                     } else {
                         html += '<div style="font-size:11px;font-weight:700;color:' + C.text + '">' + fmtTime(s) + '</div>';
                         html += '<div style="font-size:9px;color:' + C.muted + '">– ' + fmtTime(s + dur) + '</div>';
@@ -773,14 +788,14 @@
                 if (hasAnyBreak) {
                     html += '<tr>';
                     html += '<td style="padding:2px 8px;border-right:2px solid ' + C.border + '">';
-                    html += '<span style="font-size:9px;color:#f59e0b;font-weight:700">☕ พัก</span>';
+                    html += '<span style="font-size:9px;color:#f59e0b;font-weight:700">☕ ' + LANG_BREAK + '</span>';
                     html += '</td>';
                     activeDays.forEach(function(d) {
                         const dc = dayConfigs[String(d)] || {};
                         const bDur = (dc.breaks || {})[String(p)];
                         if (bDur && p < (dc.periods || 0)) {
                             html += '<td style="padding:2px 4px;border:1px solid #f59e0b;background:' + (dark ? 'rgba(245,158,11,0.12)' : 'rgba(254,243,199,0.8)') + ';text-align:center">';
-                            html += '<span style="font-size:10px;color:#d97706;font-weight:700">☕ ' + bDur + ' น.</span>';
+                            html += '<span style="font-size:10px;color:#d97706;font-weight:700">☕ ' + bDur + ' ' + LANG_MINUTES_SHORT + '</span>';
                             html += '</td>';
                         } else {
                             html += '<td style="padding:2px 4px;border:1px solid ' + C.border + ';background:' + C.bgAlt + ';opacity:.2"></td>';

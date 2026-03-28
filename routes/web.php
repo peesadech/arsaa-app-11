@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\YearlyScheduleController;
 use App\Http\Controllers\Admin\EducationLevelController;
 use App\Http\Controllers\Admin\SubjectGroupController;
 use App\Http\Controllers\Admin\TeacherController;
+use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Api\RoleController as ApiRoleController;
 use App\Http\Controllers\Api\PermissionController as ApiPermissionController;
 use App\Http\Controllers\Api\UserRoleController as ApiUserRoleController;
@@ -52,6 +53,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
+
+// Language Switcher (any user)
+Route::get('/locale/{code}', [LanguageController::class, 'switchLocale'])->name('locale.switch');
 
 // SuperAdmin only
 Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
@@ -191,6 +195,17 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::get('/admin/courses/{id}/edit', [CourseController::class, 'edit'])->name('admin.courses.edit');
     Route::put('/admin/courses/{id}', [CourseController::class, 'update'])->name('admin.courses.update');
     Route::delete('/admin/courses/{id}', [CourseController::class, 'destroy'])->name('admin.courses.destroy');
+
+    // Language Management
+    Route::get('/admin/languages', [LanguageController::class, 'index'])->name('admin.languages.index');
+    Route::get('/admin/languages/data', [LanguageController::class, 'data'])->name('admin.languages.data');
+    Route::get('/admin/languages/create', [LanguageController::class, 'create'])->name('admin.languages.create');
+    Route::post('/admin/languages', [LanguageController::class, 'store'])->name('admin.languages.store');
+    Route::get('/admin/languages/{id}/edit', [LanguageController::class, 'edit'])->name('admin.languages.edit');
+    Route::put('/admin/languages/{id}', [LanguageController::class, 'update'])->name('admin.languages.update');
+    Route::delete('/admin/languages/{id}', [LanguageController::class, 'destroy'])->name('admin.languages.destroy');
+    Route::get('/admin/languages/{code}/translations', [LanguageController::class, 'translations'])->name('admin.languages.translations');
+    Route::put('/admin/languages/{code}/translations', [LanguageController::class, 'updateTranslations'])->name('admin.languages.translations.update');
 
     // Teacher Management
     Route::get('/admin/teachers', [TeacherController::class, 'index'])->name('admin.teachers.index');

@@ -56,7 +56,7 @@
                     </div>
                     <div class="flex flex-col">
                         <span class="font-bold text-lg leading-tight">{{ Auth::user()->name }}</span>
-                        <span class="text-xs text-indigo-400 font-medium">Update Profile</span>
+                        <span class="text-xs text-indigo-400 font-medium">{{ __('Update Profile') }}</span>
                     </div>
                 </div>
             </a>
@@ -70,7 +70,7 @@
                         <div class="w-10 h-10 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center text-xl">
                             <i class="fas fa-cogs text-base"></i>
                         </div>
-                        <span class="font-bold text-sm">Setting</span>
+                        <span class="font-bold text-sm">{{ __('Setting') }}</span>
                     </div>
                     <i class="fas fa-chevron-down setting-arrow text-gray-400 text-xs transition-transform duration-200"></i>
                 </a>
@@ -81,92 +81,98 @@
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-chalkboard-teacher text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">Teacher Management</span>
+                        <span class="font-medium text-sm">{{ __('Teacher Management') }}</span>
                     </a>
                     <a href="{{ route('admin.users.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-users text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">User Management</span>
+                        <span class="font-medium text-sm">{{ __('User Management') }}</span>
                     </a>
                     <a href="{{ route('admin.grades.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-layer-group text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">Grade Management</span>
+                        <span class="font-medium text-sm">{{ __('Grade Management') }}</span>
                     </a>
                     <a href="{{ route('admin.classrooms.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-chalkboard text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">Classroom Management</span>
+                        <span class="font-medium text-sm">{{ __('Classroom Management') }}</span>
                     </a>
                     <a href="{{ route('admin.courses.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-book text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">Course Management</span>
+                        <span class="font-medium text-sm">{{ __('Course Management') }}</span>
                     </a>
                     <a href="{{ route('admin.academic-years.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-calendar-alt text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">Academic Year</span>
+                        <span class="font-medium text-sm">{{ __('Academic Year') }}</span>
                     </a>
                     <a href="{{ route('admin.semesters.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-list-ol text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">Semester</span>
+                        <span class="font-medium text-sm">{{ __('Semester') }}</span>
                     </a>
                     @if(collect(auth()->user()?->getRoleNames() ?? [])->contains(fn($r) => strtoupper($r) === 'SUPERADMIN'))
                     <a href="{{ route('admin.education-levels.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-school text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">Education Level</span>
+                        <span class="font-medium text-sm">{{ __('Education Level') }}</span>
                     </a>
                     <a href="{{ route('admin.subject-groups.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-th-large text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">Subject Group</span>
+                        <span class="font-medium text-sm">{{ __('Subject Group') }}</span>
                     </a>
                     <a href="{{ route('admin.global-schedule.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-calendar-check text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">Global Schedule</span>
+                        <span class="font-medium text-sm">{{ __('Global Schedule') }}</span>
                     </a>
                     <a href="{{ route('admin.roles-permissions') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-user-shield text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">Role Management</span>
+                        <span class="font-medium text-sm">{{ __('Role Management') }}</span>
                     </a>
                     <a href="{{ route('admin.permissions') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-key text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">Permissions</span>
+                        <span class="font-medium text-sm">{{ __('Permissions') }}</span>
                     </a>
                     <a href="{{ route('admin.permission-types') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-cubes text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">Permission Type</span>
+                        <span class="font-medium text-sm">{{ __('Permission Type') }}</span>
                     </a>
                     <a href="javascript:void(0)" onclick="document.getElementById('academicYearGlobalModal').style.display='flex'" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-graduation-cap text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">Academic Year & Semester</span>
+                        <span class="font-medium text-sm">{{ __('Academic Year & Semester') }}</span>
+                    </a>
+                    <a href="{{ route('admin.languages.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-language text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">{{ __('Language Management') }}</span>
                     </a>
                     <a href="{{ route('admin.settings.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-cog text-xs text-gray-400"></i>
                         </div>
-                        <span class="font-medium text-sm">General Settings</span>
+                        <span class="font-medium text-sm">{{ __('General Settings') }}</span>
                     </a>
                     @endif
                 </div>
@@ -175,12 +181,12 @@
                 <a
                    href=""
                    onclick="event.preventDefault(); document.getElementById('logout-form-dropdown').submit();"
-                   class="flex items-center justify-between p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors group cursor-pointer"> 
+                   class="flex items-center justify-between p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors group cursor-pointer">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center text-xl">
                             <i class="fas fa-sign-out-alt text-base"></i>
                         </div>
-                        <span class="font-bold text-sm">Log Out</span>
+                        <span class="font-bold text-sm">{{ __('Log Out') }}</span>
                     </div>
                 </a>
 
@@ -193,12 +199,12 @@
         <!-- Meta Footer Section -->
         <div class="p-4 text-[11px] text-gray-500 pt-0">
             <div class="flex flex-wrap gap-x-2 gap-y-1 px-2">
-                <a href="#" class="hover:underline">Privacy</a> · 
-                <a href="#" class="hover:underline">Terms</a> · 
-                <a href="#" class="hover:underline">Advertising</a> · 
-                <a href="#" class="hover:underline">Ad Choices</a> · 
-                <a href="#" class="hover:underline">Cookies</a> · 
-                <a href="#" class="hover:underline">More</a> · 
+                <a href="#" class="hover:underline">{{ __('Privacy') }}</a> ·
+                <a href="#" class="hover:underline">{{ __('Terms') }}</a> ·
+                <a href="#" class="hover:underline">{{ __('Advertising') }}</a> ·
+                <a href="#" class="hover:underline">{{ __('Ad Choices') }}</a> ·
+                <a href="#" class="hover:underline">{{ __('Cookies') }}</a> ·
+                <a href="#" class="hover:underline">{{ __('More') }}</a> ·
                 <span class="cursor-default">{{ $setting->app_name }} &copy; {{ date('Y') }}</span>
             </div>
         </div>

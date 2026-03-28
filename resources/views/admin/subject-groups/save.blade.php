@@ -4,18 +4,18 @@
     $isEdit = isset($subjectGroup);
     $actionUrl = $isEdit ? route('admin.subject-groups.update', $subjectGroup->id) : route('admin.subject-groups.store');
 
-    $title = $isEdit ? 'Edit Subject Group' : 'Create New Subject Group';
-    $subtitle = $isEdit ? 'Update subject group details' : 'Subject Group Registration';
+    $title = $isEdit ? __('Edit Subject Group') : __('Create New Subject Group');
+    $subtitle = $isEdit ? __('Update subject group details') : __('Subject Group Registration');
 
     // Theme Configuration
     $gradientClass = $isEdit ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500' : 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500';
     $blurClass = $isEdit ? 'bg-amber-500/20' : 'bg-indigo-500/20';
     $iconBgClass = $isEdit ? 'bg-amber-50 border-amber-100' : 'bg-indigo-50 border-indigo-100 shadow-inner';
     $iconClass = $isEdit ? 'fa-edit text-amber-600 rotate-3' : 'fa-plus text-indigo-600 -rotate-3';
-    $cardTitle = $isEdit ? 'Modify Subject Group' : 'Subject Group Details';
+    $cardTitle = $isEdit ? __('Modify Subject Group') : __('Subject Group Details');
     $cardDesc = $isEdit
-        ? "You are updating subject group #{$subjectGroup->id}. Ensure all details are correct."
-        : 'Define a new subject group and its descriptions.';
+        ? __('You are updating subject group #:id. Ensure all details are correct.', ['id' => $subjectGroup->id])
+        : __('Define a new subject group and its descriptions.');
 
     $focusRing = $isEdit ? 'focus:border-amber-400' : 'focus:border-indigo-500';
     $focusText = $isEdit ? 'group-focus-within:text-amber-500' : 'group-focus-within:text-indigo-500';
@@ -24,7 +24,7 @@
         ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-amber-200'
         : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200';
 
-    $btnText = $isEdit ? 'Save Changes' : 'Create Subject Group';
+    $btnText = $isEdit ? __('Save Changes') : __('Create Subject Group');
     $btnIcon = $isEdit ? 'fa-save' : 'fa-check-circle';
 @endphp
 
@@ -74,7 +74,7 @@
                         <!-- Name TH -->
                         <div class="space-y-2">
                             <label for="name_th" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                                Name
+                                {{ __('Name') }}
                             </label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -85,7 +85,7 @@
                                     id="name_th"
                                     name="name_th"
                                     class="block w-full pl-10 pr-4 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('name_th') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
-                                    placeholder="เช่น วิทยาศาสตร์และเทคโนโลยี"
+                                    placeholder="{{ __('e.g. Science and Technology') }}"
                                     value="{{ old('name_th', $isEdit ? $subjectGroup->name_th : '') }}"
                                     required
                                 />
@@ -98,7 +98,7 @@
                         <!-- Name EN -->
                         <div class="space-y-2">
                             <label for="name_en" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                                Name (English)
+                                {{ __('Name (English)') }}
                             </label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -123,7 +123,7 @@
                     <!-- Description -->
                     <div class="space-y-2">
                         <label for="description" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                            Description
+                            {{ __('Description') }}
                         </label>
                         <div class="group relative">
                             <div class="absolute top-4 left-4 flex items-start pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -134,7 +134,7 @@
                                 name="description"
                                 rows="4"
                                 class="block w-full pl-10 pr-4 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('description') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
-                                placeholder="รายละเอียดเพิ่มเติม..."
+                                placeholder="{{ __('Additional details...') }}"
                             >{{ old('description', $isEdit ? $subjectGroup->description : '') }}</textarea>
                         </div>
                         @error('description')
@@ -145,7 +145,7 @@
                     <!-- Status -->
                     <div class="space-y-3">
                         <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                            Status
+                            {{ __('Status') }}
                         </label>
                         <div class="flex flex-wrap gap-2">
                             <!-- Active Status -->
@@ -154,7 +154,7 @@
                                 <div class="px-4 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] bg-white dark:bg-[#242526] text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-600 dark:peer-checked:text-emerald-400 group-hover:border-gray-200 dark:group-hover:border-[#4a4b4c]">
                                     <div class="flex items-center">
                                         <i class="fas fa-check-circle mr-2 text-[10px] opacity-50"></i>
-                                        Active
+                                        {{ __('Active') }}
                                     </div>
                                 </div>
                                 <div class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center text-[8px] text-white opacity-0 peer-checked:opacity-100 transition-all scale-50 peer-checked:scale-100">
@@ -168,7 +168,7 @@
                                 <div class="px-4 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] bg-white dark:bg-[#242526] text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:border-rose-500 peer-checked:bg-rose-50 dark:peer-checked:bg-rose-900/30 peer-checked:text-rose-600 dark:peer-checked:text-rose-400 group-hover:border-gray-200 dark:group-hover:border-[#4a4b4c]">
                                     <div class="flex items-center">
                                         <i class="fas fa-times-circle mr-2 text-[10px] opacity-50"></i>
-                                        Not Active
+                                        {{ __('Not Active') }}
                                     </div>
                                 </div>
                                 <div class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 rounded-full flex items-center justify-center text-[8px] text-white opacity-0 peer-checked:opacity-100 transition-all scale-50 peer-checked:scale-100">
@@ -196,7 +196,7 @@
 
                         <a href="{{ route('admin.subject-groups.index') }}"
                            class="flex-1 flex items-center justify-center px-8 py-4 bg-white dark:bg-[#242526] text-gray-700 dark:text-gray-300 font-bold rounded-2xl border-2 border-gray-100 dark:border-[#3a3b3c] hover:border-gray-200 dark:hover:border-[#4a4b4c] hover:bg-gray-50 dark:hover:bg-[#3a3b3c] active:scale-95 transition-all duration-200">
-                            {{ $isEdit ? 'Cancel' : 'Back to List' }}
+                            {{ $isEdit ? __('Cancel') : __('Back to List') }}
                         </a>
                     </div>
                 </form>

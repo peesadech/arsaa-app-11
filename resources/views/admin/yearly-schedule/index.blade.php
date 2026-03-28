@@ -12,12 +12,12 @@
                     <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
                 </a>
                 <div>
-                    <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">ตารางสอนประจำปี/ภาคเรียน</h1>
+                    <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ __('Yearly/Semester Schedule') }}</h1>
                     <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">
                         @if($academicYear && $semester)
-                            ปีการศึกษา {{ $academicYear->year }} / ภาคเรียนที่ {{ $semester->semester_number }}
+                            {{ __('Academic Year :year', ['year' => $academicYear->year]) }} / {{ __('Semester Number') }} {{ $semester->semester_number }}
                         @else
-                            กรุณาเลือกปีการศึกษาและภาคเรียนก่อน
+                            {{ __('Please select academic year and semester first') }}
                         @endif
                     </p>
                 </div>
@@ -25,12 +25,12 @@
 
             @if($academicYear && $semester)
             <form action="{{ route('admin.yearly-schedule.copy-all') }}" method="POST"
-                  onsubmit="return confirm('คัดลอก Global Schedule ทั้งหมดมาใช้กับปี {{ $academicYear->year }} / ภาค {{ $semester->semester_number }}?')">
+                  onsubmit="return confirm('{{ __('Copy all Global Schedule to year :year / semester :sem?', ['year' => $academicYear->year, 'sem' => $semester->semester_number]) }}')">
                 @csrf
                 <input type="hidden" name="academic_year_id" value="{{ $academicYearId }}">
                 <input type="hidden" name="semester_id" value="{{ $semesterId }}">
                 <button type="submit" class="btn-app">
-                    <i class="fas fa-copy text-[10px]"></i> คัดลอกทั้งหมดจาก Global
+                    <i class="fas fa-copy text-[10px]"></i> {{ __('Copy All from Global') }}
                 </button>
             </form>
             @endif
@@ -57,16 +57,16 @@
             <div class="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-calendar-alt text-2xl text-amber-400"></i>
             </div>
-            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2">ยังไม่ได้เลือกปีการศึกษา</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400">กรุณาเลือกปีการศึกษาและภาคเรียนจากเมนูด้านบนก่อน</p>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2">{{ __('Academic year not selected') }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Please select academic year and semester from the top menu first') }}</p>
         </div>
         @elseif($educationLevels->isEmpty())
         <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-12 text-center">
             <div class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-[#3a3b3c] flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-school text-2xl text-gray-300 dark:text-gray-600"></i>
             </div>
-            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2">ไม่พบระดับการศึกษา</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400">กรุณาสร้างระดับการศึกษาก่อน</p>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2">{{ __('No Education Levels Found') }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Please create education levels first before configuring schedules.') }}</p>
         </div>
         @else
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -107,11 +107,11 @@
                         <div class="flex items-center gap-3 mb-4">
                             <div class="flex items-center px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-900/20">
                                 <i class="fas fa-calendar-day text-[10px] text-indigo-500 mr-1.5"></i>
-                                <span class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">{{ $activeDays }} วัน</span>
+                                <span class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">{{ $activeDays }} {{ __('days') }}</span>
                             </div>
                             <div class="flex items-center px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-900/20">
                                 <i class="fas fa-clock text-[10px] text-purple-500 mr-1.5"></i>
-                                <span class="text-[11px] font-bold text-purple-600 dark:text-purple-400">{{ $periods }} คาบ/สูงสุด</span>
+                                <span class="text-[11px] font-bold text-purple-600 dark:text-purple-400">{{ $periods }} {{ __('periods max') }}</span>
                             </div>
                         </div>
                         @endif
@@ -120,11 +120,11 @@
                         <div class="flex items-center justify-between mb-4">
                             @if($hasSchedule)
                                 <span class="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                                    <i class="fas fa-check-circle mr-1"></i>ตั้งค่าแล้ว
+                                    <i class="fas fa-check-circle mr-1"></i>{{ __('Configured') }}
                                 </span>
                             @else
                                 <span class="px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                                    <i class="fas fa-exclamation-circle mr-1"></i>ยังไม่ได้ตั้งค่า
+                                    <i class="fas fa-exclamation-circle mr-1"></i>{{ __('Not Yet Configured') }}
                                 </span>
                             @endif
                         </div>
@@ -133,7 +133,7 @@
                         <div class="flex items-center gap-2">
                             <a href="{{ route('admin.yearly-schedule.edit', [$academicYearId, $semesterId, $level->id]) }}"
                                class="btn-app flex-1 text-center">
-                                <i class="fas fa-edit text-[10px]"></i> {{ $hasSchedule ? 'แก้ไข' : 'ตั้งค่า' }}
+                                <i class="fas fa-edit text-[10px]"></i> {{ $hasSchedule ? __('Edit') : __('Configure') }}
                             </a>
                             @if(!$hasSchedule && $hasGlobal)
                             <form action="{{ route('admin.yearly-schedule.copy') }}" method="POST" class="flex-1">
@@ -142,7 +142,7 @@
                                 <input type="hidden" name="semester_id" value="{{ $semesterId }}">
                                 <input type="hidden" name="education_level_id" value="{{ $level->id }}">
                                 <button type="submit" class="btn-app w-full" style="background:#6366f1;border-color:#6366f1;">
-                                    <i class="fas fa-copy text-[10px]"></i> คัดลอกจาก Global
+                                    <i class="fas fa-copy text-[10px]"></i> {{ __('Copy from Global') }}
                                 </button>
                             </form>
                             @endif

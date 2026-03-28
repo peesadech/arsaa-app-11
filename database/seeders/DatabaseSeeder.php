@@ -29,5 +29,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
         $admin->assignRole('SuperAdmin');
+
+        $this->call(LanguageSeeder::class);
     }
 }

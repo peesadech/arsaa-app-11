@@ -136,19 +136,19 @@
     <div class="max-w-6xl mx-auto">
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10 space-y-4 md:space-y-0">
-           <a href="{{ route('admin.dashboard') }}" 
+           <a href="{{ route('admin.dashboard') }}"
                class="group flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-sm border border-gray-200 text-gray-500 hover:text-indigo-600 hover:border-indigo-300 transition-all duration-200">
                 <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
-            </a> 
+            </a>
             <div>
-                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">System Permissions</h1>
-                <p class="text-sm text-gray-500 font-medium px-1 mt-1">Manage and organize granular access controls</p>
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">{{ __('System Permissions') }}</h1>
+                <p class="text-sm text-gray-500 font-medium px-1 mt-1">{{ __('Manage and organize granular access controls') }}</p>
             </div>
             <div>
-                <a href="{{ route('admin.permissions.create') }}" 
+                <a href="{{ route('admin.permissions.create') }}"
                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-bold rounded-2xl shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5 active:scale-95">
                     <i class="fas fa-plus-circle mr-2 opacity-75"></i>
-                    New Permission
+                    {{ __('New Permission') }}
                 </a>
             </div>
         </div>
@@ -160,10 +160,10 @@
                     <table id="permissionsTable" class="w-full text-left border-collapse whitespace-nowrap lg:whitespace-normal">
                         <thead>
                             <tr class="bg-gray-50/50 border-b border-gray-100">
-                                <th class="px-4 sm:px-6 lg:px-8 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest">ID</th>
-                                <th class="px-4 sm:px-6 lg:px-8 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest">Permission Name</th>
-                                <th class="px-4 sm:px-6 lg:px-8 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest">Guard</th>
-                                <th class="px-4 sm:px-6 lg:px-8 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">Action</th>
+                                <th class="px-4 sm:px-6 lg:px-8 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest">{{ __('ID') }}</th>
+                                <th class="px-4 sm:px-6 lg:px-8 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest">{{ __('Permission Name') }}</th>
+                                <th class="px-4 sm:px-6 lg:px-8 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest">{{ __('Guard') }}</th>
+                                <th class="px-4 sm:px-6 lg:px-8 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">{{ __('Action') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50 text-gray-600 text-sm">
@@ -172,12 +172,12 @@
                     </table>
                 </div>
             </div>
-            
+
             <!-- Contextual Footer -->
             <div class="px-8 py-5 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-gray-400 uppercase tracking-widest">
-                <span>Access Control System</span>
+                <span>{{ __('Access Control System') }}</span>
                 <span class="flex items-center">
-                    <i class="fas fa-shield-alt mr-2"></i> Authorized Access Only
+                    <i class="fas fa-shield-alt mr-2"></i> {{ __('Authorized Access Only') }}
                 </span>
             </div>
         </div>
@@ -196,16 +196,16 @@
                         <i class="fas fa-exclamation-triangle text-rose-600 text-xl"></i>
                     </div>
                     <div class="mt-3 text-center sm:mt-0 sm:ml-6 sm:text-left">
-                        <h3 class="text-xl leading-6 font-extrabold text-gray-900 tracking-tight" id="modal-title">Confirm Deletion</h3>
+                        <h3 class="text-xl leading-6 font-extrabold text-gray-900 tracking-tight" id="modal-title">{{ __('Confirm Deletion') }}</h3>
                         <div class="mt-2 text-sm text-gray-500 leading-relaxed">
-                            Are you sure you want to permanently remove <span id="deleteItemName" class="font-bold text-gray-900 px-1.5 py-0.5 bg-gray-100 rounded-lg"></span>? This action cannot be undone.
+                            {{ __('Are you sure you want to permanently remove') }} <span id="deleteItemName" class="font-bold text-gray-900 px-1.5 py-0.5 bg-gray-100 rounded-lg"></span>{{ __('? This action cannot be undone.') }}
                         </div>
                     </div>
                 </div>
             </div>
             <div class="bg-gray-50/50 px-4 py-6 sm:px-8 sm:flex sm:flex-row-reverse space-y-3 sm:space-y-0">
-                <button type="button" id="confirmDeleteBtn" class="w-full inline-flex justify-center rounded-2xl border border-transparent shadow-lg shadow-rose-200/50 px-8 py-3 bg-rose-600 text-base font-bold text-white hover:bg-rose-700 focus:outline-none transition-all duration-200 sm:ml-3 sm:w-auto transform active:scale-95">Delete</button>
-                <button type="button" onclick="closeModal()" class="w-full inline-flex justify-center rounded-2xl border-2 border-gray-100 px-8 py-3 bg-white text-base font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-200 focus:outline-none transition-all duration-200 sm:w-auto transform active:scale-95">Cancel</button>
+                <button type="button" id="confirmDeleteBtn" class="w-full inline-flex justify-center rounded-2xl border border-transparent shadow-lg shadow-rose-200/50 px-8 py-3 bg-rose-600 text-base font-bold text-white hover:bg-rose-700 focus:outline-none transition-all duration-200 sm:ml-3 sm:w-auto transform active:scale-95">{{ __('Delete') }}</button>
+                <button type="button" onclick="closeModal()" class="w-full inline-flex justify-center rounded-2xl border-2 border-gray-100 px-8 py-3 bg-white text-base font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-200 focus:outline-none transition-all duration-200 sm:w-auto transform active:scale-95">{{ __('Cancel') }}</button>
             </div>
         </div>
     </div>
@@ -224,6 +224,10 @@
 
 <script>
     $(function() {
+        const LANG_SEARCH_PERMISSIONS = @json(__('Search permissions...'));
+        const LANG_SHOW = @json(__('Show'));
+        const LANG_ALL = @json(__('All'));
+
         // Auto-dismiss alert
         const alert = document.getElementById('statusAlert');
         if (alert) {
@@ -248,46 +252,46 @@
                 }
             },
             dom: '<"flex flex-wrap items-center justify-between mb-6"B><"grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6"lf>rt<"flex flex-col md:flex-row md:items-center md:justify-between mt-6"ip>',
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, LANG_ALL]],
             columns: [
-                { 
-                    data: 'id', 
+                {
+                    data: 'id',
                     name: 'id',
                     render: function(data) {
                         return '<span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-gray-400 text-xs font-bold">#' + data + '</span>';
                     }
                 },
-                { 
-                    data: 'name', 
+                {
+                    data: 'name',
                     name: 'name',
                     render: function(data) {
                         return '<div class="flex items-center space-x-3">' +
-                               '<div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-50 dark:border-indigo-900/50">' + 
-                               '<i class="fas fa-shield-alt"></i>' + 
+                               '<div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-50 dark:border-indigo-900/50">' +
+                               '<i class="fas fa-shield-alt"></i>' +
                                '</div>' +
                                '<span class="text-base font-bold text-gray-800 dark:text-gray-200 tracking-tight">' + data + '</span>' +
                                '</div>';
                     }
                 },
-                { 
-                    data: 'guard_name', 
+                {
+                    data: 'guard_name',
                     name: 'guard_name',
                     render: function(data) {
                         return '<span class="px-2 py-1 rounded-md bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-gray-400 text-[10px] font-black uppercase tracking-widest">' + data + '</span>';
                     }
                 },
-                { 
-                    data: 'action', 
-                    name: 'action', 
-                    orderable: false, 
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
                     searchable: false,
                     className: 'text-right'
                 }
             ],
             language: {
                 search: "",
-                searchPlaceholder: "Search permissions...",
-                lengthMenu: "Show _MENU_",
+                searchPlaceholder: LANG_SEARCH_PERMISSIONS,
+                lengthMenu: LANG_SHOW + " _MENU_",
                 paginate: {
                     previous: '<i class="fas fa-chevron-left"></i>',
                     next: '<i class="fas fa-chevron-right"></i>'

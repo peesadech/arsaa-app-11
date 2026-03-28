@@ -4,18 +4,18 @@
     $isEdit = isset($semester);
     $actionUrl = $isEdit ? route('admin.semesters.update', $semester->id) : route('admin.semesters.store');
     
-    $title = $isEdit ? 'Edit Semester' : 'Create New Semester';
-    $subtitle = $isEdit ? 'Update semester details' : 'Semester Registration';
+    $title = $isEdit ? __('Edit Semester') : __('Create New Semester');
+    $subtitle = $isEdit ? __('Update semester details') : __('Semester Registration');
     
     // Theme Configuration
     $gradientClass = $isEdit ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500' : 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500';
     $blurClass = $isEdit ? 'bg-amber-500/20' : 'bg-indigo-500/20';
     $iconBgClass = $isEdit ? 'bg-amber-50 border-amber-100' : 'bg-indigo-50 border-indigo-100 shadow-inner';
     $iconClass = $isEdit ? 'fa-edit text-amber-600 rotate-3' : 'fa-plus text-indigo-600 -rotate-3';
-    $cardTitle = $isEdit ? 'Modify Semester' : 'Semester Details';
-    $cardDesc = $isEdit 
-        ? "You are updating semester #{$semester->id}."
-        : 'Enter the semester number.';
+    $cardTitle = $isEdit ? __('Modify Semester') : __('Semester Details');
+    $cardDesc = $isEdit
+        ? __('You are updating semester') . " #{$semester->id}."
+        : __('Enter the semester number.');
     
     $focusRing = $isEdit ? 'focus:border-amber-400' : 'focus:border-indigo-500';
     $focusText = $isEdit ? 'group-focus-within:text-amber-500' : 'group-focus-within:text-indigo-500';
@@ -24,7 +24,7 @@
         ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-amber-200'
         : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200';
     
-    $btnText = $isEdit ? 'Save Changes' : 'Create Semester';
+    $btnText = $isEdit ? __('Save Changes') : __('Create Semester');
     $btnIcon = $isEdit ? 'fa-save' : 'fa-check-circle';
 @endphp
 
@@ -72,7 +72,7 @@
                     
                     <div class="space-y-2">
                         <label for="semester_number" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                            ภาคเรียนที่
+                            {{ __('Semester Number') }}
                         </label>
                         <div class="group relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -96,7 +96,7 @@
                     <!-- Status -->
                     <div class="space-y-3">
                         <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                            Status
+                            {{ __('Status') }}
                         </label>
                         <div class="flex flex-wrap gap-2">
                             <!-- Active Status -->
@@ -105,21 +105,21 @@
                                 <div class="px-4 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] bg-white dark:bg-[#242526] text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-600 dark:peer-checked:text-emerald-400 group-hover:border-gray-200 dark:group-hover:border-[#4a4b4c]">
                                     <div class="flex items-center">
                                         <i class="fas fa-check-circle mr-2 text-[10px] opacity-50"></i>
-                                        Active
+                                        {{ __('Active') }}
                                     </div>
                                 </div>
                                 <div class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center text-[8px] text-white opacity-0 peer-checked:opacity-100 transition-all scale-50 peer-checked:scale-100">
                                     <i class="fas fa-check"></i>
                                 </div>
                             </label>
-                            
+
                             <!-- Not Active Status -->
                             <label class="relative group cursor-pointer">
                                 <input type="radio" name="status" value="2" class="peer hidden" {{ old('status', $isEdit ? $semester->status : 1) == 2 ? 'checked' : '' }}>
                                 <div class="px-4 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] bg-white dark:bg-[#242526] text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:border-rose-500 peer-checked:bg-rose-50 dark:peer-checked:bg-rose-900/30 peer-checked:text-rose-600 dark:peer-checked:text-rose-400 group-hover:border-gray-200 dark:group-hover:border-[#4a4b4c]">
                                     <div class="flex items-center">
                                         <i class="fas fa-times-circle mr-2 text-[10px] opacity-50"></i>
-                                        Not Active
+                                        {{ __('Not Active') }}
                                     </div>
                                 </div>
                                 <div class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 rounded-full flex items-center justify-center text-[8px] text-white opacity-0 peer-checked:opacity-100 transition-all scale-50 peer-checked:scale-100">
@@ -147,7 +147,7 @@
                         
                         <a href="{{ route('admin.semesters.index') }}" 
                            class="flex-1 flex items-center justify-center px-8 py-4 bg-white dark:bg-[#242526] text-gray-700 dark:text-gray-300 font-bold rounded-2xl border-2 border-gray-100 dark:border-[#3a3b3c] hover:border-gray-200 dark:hover:border-[#4a4b4c] hover:bg-gray-50 dark:hover:bg-[#3a3b3c] active:scale-95 transition-all duration-200">
-                            {{ $isEdit ? 'Cancel' : 'Back to List' }}
+                            {{ $isEdit ? __('Cancel') : __('Back to List') }}
                         </a>
                     </div>
                 </form>

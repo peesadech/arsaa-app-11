@@ -150,19 +150,19 @@
                     <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
                 </a>
                 <div>
-                    <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">รายวิชาที่เปิดสอน</h1>
+                    <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ __('Opened Courses') }}</h1>
                     <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1 px-1">
                         @if($currentYear && $currentSemester)
-                            ปีการศึกษา {{ $currentYear->year }} &bull; ภาคเรียนที่ {{ $currentSemester->semester_number }}
+                            {{ __('Academic Year') }} {{ $currentYear->year }} &bull; {{ __('Semester') }} {{ $currentSemester->semester_number }}
                         @else
-                            ยังไม่ได้เลือกปีการศึกษา
+                            {{ __('No academic year selected') }}
                         @endif
                     </p>
                 </div>
             </div>
             @if($currentYear && $currentSemester)
             <a href="{{ route('admin.opened-courses.create') }}" class="btn-app">
-                <i class="fas fa-plus text-[10px]"></i> เพิ่มรายวิชา
+                <i class="fas fa-plus text-[10px]"></i> {{ __('Add Course') }}
             </a>
             @endif
         </div>
@@ -179,15 +179,15 @@
                                 <i class="fas fa-filter text-sm"></i>
                             </div>
                             <div>
-                                <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">ตัวกรอง</h3>
-                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">กรองข้อมูลตามระดับชั้นและรายวิชา</p>
+                                <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">{{ __('Filters') }}</h3>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">{{ __('Filter by grade level and course') }}</p>
                             </div>
                         </div>
                         <div class="flex flex-wrap items-center gap-3">
                             {{-- Grade Filter --}}
                             <div class="relative group">
                                 <select id="gradeFilter" class="appearance-none block w-full md:w-48 pl-4 pr-10 py-2.5 bg-white dark:bg-[#242526] border-2 border-gray-100 dark:border-[#3a3b3c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-0 focus:border-indigo-500 transition-all cursor-pointer">
-                                    <option value="">ทุกระดับชั้น</option>
+                                    <option value="">{{ __('All Grade Levels') }}</option>
                                     @foreach(\App\Models\Grade::where('status',1)->get() as $grade)
                                         <option value="{{ $grade->id }}">{{ $grade->name_th }}</option>
                                     @endforeach
@@ -199,7 +199,7 @@
                             {{-- Course Filter --}}
                             <div class="relative group">
                                 <select id="courseFilter" class="appearance-none block w-full md:w-56 pl-4 pr-10 py-2.5 bg-white dark:bg-[#242526] border-2 border-gray-100 dark:border-[#3a3b3c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-0 focus:border-indigo-500 transition-all cursor-pointer">
-                                    <option value="">ทุกรายวิชา</option>
+                                    <option value="">{{ __('All Courses') }}</option>
                                     @if($semesterId)
                                         @foreach(\App\Models\Course::where('status',1)->where('semester_id',$semesterId)->orderBy('name')->get() as $course)
                                             <option value="{{ $course->id }}">{{ $course->name }}</option>
@@ -220,10 +220,10 @@
                         <thead>
                             <tr class="bg-gray-50/50 dark:bg-[#18191a]/30 border-b border-gray-100 dark:border-[#3a3b3c]/50">
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest w-12">#</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">ระดับชั้น</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">ห้องเรียน</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">รายวิชา</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-right w-36">จัดการ</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ __('Grade Level') }}</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ __('Classroom') }}</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ __('Course') }}</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-right w-36">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50 dark:divide-[#3a3b3c]/50 text-gray-600 dark:text-gray-400 text-sm">
@@ -235,9 +235,9 @@
 
             {{-- Card Footer --}}
             <div class="px-8 py-5 bg-gray-50/50 dark:bg-[#18191a]/30 border-t border-gray-100 dark:border-[#3a3b3c]/50 flex items-center justify-between text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                <span>Opened Courses Management</span>
+                <span>{{ __('Opened Courses Management') }}</span>
                 <span class="flex items-center">
-                    <i class="fas fa-book-open mr-2"></i> Academic Control
+                    <i class="fas fa-book-open mr-2"></i> {{ __('Academic Control') }}
                 </span>
             </div>
         </div>
@@ -252,14 +252,14 @@
             <div class="w-14 h-14 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-trash-alt text-rose-500 text-xl"></i>
             </div>
-            <h3 class="text-base font-bold text-gray-800 dark:text-white mb-2">ยืนยันการลบ</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">คุณต้องการลบรายวิชานี้ใช่หรือไม่? ไม่สามารถกู้คืนได้</p>
+            <h3 class="text-base font-bold text-gray-800 dark:text-white mb-2">{{ __('Confirm Delete') }}</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{ __('Do you want to delete this course? This action cannot be undone.') }}</p>
             <div class="flex gap-3">
                 <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] text-sm font-bold text-gray-500 hover:bg-gray-50 dark:hover:bg-[#3a3b3c] transition-colors">
-                    ยกเลิก
+                    {{ __('Cancel') }}
                 </button>
                 <button id="confirmDeleteBtn" onclick="confirmDelete()" class="flex-1 px-4 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-sm font-bold transition-colors">
-                    ลบ
+                    {{ __('Delete') }}
                 </button>
             </div>
         </div>
@@ -284,6 +284,13 @@
     <script>
         let deleteId = null;
         const CSRF = '{{ csrf_token() }}';
+        const LANG_EDIT = @json(__('Edit'));
+        const LANG_DELETE = @json(__('Delete'));
+        const LANG_SEARCH_PLACEHOLDER = @json(__('Search...'));
+        const LANG_SHOW = @json(__('Show'));
+        const LANG_LOADING = @json(__('Loading...'));
+        const LANG_NO_OPENED_COURSES = @json(__('No opened courses available'));
+        const LANG_DELETING = @json(__('Deleting...'));
 
         $(document).ready(function() {
             const table = $('#openedCoursesTable').DataTable({
@@ -328,10 +335,10 @@
                             return `
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="/admin/opened-courses/${id}/edit" class="btn-app">
-                                        <i class="fas fa-edit text-[10px]"></i> แก้ไข
+                                        <i class="fas fa-edit text-[10px]"></i> ${LANG_EDIT}
                                     </a>
                                     <button onclick="openDeleteModal(${id})" class="btn-app" style="background:#ef4444;border-color:#ef4444;">
-                                        <i class="fas fa-trash-alt text-[10px]"></i> ลบ
+                                        <i class="fas fa-trash-alt text-[10px]"></i> ${LANG_DELETE}
                                     </button>
                                 </div>`;
                         }
@@ -339,14 +346,14 @@
                 ],
                 language: {
                     search: "",
-                    searchPlaceholder: "ค้นหา...",
-                    lengthMenu: "แสดง _MENU_",
+                    searchPlaceholder: LANG_SEARCH_PLACEHOLDER,
+                    lengthMenu: LANG_SHOW + " _MENU_",
                     paginate: {
                         previous: '<i class="fas fa-chevron-left"></i>',
                         next:     '<i class="fas fa-chevron-right"></i>'
                     },
-                    processing: '<div class="text-indigo-500 text-xs font-bold">กำลังโหลด...</div>',
-                    emptyTable: '<div class="text-gray-400 text-xs py-4">ไม่มีข้อมูลรายวิชาที่เปิดสอน</div>',
+                    processing: '<div class="text-indigo-500 text-xs font-bold">' + LANG_LOADING + '</div>',
+                    emptyTable: '<div class="text-gray-400 text-xs py-4">' + LANG_NO_OPENED_COURSES + '</div>',
                 },
                 drawCallback: function() {
                     $('.dataTables_filter input').addClass('dark:bg-[#242526] dark:border-[#3a3b3c] dark:text-white');
@@ -373,7 +380,7 @@
             if (!deleteId) return;
             const btn = document.getElementById('confirmDeleteBtn');
             btn.disabled = true;
-            btn.textContent = 'กำลังลบ...';
+            btn.textContent = LANG_DELETING;
 
             fetch(`/admin/opened-courses/${deleteId}`, {
                 method: 'DELETE',
@@ -388,7 +395,7 @@
             })
             .finally(() => {
                 btn.disabled = false;
-                btn.textContent = 'ลบ';
+                btn.textContent = LANG_DELETE;
             });
         }
     </script>

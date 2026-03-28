@@ -10,8 +10,8 @@
                 <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
             </a>
             <div>
-                <h1 class="text-2xl font-extrabold text-gray-900 tracking-tight">Account Settings</h1>
-                <p class="text-sm text-gray-500 font-medium px-1">Manage your personal information</p>
+                <h1 class="text-2xl font-extrabold text-gray-900 tracking-tight">{{ __('Account Settings') }}</h1>
+                <p class="text-sm text-gray-500 font-medium px-1">{{ __('Manage your personal information') }}</p>
             </div>
         </div>
 
@@ -29,7 +29,7 @@
                             <img id="imagePreview" src="{{ $user->image_path ? asset($user->image_path) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=6366f1&color=fff&size=200' }}" class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                                 <span class="px-3 py-1.5 bg-white rounded-xl text-[10px] font-bold text-gray-900 shadow-xl">
-                                    <i class="fas fa-camera mr-1 text-indigo-500"></i> Change
+                                    <i class="fas fa-camera mr-1 text-indigo-500"></i> {{ __('Change') }}
                                 </span>
                             </div>
                         </div>
@@ -46,7 +46,7 @@
                     
                     <div class="space-y-2">
                         <label for="name" class="block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">
-                            Full Name
+                            {{ __('Full Name') }}
                         </label>
                         <div class="group relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-indigo-500 transition-colors">
@@ -84,14 +84,14 @@
                         >
                             <span class="relative z-10 flex items-center">
                                 <i class="fas fa-save mr-2 opacity-50 group-hover:opacity-100 transition-opacity"></i>
-                                Save Profile
+                                {{ __('Save Profile') }}
                             </span>
                             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
                         </button>
                         
                         <a href="{{ route('admin.dashboard') }}" 
                            class="flex-1 flex items-center justify-center px-8 py-4 bg-white text-gray-700 font-bold rounded-2xl border-2 border-gray-100 hover:border-gray-200 hover:bg-gray-50 active:scale-95 transition-all duration-200">
-                            Cancel
+                            {{ __('Cancel') }}
                         </a>
                     </div>
                 </form>
@@ -145,9 +145,9 @@
                         <i class="fas fa-shield-alt text-xs"></i>
                     </div>
                     <div>
-                        <h4 class="text-xs font-bold text-gray-700 uppercase mb-1">Privacy & Security</h4>
+                        <h4 class="text-xs font-bold text-gray-700 uppercase mb-1">{{ __('Privacy & Security') }}</h4>
                         <p class="text-xs text-gray-400 leading-relaxed">
-                            Your personal information is kept secure. Only your name and profile image are visible to other users if they have permission to see your profile.
+                            {{ __('Your personal information is kept secure. Only your name and profile image are visible to other users if they have permission to see your profile.') }}
                         </p>
                     </div>
                 </div>

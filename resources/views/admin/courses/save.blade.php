@@ -4,18 +4,18 @@
     $isEdit = isset($course);
     $actionUrl = $isEdit ? route('admin.courses.update', $course->id) : route('admin.courses.store');
     
-    $title = $isEdit ? 'Edit Course' : 'Create New Course';
-    $subtitle = $isEdit ? 'Update course details' : 'Course Registration';
+    $title = $isEdit ? __('Edit Course') : __('Create New Course');
+    $subtitle = $isEdit ? __('Update course details') : __('Course Registration');
     
     // Theme Configuration
     $gradientClass = $isEdit ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500' : 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500';
     $blurClass = $isEdit ? 'bg-amber-500/20' : 'bg-indigo-500/20';
     $iconBgClass = $isEdit ? 'bg-amber-50 border-amber-100' : 'bg-indigo-50 border-indigo-100 shadow-inner';
     $iconClass = $isEdit ? 'fa-edit text-amber-600 rotate-3' : 'fa-plus text-indigo-600 -rotate-3';
-    $cardTitle = $isEdit ? 'Modify Course' : 'Course Details';
-    $cardDesc = $isEdit 
-        ? "You are updating course #{$course->id}. Ensure all details are correct."
-        : 'Define a new system course.';
+    $cardTitle = $isEdit ? __('Modify Course') : __('Course Details');
+    $cardDesc = $isEdit
+        ? __('You are updating course #:id. Ensure all details are correct.', ['id' => $course->id])
+        : __('Define a new system course.');
     
     $focusRing = $isEdit ? 'focus:border-amber-400' : 'focus:border-indigo-500';
     $focusText = $isEdit ? 'group-focus-within:text-amber-500' : 'group-focus-within:text-indigo-500';
@@ -24,7 +24,7 @@
         ? 'bg-amber-500 text-white hover:bg-amber-600 shadow-amber-200'
         : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200';
     
-    $btnText = $isEdit ? 'Save Changes' : 'Create Course';
+    $btnText = $isEdit ? __('Save Changes') : __('Create Course');
     $btnIcon = $isEdit ? 'fa-save' : 'fa-check-circle';
 @endphp
 
@@ -74,7 +74,7 @@
                         <!-- Name -->
                         <div class="space-y-2">
                             <label for="name" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                                Name (Course)
+                                {{ __('Name (Course)') }}
                             </label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -99,7 +99,7 @@
                     <!-- Subject Group -->
                     <div class="space-y-2">
                         <label for="subject_group_id" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                            Subject Group
+                            {{ __('Subject Group') }}
                         </label>
                         <div class="group relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -111,7 +111,7 @@
                                 class="block w-full pl-10 pr-10 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white appearance-none focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('subject_group_id') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
                                 required
                             >
-                                <option value="" disabled {{ !old('subject_group_id', $isEdit ? $course->subject_group_id : '') ? 'selected' : '' }}>-- Please Select --</option>
+                                <option value="" disabled {{ !old('subject_group_id', $isEdit ? $course->subject_group_id : '') ? 'selected' : '' }}>{{ __('-- Please Select --') }}</option>
                                 @foreach($subjectGroups as $sg)
                                     <option value="{{ $sg->id }}" {{ old('subject_group_id', $isEdit ? $course->subject_group_id : '') == $sg->id ? 'selected' : '' }}>
                                         {{ $sg->name_th }} / {{ $sg->name_en }}
@@ -131,7 +131,7 @@
                         <!-- Grade ID -->
                         <div class="space-y-2">
                             <label for="grade_id" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                                Select Grade
+                                {{ __('Select Grade') }}
                             </label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -143,7 +143,7 @@
                                     class="block w-full pl-10 pr-10 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white appearance-none focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('grade_id') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
                                     required
                                 >
-                                    <option value="" disabled {{ !old('grade_id', $isEdit ? $course->grade_id : '') ? 'selected' : '' }}>-- Please Select --</option>
+                                    <option value="" disabled {{ !old('grade_id', $isEdit ? $course->grade_id : '') ? 'selected' : '' }}>{{ __('-- Please Select --') }}</option>
                                     @foreach($grades as $grade)
                                         <option value="{{ $grade->id }}" {{ old('grade_id', $isEdit ? $course->grade_id : '') == $grade->id ? 'selected' : '' }}>
                                             {{ $grade->name_th }} / {{ $grade->name_en }}
@@ -162,7 +162,7 @@
                         <!-- Semester ID -->
                         <div class="space-y-2">
                             <label for="semester_id" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                                Select Semester
+                                {{ __('Select Semester') }}
                             </label>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
@@ -174,10 +174,10 @@
                                     class="block w-full pl-10 pr-10 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white appearance-none focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('semester_id') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
                                     required
                                 >
-                                    <option value="" disabled {{ !old('semester_id', $isEdit ? $course->semester_id : '') ? 'selected' : '' }}>-- Please Select --</option>
+                                    <option value="" disabled {{ !old('semester_id', $isEdit ? $course->semester_id : '') ? 'selected' : '' }}>{{ __('-- Please Select --') }}</option>
                                     @foreach($semesters as $semester)
                                         <option value="{{ $semester->id }}" {{ old('semester_id', $isEdit ? $course->semester_id : '') == $semester->id ? 'selected' : '' }}>
-                                            Semester {{ $semester->semester_number }}
+                                            {{ __('Semester') }} {{ $semester->semester_number }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -194,7 +194,7 @@
                     <!-- Status -->
                     <div class="space-y-3">
                         <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                            Status
+                            {{ __('Status') }}
                         </label>
                         <div class="flex flex-wrap gap-2">
                             <!-- Active Status -->
@@ -203,7 +203,7 @@
                                 <div class="px-4 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] bg-white dark:bg-[#242526] text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-600 dark:peer-checked:text-emerald-400 group-hover:border-gray-200 dark:group-hover:border-[#4a4b4c]">
                                     <div class="flex items-center">
                                         <i class="fas fa-check-circle mr-2 text-[10px] opacity-50"></i>
-                                        Active
+                                        {{ __('Active') }}
                                     </div>
                                 </div>
                                 <div class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center text-[8px] text-white opacity-0 peer-checked:opacity-100 transition-all scale-50 peer-checked:scale-100">
@@ -217,7 +217,7 @@
                                 <div class="px-4 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] bg-white dark:bg-[#242526] text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:border-rose-500 peer-checked:bg-rose-50 dark:peer-checked:bg-rose-900/30 peer-checked:text-rose-600 dark:peer-checked:text-rose-400 group-hover:border-gray-200 dark:group-hover:border-[#4a4b4c]">
                                     <div class="flex items-center">
                                         <i class="fas fa-times-circle mr-2 text-[10px] opacity-50"></i>
-                                        Not Active
+                                        {{ __('Not Active') }}
                                     </div>
                                 </div>
                                 <div class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 rounded-full flex items-center justify-center text-[8px] text-white opacity-0 peer-checked:opacity-100 transition-all scale-50 peer-checked:scale-100">
@@ -245,7 +245,7 @@
                         
                         <a href="{{ route('admin.courses.index') }}" 
                            class="flex-1 flex items-center justify-center px-8 py-4 bg-white dark:bg-[#242526] text-gray-700 dark:text-gray-300 font-bold rounded-2xl border-2 border-gray-100 dark:border-[#3a3b3c] hover:border-gray-200 dark:hover:border-[#4a4b4c] hover:bg-gray-50 dark:hover:bg-[#3a3b3c] active:scale-95 transition-all duration-200">
-                            {{ $isEdit ? 'Cancel' : 'Back to List' }}
+                            {{ $isEdit ? __('Cancel') : __('Back to List') }}
                         </a>
                     </div>
                 </form>
