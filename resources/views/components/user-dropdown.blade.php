@@ -132,6 +132,18 @@
                         </div>
                         <span class="font-medium text-sm">{{ __('Subject Group') }}</span>
                     </a>
+                    <a href="{{ route('admin.buildings.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-building text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">{{ __('Building') }}</span>
+                    </a>
+                    <a href="{{ route('admin.rooms.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-door-open text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">{{ __('Room') }}</span>
+                    </a>
                     <a href="{{ route('admin.global-schedule.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-calendar-check text-xs text-gray-400"></i>

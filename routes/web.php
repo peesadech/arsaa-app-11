@@ -25,6 +25,8 @@ use App\Http\Controllers\Admin\GlobalScheduleController;
 use App\Http\Controllers\Admin\YearlyScheduleController;
 use App\Http\Controllers\Admin\EducationLevelController;
 use App\Http\Controllers\Admin\SubjectGroupController;
+use App\Http\Controllers\Admin\BuildingController;
+use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Api\RoleController as ApiRoleController;
@@ -122,6 +124,24 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
     Route::get('/admin/subject-groups/{id}/edit', [SubjectGroupController::class, 'edit'])->name('admin.subject-groups.edit');
     Route::put('/admin/subject-groups/{id}', [SubjectGroupController::class, 'update'])->name('admin.subject-groups.update');
     Route::delete('/admin/subject-groups/{id}', [SubjectGroupController::class, 'destroy'])->name('admin.subject-groups.destroy');
+
+    // Buildings
+    Route::get('/admin/buildings', [BuildingController::class, 'index'])->name('admin.buildings.index');
+    Route::get('/admin/buildings/data', [BuildingController::class, 'data'])->name('admin.buildings.data');
+    Route::get('/admin/buildings/create', [BuildingController::class, 'create'])->name('admin.buildings.create');
+    Route::post('/admin/buildings', [BuildingController::class, 'store'])->name('admin.buildings.store');
+    Route::get('/admin/buildings/{id}/edit', [BuildingController::class, 'edit'])->name('admin.buildings.edit');
+    Route::put('/admin/buildings/{id}', [BuildingController::class, 'update'])->name('admin.buildings.update');
+    Route::delete('/admin/buildings/{id}', [BuildingController::class, 'destroy'])->name('admin.buildings.destroy');
+
+    // Rooms
+    Route::get('/admin/rooms', [RoomController::class, 'index'])->name('admin.rooms.index');
+    Route::get('/admin/rooms/data', [RoomController::class, 'data'])->name('admin.rooms.data');
+    Route::get('/admin/rooms/create', [RoomController::class, 'create'])->name('admin.rooms.create');
+    Route::post('/admin/rooms', [RoomController::class, 'store'])->name('admin.rooms.store');
+    Route::get('/admin/rooms/{id}/edit', [RoomController::class, 'edit'])->name('admin.rooms.edit');
+    Route::put('/admin/rooms/{id}', [RoomController::class, 'update'])->name('admin.rooms.update');
+    Route::delete('/admin/rooms/{id}', [RoomController::class, 'destroy'])->name('admin.rooms.destroy');
 
     // Academic Years (CRUD — SuperAdmin only)
     Route::get('/admin/academic-years', [AcademicYearController::class, 'index'])->name('admin.academic-years.index');
