@@ -9,9 +9,8 @@
 
     <title>{{ $setting->app_name }}</title>
     @if($setting->app_logo)
-        <link rel="icon" type="image/png" href="{{ asset('storage/' . $setting->app_logo) }}">
+        <link rel="icon" type="image/png" href="{{ asset('storage/' . $setting->app_logo) }}?v={{ time() }}">
     @endif
-
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ asset('js/app.js') }}"></script>
