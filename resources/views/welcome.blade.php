@@ -17,7 +17,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+        <!-- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
             <a href="https://laravel.com/docs" class="block p-6 bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-50 hover:border-indigo-100 group transition-all duration-300 hover:-translate-y-1">
                 <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-110 transition-transform">
                     <i class="fas fa-book text-xl"></i>
@@ -49,11 +49,11 @@
                 <h3 class="text-lg font-bold text-gray-800 mb-2">{{ __('GitHub') }}</h3>
                 <p class="text-sm text-gray-500">{{ __('Contribute to the framework code.') }}</p>
             </a>
-        </div>
+        </div> -->
         
-        <div class="mt-12 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">
+        <!-- <div class="mt-12 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">
             Laravel v{{ Illuminate\Foundation\Application::VERSION }} (PHP v{{ PHP_VERSION }})
-        </div>
+        </div> -->
     </div>
 </div>
 @endsection
