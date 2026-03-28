@@ -61,6 +61,46 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Yearly Schedule Block (30%) --}}
+            <div class="w-[30%] bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-[#3a3b3c] px-5 py-4 flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">ตารางสอนประจำภาค</p>
+                    @if($currentYear && $currentSemester)
+                    <a href="{{ route('admin.yearly-schedule.index') }}" class="btn-app">
+                        <i class="fas fa-cog text-[10px]"></i> จัดการ
+                    </a>
+                    @endif
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-baseline gap-1.5">
+                        <span class="text-3xl font-bold text-slate-800 dark:text-white">{{ $yearlyScheduleConfigured }}</span>
+                        <span class="text-xs text-gray-400">ตั้งค่าแล้ว</span>
+                    </div>
+                    <div class="w-px h-6 bg-gray-200 dark:bg-[#3a3b3c]"></div>
+                    <div class="flex items-baseline gap-1.5">
+                        <span class="text-3xl font-bold text-slate-800 dark:text-white">{{ $yearlyScheduleTotal }}</span>
+                        <span class="text-xs text-gray-400">ทั้งหมด</span>
+                    </div>
+                </div>
+                @if($currentYear && $currentSemester)
+                <div class="mt-1">
+                    @if($yearlyScheduleTotal > 0 && $yearlyScheduleConfigured >= $yearlyScheduleTotal)
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[11px] font-bold">
+                            <i class="fas fa-check-circle text-[9px]"></i> ตั้งค่าครบแล้ว
+                        </span>
+                    @elseif($yearlyScheduleConfigured > 0)
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[11px] font-bold">
+                            <i class="fas fa-exclamation-circle text-[9px]"></i> ยังตั้งค่าไม่ครบ
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-[#3a3b3c] text-gray-400 text-[11px]">
+                            ยังไม่ได้ตั้งค่า
+                        </span>
+                    @endif
+                </div>
+                @endif
+            </div>
         </div>
 
         {{-- Footer --}}

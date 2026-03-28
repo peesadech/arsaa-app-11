@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\RoleManagementController;
 use App\Http\Controllers\Admin\UserAssignmentController;
 use App\Http\Controllers\Admin\OpenedCourseController;
 use App\Http\Controllers\Admin\GlobalScheduleController;
+use App\Http\Controllers\Admin\YearlyScheduleController;
 use App\Http\Controllers\Admin\EducationLevelController;
 use App\Http\Controllers\Api\RoleController as ApiRoleController;
 use App\Http\Controllers\Api\PermissionController as ApiPermissionController;
@@ -134,6 +135,13 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::delete('/admin/dashboard/close-grade/{id}', [DashboardController::class, 'closeGrade'])->name('admin.dashboard.close-grade');
     Route::post('/admin/dashboard/sync-grade-classrooms', [DashboardController::class, 'syncGradeClassrooms'])->name('admin.dashboard.sync-grade-classrooms');
     Route::get('/admin/dashboard/stats', [DashboardController::class, 'stats'])->name('admin.dashboard.stats');
+
+    // Yearly Schedule
+    Route::get('/admin/yearly-schedule', [YearlyScheduleController::class, 'index'])->name('admin.yearly-schedule.index');
+    Route::post('/admin/yearly-schedule/copy', [YearlyScheduleController::class, 'copyFromGlobal'])->name('admin.yearly-schedule.copy');
+    Route::post('/admin/yearly-schedule/copy-all', [YearlyScheduleController::class, 'copyAllFromGlobal'])->name('admin.yearly-schedule.copy-all');
+    Route::get('/admin/yearly-schedule/{academicYearId}/{semesterId}/{educationLevelId}/edit', [YearlyScheduleController::class, 'edit'])->name('admin.yearly-schedule.edit');
+    Route::put('/admin/yearly-schedule/{academicYearId}/{semesterId}/{educationLevelId}', [YearlyScheduleController::class, 'update'])->name('admin.yearly-schedule.update');
 
     // Opened Courses
     Route::get('/admin/opened-courses', [OpenedCourseController::class, 'index'])->name('admin.opened-courses.index');

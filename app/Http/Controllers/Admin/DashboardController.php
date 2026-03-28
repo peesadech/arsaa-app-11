@@ -9,9 +9,12 @@ use App\Models\Course;
 use App\Models\CurrentAcademicSetting;
 use App\Models\Grade;
 use App\Models\OpenedClassroom;
+use App\Models\EducationLevel;
+use App\Models\GlobalSchedule;
 use App\Models\OpenedCourse;
 use App\Models\OpenedGrade;
 use App\Models\Semester;
+use App\Models\YearlySchedule;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -58,7 +61,23 @@ class DashboardController extends Controller
                 ->count()
             : 0;
 
-        return view('admin.dashboard', compact('currentYear', 'currentSemester', 'openedGrades', 'academicYearId', 'semesterId', 'openedClassroomCount', 'openedCourseCount', 'openedCourseTotalCount'));
+        // Yearly schedule status
+        $educationLevels = EducationLevel::where('status', 1)->get();
+        $yearlyScheduleMap = ($academicYearId && $semesterId)
+            ? YearlySchedule::where('academic_year_id', $academicYearId)
+                ->where('semester_id', $semesterId)
+                ->get()
+                ->keyBy('education_level_id')
+            : collect();
+        $yearlyScheduleTotal = $educationLevels->count();
+        $yearlyScheduleConfigured = $yearlyScheduleMap->count();
+
+        return view('admin.dashboard', compact(
+            'currentYear', 'currentSemester', 'openedGrades',
+            'academicYearId', 'semesterId',
+            'openedClassroomCount', 'openedCourseCount', 'openedCourseTotalCount',
+            'yearlyScheduleTotal', 'yearlyScheduleConfigured'
+        ));
     }
 
     public function stats()
