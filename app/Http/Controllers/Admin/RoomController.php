@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Models\Building;
 use App\Models\Course;
+use App\Models\SubjectGroup;
+use App\Models\EducationLevel;
+use App\Models\Grade;
+use App\Models\GlobalSchedule;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -61,8 +65,12 @@ class RoomController extends Controller
     public function create()
     {
         $buildings = Building::where('status', 1)->get();
-        $courses = Course::where('status', 1)->get();
-        return view('admin.rooms.save', compact('buildings', 'courses'));
+        $courses = Course::where('status', 1)->with(['subjectGroup', 'grade.educationLevel'])->get();
+        $subjectGroups = SubjectGroup::where('status', 1)->get();
+        $educationLevels = EducationLevel::where('status', 1)->get();
+        $grades = Grade::where('status', 1)->get();
+        $globalSchedules = GlobalSchedule::all()->keyBy('education_level_id');
+        return view('admin.rooms.save', compact('buildings', 'courses', 'subjectGroups', 'educationLevels', 'grades', 'globalSchedules'));
     }
 
     public function store(Request $request)
@@ -71,10 +79,15 @@ class RoomController extends Controller
             'room_number' => 'required|string|max:255',
             'building_id' => 'required|exists:buildings,id',
             'description' => 'nullable|string',
+            'unavailable_periods' => 'nullable|string',
             'status' => 'required|in:1,2',
             'course_ids' => 'nullable|array',
             'course_ids.*' => 'exists:courses,id',
         ]);
+
+        if ($request->filled('unavailable_periods')) {
+            $data['unavailable_periods'] = json_decode($request->input('unavailable_periods'), true);
+        }
 
         $room = Room::create($data);
 
@@ -89,8 +102,12 @@ class RoomController extends Controller
     {
         $room = Room::with('courses')->findOrFail($id);
         $buildings = Building::where('status', 1)->get();
-        $courses = Course::where('status', 1)->get();
-        return view('admin.rooms.save', compact('room', 'buildings', 'courses'));
+        $courses = Course::where('status', 1)->with(['subjectGroup', 'grade.educationLevel'])->get();
+        $subjectGroups = SubjectGroup::where('status', 1)->get();
+        $educationLevels = EducationLevel::where('status', 1)->get();
+        $grades = Grade::where('status', 1)->get();
+        $globalSchedules = GlobalSchedule::all()->keyBy('education_level_id');
+        return view('admin.rooms.save', compact('room', 'buildings', 'courses', 'subjectGroups', 'educationLevels', 'grades', 'globalSchedules'));
     }
 
     public function update(Request $request, $id)
@@ -100,10 +117,17 @@ class RoomController extends Controller
             'room_number' => 'required|string|max:255',
             'building_id' => 'required|exists:buildings,id',
             'description' => 'nullable|string',
+            'unavailable_periods' => 'nullable|string',
             'status' => 'required|in:1,2',
             'course_ids' => 'nullable|array',
             'course_ids.*' => 'exists:courses,id',
         ]);
+
+        if ($request->filled('unavailable_periods')) {
+            $data['unavailable_periods'] = json_decode($request->input('unavailable_periods'), true);
+        } else {
+            $data['unavailable_periods'] = null;
+        }
 
         $room->update($data);
         $room->courses()->sync($data['course_ids'] ?? []);

@@ -28,6 +28,10 @@
     $btnIcon = $isEdit ? 'fa-save' : 'fa-check-circle';
 
     $selectedCourseIds = old('course_ids', $isEdit ? $room->courses->pluck('id')->toArray() : []);
+
+    $selectedCoursesJson = $isEdit
+        ? $room->courses->map(fn($c) => ['id' => $c->id, 'name' => $c->name])->values()
+        : collect($selectedCourseIds)->map(fn($id) => ['id' => $id, 'name' => $courses->firstWhere('id', $id)?->name ?? ''])->values();
 @endphp
 
 @section('content')
@@ -159,6 +163,37 @@
                         </div>
                     </div>
 
+                    <!-- Unavailable Time Ranges -->
+                    <div class="space-y-3">
+                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
+                            {{ __('Unavailable Time Ranges') }}
+                        </label>
+                        <p class="text-[11px] text-gray-400 dark:text-gray-500 px-1">{{ __('Specify time ranges when this room is NOT available for scheduling.') }}</p>
+
+                        <input type="hidden" name="unavailable_periods" id="unavailablePeriodsInput">
+
+                        <div class="space-y-3" id="unavailableDaysContainer">
+                            @foreach([1 => __('Monday'), 2 => __('Tuesday'), 3 => __('Wednesday'), 4 => __('Thursday'), 5 => __('Friday'), 6 => __('Saturday'), 7 => __('Sunday')] as $dayNum => $dayLabel)
+                            <div class="bg-gray-50 dark:bg-[#3a3b3c] rounded-2xl border border-gray-100 dark:border-[#4a4b4c] overflow-hidden" data-day="{{ $dayNum }}">
+                                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#4a4b4c]/50">
+                                    <div class="flex items-center space-x-2.5">
+                                        <span class="w-7 h-7 rounded-lg bg-white dark:bg-[#242526] border border-gray-200 dark:border-[#4a4b4c] flex items-center justify-center text-[10px] font-extrabold text-gray-500 dark:text-gray-400">{{ $dayNum }}</span>
+                                        <span class="text-xs font-bold text-gray-700 dark:text-gray-300">{{ $dayLabel }}</span>
+                                        <span class="day-range-count text-[10px] font-bold text-rose-500 hidden" data-day="{{ $dayNum }}"></span>
+                                    </div>
+                                    <button type="button" onclick="addTimeRange({{ $dayNum }})" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-[#242526] border border-gray-200 dark:border-[#4a4b4c] text-gray-500 dark:text-gray-400 hover:border-indigo-300 hover:text-indigo-500 dark:hover:text-indigo-400 transition-all text-[10px] font-bold">
+                                        <i class="fas fa-plus text-[8px]"></i>
+                                        <span>{{ __('Add Range') }}</span>
+                                    </button>
+                                </div>
+                                <div class="time-ranges-list px-4 py-2 space-y-2" data-day="{{ $dayNum }}">
+                                    <!-- Rendered by JS -->
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
                     <!-- Description -->
                     <div class="space-y-2">
                         <label for="description" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
@@ -281,6 +316,28 @@
                     </div>
                 </div>
 
+                <!-- Filters -->
+                <div class="grid grid-cols-3 gap-3 mb-4">
+                    <select id="filterSubjectGroup" onchange="filterCourses()" class="block w-full px-3 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-xl text-gray-900 dark:text-white text-xs font-bold focus:outline-none focus:ring-0 focus:border-indigo-500 transition-all duration-200 appearance-none">
+                        <option value="">{{ __('-- Subject Group --') }}</option>
+                        @foreach($subjectGroups as $sg)
+                            <option value="{{ $sg->id }}">{{ $sg->name_th }}</option>
+                        @endforeach
+                    </select>
+                    <select id="filterEducationLevel" onchange="onEducationLevelChange()" class="block w-full px-3 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-xl text-gray-900 dark:text-white text-xs font-bold focus:outline-none focus:ring-0 focus:border-indigo-500 transition-all duration-200 appearance-none">
+                        <option value="">{{ __('-- Education Level --') }}</option>
+                        @foreach($educationLevels as $el)
+                            <option value="{{ $el->id }}">{{ $el->name_th }}</option>
+                        @endforeach
+                    </select>
+                    <select id="filterGrade" onchange="filterCourses()" class="block w-full px-3 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-xl text-gray-900 dark:text-white text-xs font-bold focus:outline-none focus:ring-0 focus:border-indigo-500 transition-all duration-200 appearance-none">
+                        <option value="">{{ __('-- Grade --') }}</option>
+                        @foreach($grades as $grade)
+                            <option value="{{ $grade->id }}" data-education-level="{{ $grade->education_level_id }}">{{ $grade->name_th }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <!-- Select All -->
                 <div class="flex items-center justify-between mb-3 px-1">
                     <label class="flex items-center space-x-2 cursor-pointer">
@@ -293,7 +350,7 @@
                 <!-- Course List -->
                 <div class="max-h-80 overflow-y-auto rounded-2xl border border-gray-100 dark:border-[#3a3b3c]/50">
                     @foreach($courses as $course)
-                    <label class="course-item flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#3a3b3c] cursor-pointer transition-colors border-b border-gray-50 dark:border-[#3a3b3c]/30 last:border-b-0" data-name="{{ strtolower($course->name) }}">
+                    <label class="course-item flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#3a3b3c] cursor-pointer transition-colors border-b border-gray-50 dark:border-[#3a3b3c]/30 last:border-b-0" data-name="{{ strtolower($course->name) }}" data-subject-group="{{ $course->subject_group_id }}" data-grade="{{ $course->grade_id }}" data-education-level="{{ $course->grade?->education_level_id }}">
                         <div class="flex items-center space-x-3">
                             <input
                                 type="checkbox"
@@ -336,11 +393,7 @@
 @push('scripts')
 <script>
     // Courses data from server
-    let selectedCourses = @json(
-        $isEdit
-            ? $room->courses->map(fn($c) => ['id' => $c->id, 'name' => $c->name])->values()
-            : collect($selectedCourseIds)->map(fn($id) => ['id' => $id, 'name' => $courses->firstWhere('id', $id)?->name ?? ''])->values()
-    );
+    let selectedCourses = @json($selectedCoursesJson);
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
@@ -364,10 +417,41 @@
 
     function filterCourses() {
         const search = document.getElementById('courseSearchInput').value.toLowerCase();
+        const sgFilter = document.getElementById('filterSubjectGroup').value;
+        const elFilter = document.getElementById('filterEducationLevel').value;
+        const gradeFilter = document.getElementById('filterGrade').value;
+
         document.querySelectorAll('.course-item').forEach(item => {
             const name = item.getAttribute('data-name');
-            item.style.display = name.includes(search) ? '' : 'none';
+            const sg = item.getAttribute('data-subject-group');
+            const el = item.getAttribute('data-education-level');
+            const grade = item.getAttribute('data-grade');
+
+            const matchSearch = !search || name.includes(search);
+            const matchSg = !sgFilter || sg === sgFilter;
+            const matchEl = !elFilter || el === elFilter;
+            const matchGrade = !gradeFilter || grade === gradeFilter;
+
+            item.style.display = (matchSearch && matchSg && matchEl && matchGrade) ? '' : 'none';
         });
+        updateSelectAllState();
+    }
+
+    function onEducationLevelChange() {
+        const elId = document.getElementById('filterEducationLevel').value;
+        const gradeSelect = document.getElementById('filterGrade');
+        gradeSelect.value = '';
+        Array.from(gradeSelect.options).forEach(opt => {
+            if (!opt.value) return;
+            opt.style.display = (!elId || opt.getAttribute('data-education-level') === elId) ? '' : 'none';
+        });
+        filterCourses();
+    }
+
+    function updateSelectAllState() {
+        const allVisible = document.querySelectorAll('.course-item:not([style*="display: none"]) .course-checkbox');
+        const allChecked = allVisible.length > 0 && Array.from(allVisible).every(cb => cb.checked);
+        document.getElementById('selectAllCourses').checked = allChecked;
     }
 
     function toggleSelectAll() {
@@ -441,6 +525,90 @@
     function removeCourse(id) {
         selectedCourses = selectedCourses.filter(c => c.id !== id);
         renderSelectedCourses();
+    }
+
+    // ── Unavailable Time Ranges ──
+    // State: { 1: [{start:'08:00', end:'12:00'}, ...], 2: [...], ... }
+    let timeRanges = {1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[]};
+
+    // Load saved data
+    const savedUnavailable = @json($isEdit ? ($room->unavailable_periods ?? []) : []);
+    if (Array.isArray(savedUnavailable)) {
+        savedUnavailable.forEach(item => {
+            if (item.day && item.start && item.end) {
+                if (!timeRanges[item.day]) timeRanges[item.day] = [];
+                timeRanges[item.day].push({ start: item.start, end: item.end });
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        for (let d = 1; d <= 7; d++) renderDayRanges(d);
+
+        document.getElementById('roomForm').addEventListener('submit', function() {
+            const result = [];
+            for (let d = 1; d <= 7; d++) {
+                timeRanges[d].forEach(r => {
+                    if (r.start && r.end) result.push({ day: d, start: r.start, end: r.end });
+                });
+            }
+            document.getElementById('unavailablePeriodsInput').value = result.length ? JSON.stringify(result) : '';
+        });
+    });
+
+    function addTimeRange(day) {
+        timeRanges[day].push({ start: '08:00', end: '16:00' });
+        renderDayRanges(day);
+    }
+
+    function removeTimeRange(day, index) {
+        timeRanges[day].splice(index, 1);
+        renderDayRanges(day);
+    }
+
+    function updateTimeRange(day, index, field, value) {
+        timeRanges[day][index][field] = value;
+        updateDayCount(day);
+    }
+
+    function renderDayRanges(day) {
+        const container = document.querySelector('.time-ranges-list[data-day="' + day + '"]');
+        container.innerHTML = '';
+
+        if (timeRanges[day].length === 0) {
+            container.innerHTML = '<div class="py-2 text-center text-[10px] text-gray-400 dark:text-gray-500 font-medium"><i class="fas fa-check-circle mr-1 text-emerald-400"></i>{{ __("Available all day") }}</div>';
+            updateDayCount(day);
+            return;
+        }
+
+        timeRanges[day].forEach((range, idx) => {
+            const row = document.createElement('div');
+            row.className = 'flex items-center space-x-2 py-1';
+            row.innerHTML =
+                '<div class="flex items-center space-x-1.5 flex-1">' +
+                    '<i class="fas fa-clock text-[10px] text-rose-400 opacity-60"></i>' +
+                    '<input type="time" value="' + range.start + '" onchange="updateTimeRange(' + day + ',' + idx + ',\'start\',this.value)" class="px-2.5 py-2 bg-white dark:bg-[#242526] border border-gray-200 dark:border-[#4a4b4c] rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 focus:outline-none focus:border-indigo-400 transition-all w-[110px]">' +
+                    '<span class="text-[10px] font-bold text-gray-400">{{ __("to") }}</span>' +
+                    '<input type="time" value="' + range.end + '" onchange="updateTimeRange(' + day + ',' + idx + ',\'end\',this.value)" class="px-2.5 py-2 bg-white dark:bg-[#242526] border border-gray-200 dark:border-[#4a4b4c] rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 focus:outline-none focus:border-indigo-400 transition-all w-[110px]">' +
+                '</div>' +
+                '<button type="button" onclick="removeTimeRange(' + day + ',' + idx + ')" class="w-7 h-7 rounded-lg bg-rose-50 dark:bg-rose-900/20 text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 hover:text-rose-600 transition-all flex items-center justify-center flex-shrink-0">' +
+                    '<i class="fas fa-trash-alt text-[10px]"></i>' +
+                '</button>';
+            container.appendChild(row);
+        });
+
+        updateDayCount(day);
+    }
+
+    function updateDayCount(day) {
+        const countEl = document.querySelector('.day-range-count[data-day="' + day + '"]');
+        const count = timeRanges[day].length;
+        if (count > 0) {
+            countEl.textContent = count + ' {{ __("range(s)") }}';
+            countEl.classList.remove('hidden');
+        } else {
+            countEl.classList.add('hidden');
+        }
     }
 </script>
 @endpush

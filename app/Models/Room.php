@@ -10,7 +10,12 @@ class Room extends Model
         'room_number',
         'building_id',
         'description',
+        'unavailable_periods',
         'status',
+    ];
+
+    protected $casts = [
+        'unavailable_periods' => 'array',
     ];
 
     public function building()

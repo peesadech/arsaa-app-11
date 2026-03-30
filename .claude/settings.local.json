@@ -17,7 +17,9 @@
       "Read(//c/Users/ADMINS/.config/herd/bin//**)",
       "Bash(\"/c/Users/ADMINS/.config/herd/bin/php82\" artisan:*)",
       "Bash(\"/c/Users/ADMINS/.config/herd/bin/php82.bat\" artisan:*)",
-      "Bash(\"/c/Users/ADMINS/.config/herd/bin/php82.bat\" check_roles.php)"
+      "Bash(\"/c/Users/ADMINS/.config/herd/bin/php82.bat\" check_roles.php)",
+      "Bash(php82 artisan:*)",
+      "Bash(\"/c/Users/ADMINS/.config/herd/bin/php82/php.exe\" \"/d/myWork/arsaa-app/arsaa-app/artisan\" migrate --force)"
     ]
   }
 }
