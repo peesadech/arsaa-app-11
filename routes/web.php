@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\YearlyScheduleController;
 use App\Http\Controllers\Admin\EducationLevelController;
 use App\Http\Controllers\Admin\SubjectGroupController;
 use App\Http\Controllers\Admin\BuildingController;
+use App\Http\Controllers\Admin\CourseTypeController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\LanguageController;
@@ -133,6 +134,15 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
     Route::get('/admin/buildings/{id}/edit', [BuildingController::class, 'edit'])->name('admin.buildings.edit');
     Route::put('/admin/buildings/{id}', [BuildingController::class, 'update'])->name('admin.buildings.update');
     Route::delete('/admin/buildings/{id}', [BuildingController::class, 'destroy'])->name('admin.buildings.destroy');
+
+    // Course Types
+    Route::get('/admin/course-types', [CourseTypeController::class, 'index'])->name('admin.course-types.index');
+    Route::get('/admin/course-types/data', [CourseTypeController::class, 'data'])->name('admin.course-types.data');
+    Route::get('/admin/course-types/create', [CourseTypeController::class, 'create'])->name('admin.course-types.create');
+    Route::post('/admin/course-types', [CourseTypeController::class, 'store'])->name('admin.course-types.store');
+    Route::get('/admin/course-types/{id}/edit', [CourseTypeController::class, 'edit'])->name('admin.course-types.edit');
+    Route::put('/admin/course-types/{id}', [CourseTypeController::class, 'update'])->name('admin.course-types.update');
+    Route::delete('/admin/course-types/{id}', [CourseTypeController::class, 'destroy'])->name('admin.course-types.destroy');
 
     // Rooms
     Route::get('/admin/rooms', [RoomController::class, 'index'])->name('admin.rooms.index');

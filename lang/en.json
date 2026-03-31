@@ -493,5 +493,22 @@
     "range(s)": "range(s)",
     "-- Subject Group --": "-- Subject Group --",
     "-- Education Level --": "-- Education Level --",
-    "-- Grade --": "-- Grade --"
+    "-- Grade --": "-- Grade --",
+    "Course Type Management": "Course Type Management",
+    "Manage course types such as theory, practice, lab, activity": "Manage course types such as theory, practice, lab, activity",
+    "New Course Type": "New Course Type",
+    "Refine course type list": "Refine course type list",
+    "Course Type Management System": "Course Type Management System",
+    "Search course types...": "Search course types...",
+    "Edit Course Type": "Edit Course Type",
+    "Create New Course Type": "Create New Course Type",
+    "Update course type details": "Update course type details",
+    "Course Type Registration": "Course Type Registration",
+    "Modify Course Type": "Modify Course Type",
+    "Course Type Details": "Course Type Details",
+    "You are updating course type #:id. Ensure all details are correct.": "You are updating course type #:id. Ensure all details are correct.",
+    "Define a new course type such as theory, practice, lab, or activity.": "Define a new course type such as theory, practice, lab, or activity.",
+    "Create Course Type": "Create Course Type",
+    "e.g. ทฤษฎี, ปฏิบัติ": "e.g. Theory, Practice",
+    "Course Type": "Course Type"
 }

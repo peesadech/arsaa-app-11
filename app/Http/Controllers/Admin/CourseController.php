@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Grade;
 use App\Models\Semester;
 use App\Models\SubjectGroup;
+use App\Models\CourseType;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -63,7 +64,8 @@ class CourseController extends Controller
         $grades = Grade::all();
         $semesters = Semester::all();
         $subjectGroups = SubjectGroup::where('status', 1)->get();
-        return view('admin.courses.save', compact('grades', 'semesters', 'subjectGroups'));
+        $courseTypes = CourseType::where('status', 1)->get();
+        return view('admin.courses.save', compact('grades', 'semesters', 'subjectGroups', 'courseTypes'));
     }
 
     public function store(Request $request)
@@ -73,6 +75,7 @@ class CourseController extends Controller
             'grade_id' => 'required|exists:grades,id',
             'semester_id' => 'required|exists:semesters,id',
             'subject_group_id' => 'required|exists:subject_groups,id',
+            'course_type_id' => 'required|exists:course_types,id',
             'periods_per_week' => 'required|integer|min:1|max:20',
             'preferred_days' => 'nullable|array',
             'preferred_days.*' => 'integer|min:1|max:7',
@@ -90,7 +93,8 @@ class CourseController extends Controller
         $grades = Grade::all();
         $semesters = Semester::all();
         $subjectGroups = SubjectGroup::where('status', 1)->get();
-        return view('admin.courses.save', compact('course', 'grades', 'semesters', 'subjectGroups'));
+        $courseTypes = CourseType::where('status', 1)->get();
+        return view('admin.courses.save', compact('course', 'grades', 'semesters', 'subjectGroups', 'courseTypes'));
     }
 
     public function update(Request $request, $id)
@@ -101,6 +105,7 @@ class CourseController extends Controller
             'grade_id' => 'required|exists:grades,id',
             'semester_id' => 'required|exists:semesters,id',
             'subject_group_id' => 'required|exists:subject_groups,id',
+            'course_type_id' => 'required|exists:course_types,id',
             'periods_per_week' => 'required|integer|min:1|max:20',
             'preferred_days' => 'nullable|array',
             'preferred_days.*' => 'integer|min:1|max:7',

@@ -127,6 +127,37 @@
                         @enderror
                     </div>
 
+                    <!-- Course Type -->
+                    <div class="space-y-2">
+                        <label for="course_type_id" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
+                            {{ __('Course Type') }}
+                        </label>
+                        <div class="group relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
+                                <i class="fas fa-tags text-sm"></i>
+                            </div>
+                            <select
+                                id="course_type_id"
+                                name="course_type_id"
+                                class="block w-full pl-10 pr-10 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white appearance-none focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('course_type_id') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
+                                required
+                            >
+                                <option value="" disabled {{ !old('course_type_id', $isEdit ? $course->course_type_id : '') ? 'selected' : '' }}>{{ __('-- Please Select --') }}</option>
+                                @foreach($courseTypes as $ct)
+                                    <option value="{{ $ct->id }}" {{ old('course_type_id', $isEdit ? $course->course_type_id : '') == $ct->id ? 'selected' : '' }}>
+                                        {{ $ct->name_th }} / {{ $ct->name_en }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                                <i class="fas fa-chevron-down text-sm"></i>
+                            </div>
+                        </div>
+                        @error('course_type_id')
+                            <p class="text-[10px] font-bold text-rose-500 mt-1 px-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Grade ID -->
                         <div class="space-y-2">

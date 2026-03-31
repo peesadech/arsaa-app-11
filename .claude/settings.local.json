@@ -19,7 +19,10 @@
       "Bash(\"/c/Users/ADMINS/.config/herd/bin/php82.bat\" artisan:*)",
       "Bash(\"/c/Users/ADMINS/.config/herd/bin/php82.bat\" check_roles.php)",
       "Bash(php82 artisan:*)",
-      "Bash(\"/c/Users/ADMINS/.config/herd/bin/php82/php.exe\" \"/d/myWork/arsaa-app/arsaa-app/artisan\" migrate --force)"
+      "Bash(\"/c/Users/ADMINS/.config/herd/bin/php82/php.exe\" \"/d/myWork/arsaa-app/arsaa-app/artisan\" migrate --force)",
+      "Bash(\"/c/Users/ADMINS/.config/herd/bin/php82/php.exe\" \"/d/myWork/arsaa-app/arsaa-app/artisan\" route:list --name=course-types)",
+      "Bash(find d:myWorkarsaa-apparsaa-app -name *.blade.php -type f -exec grep -l \"nav\\\\|menu\\\\|sidebar\\\\|href.*admin\" {})",
+      "Bash(2)"
     ]
   }
 }

@@ -493,5 +493,22 @@
     "range(s)": "ช่วง",
     "-- Subject Group --": "-- กลุ่มสาระ --",
     "-- Education Level --": "-- ระดับการศึกษา --",
-    "-- Grade --": "-- ชั้นเรียน --"
+    "-- Grade --": "-- ชั้นเรียน --",
+    "Course Type Management": "จัดการประเภทวิชา",
+    "Manage course types such as theory, practice, lab, activity": "จัดการประเภทวิชา เช่น ทฤษฎี ปฏิบัติ แล็บ กิจกรรม",
+    "New Course Type": "เพิ่มประเภทวิชา",
+    "Refine course type list": "กรองรายการประเภทวิชา",
+    "Course Type Management System": "ระบบจัดการประเภทวิชา",
+    "Search course types...": "ค้นหาประเภทวิชา...",
+    "Edit Course Type": "แก้ไขประเภทวิชา",
+    "Create New Course Type": "สร้างประเภทวิชาใหม่",
+    "Update course type details": "อัปเดตรายละเอียดประเภทวิชา",
+    "Course Type Registration": "ลงทะเบียนประเภทวิชา",
+    "Modify Course Type": "แก้ไขประเภทวิชา",
+    "Course Type Details": "รายละเอียดประเภทวิชา",
+    "You are updating course type #:id. Ensure all details are correct.": "คุณกำลังแก้ไขประเภทวิชา #:id กรุณาตรวจสอบข้อมูลให้ถูกต้อง",
+    "Define a new course type such as theory, practice, lab, or activity.": "กำหนดประเภทวิชาใหม่ เช่น ทฤษฎี ปฏิบัติ แล็บ หรือกิจกรรม",
+    "Create Course Type": "สร้างประเภทวิชา",
+    "e.g. ทฤษฎี, ปฏิบัติ": "เช่น ทฤษฎี, ปฏิบัติ",
+    "Course Type": "ประเภทวิชา"
 }

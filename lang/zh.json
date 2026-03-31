@@ -493,5 +493,22 @@
     "range(s)": "个时间段",
     "-- Subject Group --": "-- 学科组 --",
     "-- Education Level --": "-- 教育阶段 --",
-    "-- Grade --": "-- 年级 --"
+    "-- Grade --": "-- 年级 --",
+    "Course Type Management": "课程类型管理",
+    "Manage course types such as theory, practice, lab, activity": "管理课程类型，如理论、实践、实验、活动",
+    "New Course Type": "新增课程类型",
+    "Refine course type list": "筛选课程类型列表",
+    "Course Type Management System": "课程类型管理系统",
+    "Search course types...": "搜索课程类型...",
+    "Edit Course Type": "编辑课程类型",
+    "Create New Course Type": "创建新课程类型",
+    "Update course type details": "更新课程类型详情",
+    "Course Type Registration": "课程类型注册",
+    "Modify Course Type": "修改课程类型",
+    "Course Type Details": "课程类型详情",
+    "You are updating course type #:id. Ensure all details are correct.": "您正在更新课程类型 #:id，请确保所有信息正确。",
+    "Define a new course type such as theory, practice, lab, or activity.": "定义新的课程类型，如理论、实践、实验或活动。",
+    "Create Course Type": "创建课程类型",
+    "e.g. ทฤษฎี, ปฏิบัติ": "例如 理论、实践",
+    "Course Type": "课程类型"
 }

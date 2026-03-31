@@ -11,6 +11,7 @@ class Course extends Model
         'grade_id',
         'semester_id',
         'subject_group_id',
+        'course_type_id',
         'periods_per_week',
         'preferred_days',
         'status',
@@ -33,5 +34,10 @@ class Course extends Model
     public function subjectGroup()
     {
         return $this->belongsTo(SubjectGroup::class, 'subject_group_id');
+    }
+
+    public function courseType()
+    {
+        return $this->belongsTo(CourseType::class, 'course_type_id');
     }
 }
