@@ -480,5 +480,18 @@
     "periods": "คาบ",
     "periods max": "คาบสูงสุด",
     "to manage classrooms for each grade level": "เพื่อจัดการห้องเรียนของแต่ละระดับชั้น",
-    "updated successfully!": "อัปเดตเรียบร้อยแล้ว!"
+    "updated successfully!": "อัปเดตเรียบร้อยแล้ว!",
+    "Periods per Session": "จำนวนคาบที่ใช้ในการเรียนแต่ละครั้ง",
+    "Number of periods used per session": "จำนวนคาบที่ใช้เรียนในแต่ละครั้งที่จัดตารางเรียน",
+    "Preferred Days": "วันที่ต้องการจัดตารางเรียน",
+    "Leave empty for any day": "ไม่เลือก = จัดได้ทุกวัน",
+    "Unavailable Time Ranges": "ช่วงเวลาที่ไม่ใช้งานห้อง",
+    "Specify time ranges when this room is NOT available for scheduling.": "ระบุช่วงเวลาที่ห้องนี้ไม่สามารถใช้จัดตารางเรียนได้",
+    "Add Range": "เพิ่มช่วงเวลา",
+    "Available all day": "ใช้ได้ตลอดทั้งวัน",
+    "to": "ถึง",
+    "range(s)": "ช่วง",
+    "-- Subject Group --": "-- กลุ่มสาระ --",
+    "-- Education Level --": "-- ระดับการศึกษา --",
+    "-- Grade --": "-- ชั้นเรียน --"
 }

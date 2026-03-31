@@ -480,5 +480,18 @@
     "periods": "节",
     "periods max": "最大节次",
     "to manage classrooms for each grade level": "管理每个年级的教室",
-    "updated successfully!": "更新成功！"
+    "updated successfully!": "更新成功！",
+    "Periods per Session": "每次上课节数",
+    "Number of periods used per session": "每次排课使用的节数",
+    "Preferred Days": "首选上课日",
+    "Leave empty for any day": "不选择 = 任意一天均可",
+    "Unavailable Time Ranges": "不可用时间段",
+    "Specify time ranges when this room is NOT available for scheduling.": "指定此教室不可用于排课的时间段。",
+    "Add Range": "添加时间段",
+    "Available all day": "全天可用",
+    "to": "至",
+    "range(s)": "个时间段",
+    "-- Subject Group --": "-- 学科组 --",
+    "-- Education Level --": "-- 教育阶段 --",
+    "-- Grade --": "-- 年级 --"
 }

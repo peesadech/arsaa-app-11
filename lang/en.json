@@ -480,5 +480,18 @@
     "periods": "periods",
     "periods max": "periods max",
     "to manage classrooms for each grade level": "to manage classrooms for each grade level",
-    "updated successfully!": "updated successfully!"
+    "updated successfully!": "updated successfully!",
+    "Periods per Session": "Periods per Session",
+    "Number of periods used per session": "Number of periods used per session",
+    "Preferred Days": "Preferred Days",
+    "Leave empty for any day": "Leave empty for any day",
+    "Unavailable Time Ranges": "Unavailable Time Ranges",
+    "Specify time ranges when this room is NOT available for scheduling.": "Specify time ranges when this room is NOT available for scheduling.",
+    "Add Range": "Add Range",
+    "Available all day": "Available all day",
+    "to": "to",
+    "range(s)": "range(s)",
+    "-- Subject Group --": "-- Subject Group --",
+    "-- Education Level --": "-- Education Level --",
+    "-- Grade --": "-- Grade --"
 }

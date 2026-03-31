@@ -73,6 +73,9 @@ class CourseController extends Controller
             'grade_id' => 'required|exists:grades,id',
             'semester_id' => 'required|exists:semesters,id',
             'subject_group_id' => 'required|exists:subject_groups,id',
+            'periods_per_week' => 'required|integer|min:1|max:20',
+            'preferred_days' => 'nullable|array',
+            'preferred_days.*' => 'integer|min:1|max:7',
             'status' => 'required|in:1,2',
         ]);
 
@@ -98,6 +101,9 @@ class CourseController extends Controller
             'grade_id' => 'required|exists:grades,id',
             'semester_id' => 'required|exists:semesters,id',
             'subject_group_id' => 'required|exists:subject_groups,id',
+            'periods_per_week' => 'required|integer|min:1|max:20',
+            'preferred_days' => 'nullable|array',
+            'preferred_days.*' => 'integer|min:1|max:7',
             'status' => 'required|in:1,2',
         ]);
 

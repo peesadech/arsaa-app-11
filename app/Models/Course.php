@@ -11,7 +11,13 @@ class Course extends Model
         'grade_id',
         'semester_id',
         'subject_group_id',
+        'periods_per_week',
+        'preferred_days',
         'status',
+    ];
+
+    protected $casts = [
+        'preferred_days' => 'array',
     ];
 
     public function grade()

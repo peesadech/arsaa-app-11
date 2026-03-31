@@ -191,6 +191,75 @@
                         </div>
                     </div>
 
+                    <!-- Scheduling: Periods per Week + Preferred Days -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Periods per Week -->
+                        <div class="space-y-2">
+                            <label for="periods_per_week" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
+                                {{ __('Periods per Session') }}
+                            </label>
+                            <p class="text-[10px] text-gray-400 dark:text-gray-500 px-1">{{ __('Number of periods used per session') }}</p>
+                            <div class="group relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
+                                    <i class="fas fa-clock text-sm"></i>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="periods_per_week"
+                                    name="periods_per_week"
+                                    min="1"
+                                    max="20"
+                                    class="block w-full pl-10 pr-16 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('periods_per_week') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
+                                    placeholder="e.g. 2"
+                                    value="{{ old('periods_per_week', $isEdit ? $course->periods_per_week : 1) }}"
+                                    required
+                                />
+                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-xs font-bold text-gray-400 dark:text-gray-500">
+                                    {{ __('periods') }}
+                                </div>
+                            </div>
+                            @error('periods_per_week')
+                                <p class="text-[10px] font-bold text-rose-500 mt-1 px-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Preferred Days -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
+                                {{ __('Preferred Days') }}
+                            </label>
+                            <p class="text-[10px] text-gray-400 dark:text-gray-500 px-1">{{ __('Leave empty for any day') }}</p>
+                            @php
+                                $savedDays = old('preferred_days', $isEdit ? ($course->preferred_days ?? []) : []);
+                                $dayOptions = [
+                                    1 => __('Mon'),
+                                    2 => __('Tue'),
+                                    3 => __('Wed'),
+                                    4 => __('Thu'),
+                                    5 => __('Fri'),
+                                    6 => __('Sat'),
+                                    7 => __('Sun'),
+                                ];
+                            @endphp
+                            <div class="flex flex-wrap gap-2 pt-1">
+                                @foreach($dayOptions as $dayNum => $dayLabel)
+                                <label class="relative group cursor-pointer">
+                                    <input type="checkbox" name="preferred_days[]" value="{{ $dayNum }}" class="peer hidden" {{ in_array($dayNum, $savedDays) ? 'checked' : '' }}>
+                                    <div class="px-3.5 py-2.5 rounded-xl border-2 border-gray-100 dark:border-[#3a3b3c] bg-white dark:bg-[#242526] text-xs font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/30 peer-checked:text-indigo-600 dark:peer-checked:text-indigo-400 group-hover:border-gray-200 dark:group-hover:border-[#4a4b4c]">
+                                        {{ $dayLabel }}
+                                    </div>
+                                    <div class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-indigo-500 rounded-full flex items-center justify-center text-[7px] text-white opacity-0 peer-checked:opacity-100 transition-all scale-50 peer-checked:scale-100">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                </label>
+                                @endforeach
+                            </div>
+                            @error('preferred_days')
+                                <p class="text-[10px] font-bold text-rose-500 mt-1 px-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
                     <!-- Status -->
                     <div class="space-y-3">
                         <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
