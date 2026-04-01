@@ -32,4 +32,9 @@ class OpenedCourse extends Model
     {
         return $this->belongsTo(Course::class);
     }
+
+    public function timetableEntries()
+    {
+        return $this->hasMany(TimetableEntry::class);
+    }
 }

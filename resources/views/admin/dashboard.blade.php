@@ -103,6 +103,24 @@
             </div>
         </div>
 
+        {{-- Timetable Scheduling Block --}}
+        @if($currentYear && $currentSemester)
+        <div class="mt-4 bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-[#3a3b3c] px-5 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                    <i class="fas fa-calendar-alt text-indigo-600 dark:text-indigo-400"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-gray-800 dark:text-white">จัดตารางเรียน</p>
+                    <p class="text-xs text-gray-400">Timetable Scheduling — Auto & Manual</p>
+                </div>
+            </div>
+            <a href="{{ route('admin.timetable.index') }}" class="btn-app">
+                <i class="fas fa-magic text-[10px]"></i> จัดตาราง
+            </a>
+        </div>
+        @endif
+
         {{-- Footer --}}
         <div class="pt-4 border-t border-gray-100 dark:border-[#3a3b3c] flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
             <div class="flex items-center">

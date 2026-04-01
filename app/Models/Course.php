@@ -13,6 +13,7 @@ class Course extends Model
         'subject_group_id',
         'course_type_id',
         'periods_per_week',
+        'periods_per_session',
         'preferred_days',
         'status',
     ];
@@ -39,5 +40,15 @@ class Course extends Model
     public function courseType()
     {
         return $this->belongsTo(CourseType::class, 'course_type_id');
+    }
+
+    public function teachers()
+    {
+        return $this->belongsToMany(Teacher::class, 'course_teacher')->withTimestamps();
+    }
+
+    public function rooms()
+    {
+        return $this->belongsToMany(Room::class, 'course_room')->withTimestamps();
     }
 }

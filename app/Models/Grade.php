@@ -18,4 +18,9 @@ class Grade extends Model
     {
         return $this->belongsTo(EducationLevel::class);
     }
+
+    public function openedCourses()
+    {
+        return $this->hasMany(OpenedCourse::class);
+    }
 }

@@ -27,4 +27,9 @@ class Room extends Model
     {
         return $this->belongsToMany(Course::class, 'course_room')->withTimestamps();
     }
+
+    public function timetableEntries()
+    {
+        return $this->hasMany(TimetableEntry::class);
+    }
 }

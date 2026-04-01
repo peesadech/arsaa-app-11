@@ -17,7 +17,8 @@
       "Read(//c/Users/ADMINS/AppData/Local/Herd/**)",
       "Read(//c/Program Files/Herd/**)",
       "Bash(\"C:/Users/ADMINS/.config/herd/bin/php82/php.exe\" d:/myWork/arsaa-app/arsaa-app/artisan session:table)",
-      "Bash(\"C:/Users/ADMINS/.config/herd/bin/php82/php.exe\" d:/myWork/arsaa-app/arsaa-app/artisan tinker --execute=\"echo Schema::hasTable\\(''sessions''\\) ? ''YES'' : ''NO'';\")"
+      "Bash(\"C:/Users/ADMINS/.config/herd/bin/php82/php.exe\" d:/myWork/arsaa-app/arsaa-app/artisan tinker --execute=\"echo Schema::hasTable\\(''sessions''\\) ? ''YES'' : ''NO'';\")",
+      "Bash(\"C:/Users/ADMINS/.config/herd/bin/php82/php.exe\" d:/myWork/arsaa-app/arsaa-app/artisan migrate)"
     ]
   }
 }

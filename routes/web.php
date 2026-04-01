@@ -30,6 +30,8 @@ use App\Http\Controllers\Admin\CourseTypeController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\LanguageController;
+use App\Http\Controllers\Admin\TimetableController;
+use App\Http\Controllers\Admin\TimetableExportController;
 use App\Http\Controllers\Api\RoleController as ApiRoleController;
 use App\Http\Controllers\Api\PermissionController as ApiPermissionController;
 use App\Http\Controllers\Api\UserRoleController as ApiUserRoleController;
@@ -266,6 +268,36 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::get('/admin/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
     Route::put('/admin/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/admin/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+
+    // Timetable Scheduling
+    Route::get('/admin/timetable', [TimetableController::class, 'index'])->name('admin.timetable.index');
+    Route::get('/admin/timetable/generate', [TimetableController::class, 'generateForm'])->name('admin.timetable.generate');
+    Route::post('/admin/timetable/generate', [TimetableController::class, 'generateStore'])->name('admin.timetable.generate.store');
+    Route::get('/admin/timetable/generations/{id}', [TimetableController::class, 'showGeneration'])->name('admin.timetable.generations.show');
+    Route::get('/admin/timetable/solutions/{id}', [TimetableController::class, 'showSolution'])->name('admin.timetable.solutions.show');
+    Route::get('/admin/timetable/view/classroom/{classroomId}', [TimetableController::class, 'viewByClassroom'])->name('admin.timetable.view.classroom');
+    Route::get('/admin/timetable/view/teacher/{teacherId}', [TimetableController::class, 'viewByTeacher'])->name('admin.timetable.view.teacher');
+    Route::get('/admin/timetable/view/room/{roomId}', [TimetableController::class, 'viewByRoom'])->name('admin.timetable.view.room');
+    Route::get('/admin/timetable/conflicts/{solutionId}', [TimetableController::class, 'conflicts'])->name('admin.timetable.conflicts');
+    Route::get('/admin/timetable/manual', [TimetableController::class, 'manualSelect'])->name('admin.timetable.manual.select');
+    Route::get('/admin/timetable/manual/{gradeId}/{classroomId}', [TimetableController::class, 'manualEditor'])->name('admin.timetable.manual.editor');
+
+    // Timetable API (JSON)
+    Route::prefix('admin/timetable/api')->group(function () {
+        Route::get('/generations/{id}/progress', [TimetableController::class, 'apiProgress'])->name('admin.timetable.api.progress');
+        Route::post('/solutions/{id}/select', [TimetableController::class, 'apiSelect'])->name('admin.timetable.api.select');
+        Route::get('/solutions/{id}/entries', [TimetableController::class, 'apiEntries'])->name('admin.timetable.api.entries');
+        Route::post('/entries/{id}/move', [TimetableController::class, 'apiMove'])->name('admin.timetable.api.move');
+        Route::post('/entries/{id}/lock', [TimetableController::class, 'apiLock'])->name('admin.timetable.api.lock');
+        Route::delete('/entries/{id}', [TimetableController::class, 'apiDelete'])->name('admin.timetable.api.delete');
+        Route::post('/entries', [TimetableController::class, 'apiCreate'])->name('admin.timetable.api.create');
+        Route::get('/check-conflicts', [TimetableController::class, 'apiCheckConflicts'])->name('admin.timetable.api.check');
+        Route::get('/explain-slot', [TimetableController::class, 'apiExplainSlot'])->name('admin.timetable.api.explain');
+        Route::get('/solutions/{id}/fitness', [TimetableController::class, 'apiFitness'])->name('admin.timetable.api.fitness');
+        Route::post('/export/classroom-pdf', [TimetableExportController::class, 'exportClassroomPdf'])->name('admin.timetable.api.export.classroom-pdf');
+        Route::post('/export/teacher-pdf', [TimetableExportController::class, 'exportTeacherPdf'])->name('admin.timetable.api.export.teacher-pdf');
+        Route::post('/export/excel', [TimetableExportController::class, 'exportExcel'])->name('admin.timetable.api.export.excel');
+    });
 
     // Admin Data (DataTables)
     Route::prefix('admin/data')->group(function () {

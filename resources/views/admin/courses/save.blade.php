@@ -222,14 +222,14 @@
                         </div>
                     </div>
 
-                    <!-- Scheduling: Periods per Week + Preferred Days -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Scheduling: Periods per Week + Periods per Session + Preferred Days -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <!-- Periods per Week -->
                         <div class="space-y-2">
                             <label for="periods_per_week" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                                {{ __('Periods per Session') }}
+                                {{ __('Periods per Week') }}
                             </label>
-                            <p class="text-[10px] text-gray-400 dark:text-gray-500 px-1">{{ __('Number of periods used per session') }}</p>
+                            <p class="text-[10px] text-gray-400 dark:text-gray-500 px-1">{{ __('Total periods in a week') }}</p>
                             <div class="group relative">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
                                     <i class="fas fa-clock text-sm"></i>
@@ -250,6 +250,36 @@
                                 </div>
                             </div>
                             @error('periods_per_week')
+                                <p class="text-[10px] font-bold text-rose-500 mt-1 px-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Periods per Session -->
+                        <div class="space-y-2">
+                            <label for="periods_per_session" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
+                                {{ __('Periods per Session') }}
+                            </label>
+                            <p class="text-[10px] text-gray-400 dark:text-gray-500 px-1">{{ __('Consecutive periods per class') }}</p>
+                            <div class="group relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
+                                    <i class="fas fa-layer-group text-sm"></i>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="periods_per_session"
+                                    name="periods_per_session"
+                                    min="1"
+                                    max="10"
+                                    class="block w-full pl-10 pr-16 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('periods_per_session') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
+                                    placeholder="e.g. 2"
+                                    value="{{ old('periods_per_session', $isEdit ? ($course->periods_per_session ?? 1) : 1) }}"
+                                    required
+                                />
+                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-xs font-bold text-gray-400 dark:text-gray-500">
+                                    {{ __('periods') }}
+                                </div>
+                            </div>
+                            @error('periods_per_session')
                                 <p class="text-[10px] font-bold text-rose-500 mt-1 px-1">{{ $message }}</p>
                             @enderror
                         </div>

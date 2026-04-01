@@ -29,4 +29,9 @@ class Teacher extends Model
     {
         return $this->belongsToMany(Course::class, 'course_teacher')->withTimestamps();
     }
+
+    public function timetableEntries()
+    {
+        return $this->hasMany(TimetableEntry::class);
+    }
 }
