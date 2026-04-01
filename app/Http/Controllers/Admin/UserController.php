@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
@@ -140,12 +141,9 @@ class UserController extends Controller
         }
 
         if ($request->filled('image_base64')) {
-            // Delete old image
             if ($user->image_path) {
-                $oldPath = public_path($user->image_path);
-                if (file_exists($oldPath)) {
-                    @unlink($oldPath);
-                }
+                $storagePath = str_replace('/storage/', '', $user->image_path);
+                Storage::disk('public')->delete($storagePath);
             }
             $data['image_path'] = $this->handleImageUpload($request->input('image_base64'));
         }
@@ -169,10 +167,8 @@ class UserController extends Controller
         }
 
         if ($user->image_path) {
-            $path = public_path($user->image_path);
-            if (file_exists($path)) {
-                @unlink($path);
-            }
+            $storagePath = str_replace('/storage/', '', $user->image_path);
+            Storage::disk('public')->delete($storagePath);
         }
 
         $user->delete();
@@ -183,15 +179,11 @@ class UserController extends Controller
     {
         $image_parts = explode(";base64,", $base64Data);
         $image_base64 = base64_decode($image_parts[1]);
-        
+
         $fileName = time() . '_' . uniqid() . '.jpg';
-        $directory = public_path('/image/users');
-        
-        if (!file_exists($directory)) {
-            mkdir($directory, 0777, true);
-        }
-        
-        file_put_contents($directory . '/' . $fileName, $image_base64);
-        return '/image/users/' . $fileName;
+        $path = 'image/users/' . $fileName;
+
+        Storage::disk('public')->put($path, $image_base64);
+        return '/storage/' . $path;
     }
 }

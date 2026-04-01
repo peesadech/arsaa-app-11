@@ -12,6 +12,7 @@ use App\Models\SubjectGroup;
 use App\Models\Semester;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class TeacherController extends Controller
@@ -144,10 +145,8 @@ class TeacherController extends Controller
 
         if ($request->filled('image_base64')) {
             if ($teacher->image_path) {
-                $oldPath = public_path($teacher->image_path);
-                if (file_exists($oldPath)) {
-                    @unlink($oldPath);
-                }
+                $storagePath = str_replace('/storage/', '', $teacher->image_path);
+                Storage::disk('public')->delete($storagePath);
             }
             $data['image_path'] = $this->handleImageUpload($request->input('image_base64'));
         }
@@ -163,10 +162,8 @@ class TeacherController extends Controller
         $teacher = Teacher::findOrFail($id);
 
         if ($teacher->image_path) {
-            $path = public_path($teacher->image_path);
-            if (file_exists($path)) {
-                @unlink($path);
-            }
+            $storagePath = str_replace('/storage/', '', $teacher->image_path);
+            Storage::disk('public')->delete($storagePath);
         }
 
         $teacher->delete();
@@ -239,13 +236,9 @@ class TeacherController extends Controller
         $image_base64 = base64_decode($image_parts[1]);
 
         $fileName = time() . '_' . uniqid() . '.jpg';
-        $directory = public_path('/image/teachers');
+        $path = 'image/teachers/' . $fileName;
 
-        if (!file_exists($directory)) {
-            mkdir($directory, 0777, true);
-        }
-
-        file_put_contents($directory . '/' . $fileName, $image_base64);
-        return '/image/teachers/' . $fileName;
+        Storage::disk('public')->put($path, $image_base64);
+        return '/storage/' . $path;
     }
 }

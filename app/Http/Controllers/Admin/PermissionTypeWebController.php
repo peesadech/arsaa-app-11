@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\PermissionType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PermissionTypeWebController extends Controller
 {
@@ -48,19 +49,13 @@ class PermissionTypeWebController extends Controller
         if ($request->filled('image_base64')) {
             $base64Image  = $request->input('image_base64');
             $image_parts  = explode(";base64,", $base64Image);
-            $image_type_aux = explode("image/", $image_parts[0]);
-            $image_type   = $image_type_aux[1];
             $image_base64 = base64_decode($image_parts[1]);
 
-            $fileName  = time() . '.jpg';
-            $directory = public_path('/image/permissionTypes');
+            $fileName = time() . '.jpg';
+            $path = 'image/permissionTypes/' . $fileName;
 
-            if (!file_exists($directory)) {
-                mkdir($directory, 0777, true);
-            }
-
-            file_put_contents($directory . '/' . $fileName, $image_base64);
-            $data['permissionType_image_path'] = '/image/permissionTypes/' . $fileName;
+            Storage::disk('public')->put($path, $image_base64);
+            $data['permissionType_image_path'] = '/storage/' . $path;
         }
 
         unset($data['image_base64']);
@@ -88,23 +83,16 @@ class PermissionTypeWebController extends Controller
             $image_parts  = explode(";base64,", $base64Image);
             $image_base64 = base64_decode($image_parts[1]);
 
-            $fileName  = time() . '.jpg';
-            $directory = public_path('/image/permissionTypes');
+            $fileName = time() . '.jpg';
+            $path = 'image/permissionTypes/' . $fileName;
 
-            if (!file_exists($directory)) {
-                mkdir($directory, 0777, true);
-            }
-
-            // Delete old image if exists
             if ($permissionType->permissionType_image_path) {
-                $oldPath = public_path($permissionType->permissionType_image_path);
-                if (file_exists($oldPath)) {
-                    @unlink($oldPath);
-                }
+                $storagePath = str_replace('/storage/', '', $permissionType->permissionType_image_path);
+                Storage::disk('public')->delete($storagePath);
             }
 
-            file_put_contents($directory . '/' . $fileName, $image_base64);
-            $data['permissionType_image_path'] = '/image/permissionTypes/' . $fileName;
+            Storage::disk('public')->put($path, $image_base64);
+            $data['permissionType_image_path'] = '/storage/' . $path;
         }
 
         unset($data['image_base64']);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -41,22 +42,15 @@ class ProfileController extends Controller implements HasMiddleware
             $image_base64 = base64_decode($image_parts[1]);
 
             $fileName = time() . '.jpg';
-            $directory = public_path('/image/users');
+            $path = 'image/users/' . $fileName;
 
-            if (!file_exists($directory)) {
-                mkdir($directory, 0777, true);
-            }
-
-            // Delete old image if exists and it's not a default one
             if ($user->image_path) {
-                $oldPath = public_path($user->image_path);
-                if (file_exists($oldPath)) {
-                    @unlink($oldPath);
-                }
+                $storagePath = str_replace('/storage/', '', $user->image_path);
+                Storage::disk('public')->delete($storagePath);
             }
 
-            file_put_contents($directory . '/' . $fileName, $image_base64);
-            $data['image_path'] = '/image/users/' . $fileName;
+            Storage::disk('public')->put($path, $image_base64);
+            $data['image_path'] = '/storage/' . $path;
         }
 
         $user->update($data);
