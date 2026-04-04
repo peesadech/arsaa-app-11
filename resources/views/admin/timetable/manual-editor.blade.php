@@ -245,8 +245,12 @@ const classroomId = {{ $classroom->id }};
 
 const schedule = @json($schedule);
 const allRooms = @json($allRoomsJson);
-const teachingDays = schedule.teaching_days || [];
 const dayConfigs = schedule.day_configs || {};
+// Only show days that have periods > 0 (exclude holidays/non-teaching days)
+const teachingDays = (schedule.teaching_days || []).filter(d => {
+    const dc = dayConfigs[String(d)];
+    return dc && (dc.periods || 0) > 0;
+});
 const periodDuration = schedule.period_duration || 50;
 const globalStart = schedule.start_time || '08:00';
 const dayNames = {1:@json(__('Monday')), 2:@json(__('Tuesday')), 3:@json(__('Wednesday')), 4:@json(__('Thursday')), 5:@json(__('Friday')), 6:@json(__('Saturday')), 7:@json(__('Sunday'))};

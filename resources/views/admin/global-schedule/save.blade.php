@@ -320,7 +320,9 @@ function setBreakDur(d, p, val) {
 
 function prepareSubmit() {
     document.getElementById('dayConfigsInput').value = JSON.stringify(state.day_configs);
-    document.getElementById('teachingDaysInputs').innerHTML = ALL_DAYS
+    // Only include days that have periods > 0 as teaching days
+    const teachingDays = ALL_DAYS.filter(d => (state.day_configs[d]?.periods ?? 0) > 0);
+    document.getElementById('teachingDaysInputs').innerHTML = teachingDays
         .map(d => `<input type="hidden" name="teaching_days[]" value="${d}">`).join('');
 }
 

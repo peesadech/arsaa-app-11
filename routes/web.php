@@ -296,7 +296,9 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
         Route::get('/solutions/{id}/fitness', [TimetableController::class, 'apiFitness'])->name('admin.timetable.api.fitness');
         Route::post('/export/classroom-pdf', [TimetableExportController::class, 'exportClassroomPdf'])->name('admin.timetable.api.export.classroom-pdf');
         Route::post('/export/teacher-pdf', [TimetableExportController::class, 'exportTeacherPdf'])->name('admin.timetable.api.export.teacher-pdf');
+        Route::post('/export/room-pdf', [TimetableExportController::class, 'exportRoomPdf'])->name('admin.timetable.api.export.room-pdf');
         Route::post('/export/excel', [TimetableExportController::class, 'exportExcel'])->name('admin.timetable.api.export.excel');
+        Route::post('/export/word', [TimetableExportController::class, 'exportWord'])->name('admin.timetable.api.export.word');
     });
 
     // Admin Data (DataTables)
