@@ -13,14 +13,14 @@
                 </a>
                 <div>
                     <h1 class="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-                        จัดตาราง {{ $grade->name_th }} / {{ $classroom->name }}
+                        {{ __('Schedule') }} {{ $grade->name_th }} / {{ $classroom->name }}
                     </h1>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">คลิกช่องว่างเพื่อวางวิชา | ลากเพื่อย้าย | คลิกขวาเพื่อลบ</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Click empty cell to place | Drag to move | Right-click to remove') }}</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
                 <button onclick="checkAllConflicts()" class="btn-app text-sm">
-                    <i class="fas fa-search text-[10px]"></i> ตรวจ Conflict
+                    <i class="fas fa-search text-[10px]"></i> {{ __('Check Conflicts') }}
                 </button>
             </div>
         </div>
@@ -29,7 +29,7 @@
             {{-- Sidebar: Course List --}}
             <div class="w-72 shrink-0">
                 <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-4 sticky top-4">
-                    <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">วิชาที่ต้องจัด</h3>
+                    <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">{{ __('Courses to Schedule') }}</h3>
                     <div class="space-y-2 max-h-[70vh] overflow-y-auto" id="course-list">
                         @foreach($openedCourses as $oc)
                         @php
@@ -60,20 +60,20 @@
                             <div class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
                                 {{ $oc->course->subjectGroup->name_th ?? '-' }}
                                 @if(($oc->course->periods_per_session ?? 1) > 1)
-                                    <span class="text-indigo-500 dark:text-indigo-400 ml-1">| {{ $oc->course->periods_per_session }} คาบ/ครั้ง</span>
+                                    <span class="text-indigo-500 dark:text-indigo-400 ml-1">| {{ $oc->course->periods_per_session }} {{ __('periods/session') }}</span>
                                 @endif
                             </div>
                             @if(!empty($oc->course->preferred_days))
                             @php
-                                $dNames = [1=>'จ.', 2=>'อ.', 3=>'พ.', 4=>'พฤ.', 5=>'ศ.', 6=>'ส.', 7=>'อา.'];
+                                $dNames = [1=>__('Mon'), 2=>__('Tue'), 3=>__('Wed'), 4=>__('Thu'), 5=>__('Fri'), 6=>__('Sat'), 7=>__('Sun')];
                                 $pDays = collect($oc->course->preferred_days)->map(fn($d) => $dNames[$d] ?? $d)->join(' ');
                             @endphp
                             <div class="text-[10px] text-emerald-500 dark:text-emerald-400 mt-0.5">
-                                <i class="fas fa-calendar-check text-[8px]"></i> สอนได้: {{ $pDays }}
+                                <i class="fas fa-calendar-check text-[8px]"></i> {{ __('Available') }}: {{ $pDays }}
                             </div>
                             @endif
                             <div class="text-[10px] text-gray-400 dark:text-gray-500">
-                                ครู: {{ $oc->course->teachers->pluck('name')->join(', ') ?: '-' }}
+                                {{ __('Teacher') }}: {{ $oc->course->teachers->pluck('name')->join(', ') ?: '-' }}
                             </div>
                         </div>
                         @endforeach
@@ -92,7 +92,7 @@
                 {{-- Conflict panel --}}
                 <div id="conflict-panel" class="mt-4 hidden">
                     <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-4">
-                        <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">ผลตรวจสอบ Conflict</h3>
+                        <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">{{ __('Conflict Check Results') }}</h3>
                         <div id="conflict-list" class="space-y-2"></div>
                     </div>
                 </div>
@@ -104,28 +104,28 @@
 {{-- Place Course Modal --}}
 <div id="placeModal" style="display:none" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm" onclick="if(event.target===this)closePlaceModal()">
     <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
-        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4" id="modal-title">วางวิชา</h3>
+        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4" id="modal-title">{{ __('Place Course') }}</h3>
         <div class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">วิชา</label>
+                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Course') }}</label>
                 <div id="modal-course-name" class="px-4 py-2 bg-gray-50 dark:bg-[#3a3b3c] rounded-xl text-sm text-gray-800 dark:text-white font-medium"></div>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">ครูผู้สอน</label>
+                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Teacher') }}</label>
                 <select id="modal-teacher" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-xl text-sm text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none">
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">ห้องเรียน/ห้องปฏิบัติการ</label>
+                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Room / Lab') }}</label>
                 <select id="modal-room" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-xl text-sm text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none">
-                    <option value="">ไม่ระบุ</option>
+                    <option value="">{{ __('Not specified') }}</option>
                 </select>
             </div>
             <div id="modal-conflicts" class="hidden p-3 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-xl text-sm text-rose-700 dark:text-rose-300"></div>
         </div>
         <div class="flex gap-3 mt-6">
-            <button onclick="closePlaceModal()" class="flex-1 py-2.5 bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4a4b4c] text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold transition-colors">ยกเลิก</button>
-            <button onclick="confirmPlace()" id="btn-confirm" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-colors">วางวิชา</button>
+            <button onclick="closePlaceModal()" class="flex-1 py-2.5 bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4a4b4c] text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold transition-colors">{{ __('Cancel') }}</button>
+            <button onclick="confirmPlace()" id="btn-confirm" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-colors">{{ __('Place Course') }}</button>
         </div>
     </div>
 </div>
@@ -136,7 +136,7 @@
         <div id="alert-icon" class="mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-4"></div>
         <h3 id="alert-title" class="text-lg font-bold text-gray-800 dark:text-white mb-2"></h3>
         <p id="alert-message" class="text-sm text-gray-600 dark:text-gray-400 mb-6 whitespace-pre-line"></p>
-        <button onclick="closeAlertModal()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-colors">ตกลง</button>
+        <button onclick="closeAlertModal()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-colors">{{ __('OK') }}</button>
     </div>
 </div>
 
@@ -149,8 +149,8 @@
         <h3 id="confirm-title" class="text-lg font-bold text-gray-800 dark:text-white mb-2"></h3>
         <p id="confirm-message" class="text-sm text-gray-600 dark:text-gray-400 mb-6 whitespace-pre-line"></p>
         <div class="flex gap-3">
-            <button onclick="closeConfirmModal(false)" class="flex-1 py-2.5 bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4a4b4c] text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold transition-colors">ยกเลิก</button>
-            <button onclick="closeConfirmModal(true)" id="confirm-yes-btn" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-semibold transition-colors">ยืนยัน</button>
+            <button onclick="closeConfirmModal(false)" class="flex-1 py-2.5 bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4a4b4c] text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold transition-colors">{{ __('Cancel') }}</button>
+            <button onclick="closeConfirmModal(true)" id="confirm-yes-btn" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-semibold transition-colors">{{ __('Confirm') }}</button>
         </div>
     </div>
 </div>
@@ -158,6 +158,44 @@
 <script>
 // ==================== Modal Alert / Confirm ====================
 let confirmResolve = null;
+
+const __t = {
+    warning: @json(__('Warning')),
+    error: @json(__('Cannot proceed')),
+    success: @json(__('Success')),
+    info: @json(__('Information')),
+    period: @json(__('Period')),
+    day: @json(__('Day')),
+    breakMin: @json(__('Break :min minutes')),
+    placed: @json(__('placed')),
+    selectCourseFirst: @json(__('Please select a course from the list first')),
+    courseFullyScheduled: @json(__('This course is fully scheduled')),
+    cannotPlaceOnDay: @json(__('This course cannot be placed on')),
+    availableDays: @json(__('Available days')),
+    courseAlreadyOnDay: @json(__('already scheduled on')),
+    cannotDuplicateDay: @json(__('Cannot place the same course on the same day')),
+    needConsecutivePeriods: @json(__('This course requires :pps consecutive periods but not enough periods remain')),
+    periodRange: @json(__('Period :start-:end exceeds periods for this day')),
+    needConsecutiveButOccupied: @json(__('This course requires :pps consecutive periods (Period :start-:end)')),
+    butPeriodOccupied: @json(__('but period :p has course \":name\" already')),
+    consecutiveLabel: @json(__(':pps consecutive: Period :start-:end')),
+    placeCourseTitle: @json(__('Place Course — :day Period :period')),
+    noTeacherAssigned: @json(__('No teacher assigned')),
+    courseRooms: @json(__('Rooms assigned to course')),
+    otherRooms: @json(__('Other rooms')),
+    notSpecified: @json(__('Not specified')),
+    hardErrors: @json(__('Errors (cannot place)')),
+    softWarnings: @json(__('Warnings (can place but not recommended)')),
+    pleaseSelectTeacher: @json(__('Please select a teacher')),
+    cannotPlacePeriod: @json(__('Cannot place period :p')),
+    cannotMove: @json(__('Cannot move')),
+    cannotDeleteLocked: @json(__('Cannot delete because period :periods is locked')),
+    confirmDelete: @json(__('Confirm Delete')),
+    deleteCourseDayPeriods: @json(__('Delete \":name\" :day Period :periods (:count periods)')),
+    deleteCourseDayPeriod: @json(__('Delete \":name\" :day Period :period')),
+    noConflictsFound: @json(__('No conflicts found. All correct!')),
+    viewAllDetails: @json(__('View all details')),
+};
 
 function showAlert(message, type = 'warning') {
     const icons = {
@@ -172,11 +210,11 @@ function showAlert(message, type = 'warning') {
         success: 'bg-emerald-100 dark:bg-emerald-900/30',
         info: 'bg-indigo-100 dark:bg-indigo-900/30',
     };
-    const titles = { warning: 'แจ้งเตือน', error: 'ไม่สามารถดำเนินการได้', success: 'สำเร็จ', info: 'ข้อมูล' };
+    const titles = { warning: __t.warning, error: __t.error, success: __t.success, info: __t.info };
 
     document.getElementById('alert-icon').className = `mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-4 ${bgColors[type] || bgColors.warning}`;
     document.getElementById('alert-icon').innerHTML = icons[type] || icons.warning;
-    document.getElementById('alert-title').textContent = titles[type] || 'แจ้งเตือน';
+    document.getElementById('alert-title').textContent = titles[type] || __t.warning;
     document.getElementById('alert-message').textContent = message;
     document.getElementById('alertModal').style.display = 'flex';
 }
@@ -211,7 +249,7 @@ const teachingDays = schedule.teaching_days || [];
 const dayConfigs = schedule.day_configs || {};
 const periodDuration = schedule.period_duration || 50;
 const globalStart = schedule.start_time || '08:00';
-const dayNames = {1:'จันทร์', 2:'อังคาร', 3:'พุธ', 4:'พฤหัสบดี', 5:'ศุกร์', 6:'เสาร์', 7:'อาทิตย์'};
+const dayNames = {1:@json(__('Monday')), 2:@json(__('Tuesday')), 3:@json(__('Wednesday')), 4:@json(__('Thursday')), 5:@json(__('Friday')), 6:@json(__('Saturday')), 7:@json(__('Sunday'))};
 
 const subjectColors = [
     'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700 text-indigo-800 dark:text-indigo-200',
@@ -227,7 +265,7 @@ const subjectColors = [
 // State
 let entries = @json($entriesJson);
 
-let selectedCourse = null; // current course item element
+let selectedCourse = null;
 let pendingDay = null;
 let pendingPeriod = null;
 
@@ -254,7 +292,7 @@ function selectCourse(el) {
     document.querySelectorAll('.course-item').forEach(e => e.classList.remove('ring-2', 'ring-indigo-500'));
     el.classList.add('ring-2', 'ring-indigo-500');
     selectedCourse = el;
-    renderGrid(); // re-render to highlight preferred days
+    renderGrid();
 }
 
 // Render grid
@@ -263,9 +301,9 @@ function renderGrid() {
     teachingDays.forEach(d => { const dc = dayConfigs[d]; if (dc && dc.periods > maxPeriods) maxPeriods = dc.periods; });
 
     let html = '<table class="w-full border-collapse" style="min-width:600px">';
-    html += '<thead><tr><th class="p-2 text-xs font-semibold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-[#3a3b3c] bg-gray-50 dark:bg-[#3a3b3c] w-24">คาบ</th>';
+    html += `<thead><tr><th class="p-2 text-xs font-semibold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-[#3a3b3c] bg-gray-50 dark:bg-[#3a3b3c] w-24">${__t.period}</th>`;
     teachingDays.forEach(d => {
-        html += `<th class="p-2 text-xs font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-[#3a3b3c] bg-gray-50 dark:bg-[#3a3b3c]">${dayNames[parseInt(d)] || 'วัน '+d}</th>`;
+        html += `<th class="p-2 text-xs font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-[#3a3b3c] bg-gray-50 dark:bg-[#3a3b3c]">${dayNames[parseInt(d)] || __t.day+' '+d}</th>`;
     });
     html += '</tr></thead><tbody>';
 
@@ -273,7 +311,7 @@ function renderGrid() {
         html += '<tr>';
         const times = calcTimes(teachingDays[0]);
         const tl = times[p-1] ? `<br><span class="text-[10px] text-gray-400">${times[p-1].start}-${times[p-1].end}</span>` : '';
-        html += `<td class="p-2 text-center text-xs font-medium text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-[#3a3b3c] bg-gray-50 dark:bg-[#3a3b3c]">คาบ ${p}${tl}</td>`;
+        html += `<td class="p-2 text-center text-xs font-medium text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-[#3a3b3c] bg-gray-50 dark:bg-[#3a3b3c]">${__t.period} ${p}${tl}</td>`;
 
         teachingDays.forEach(d => {
             const dayInt = parseInt(d);
@@ -304,7 +342,6 @@ function renderGrid() {
                     </div>
                 </td>`;
             } else {
-                // Check if day is allowed for selected course
                 let cellBg = 'hover:bg-indigo-50 dark:hover:bg-indigo-900/10';
                 let hint = '<span class="text-gray-200 dark:text-gray-700 text-lg">+</span>';
                 let clickable = true;
@@ -314,18 +351,16 @@ function renderGrid() {
                     const prefDays = JSON.parse(selectedCourse.dataset.preferredDays || '[]').map(Number);
                     const pps = parseInt(selectedCourse.dataset.periodsPerSession) || 1;
 
-                    // เช็ควันที่สอนได้
                     if (prefDays.length > 0 && !prefDays.includes(dayInt)) {
                         cellBg = 'bg-gray-100 dark:bg-[#1e1f20] opacity-50';
                         hint = '<span class="text-gray-300 dark:text-gray-600 text-[10px]"><i class="fas fa-ban text-[8px]"></i></span>';
                         clickable = false;
                     }
-                    // เช็ควิชาเดียวกันลงในวันนี้ครบ session แล้ว
                     else {
                         const sameCourseOnDay = entries.filter(e => e.opened_course_id === ocIdSel && e.day === dayInt);
                         if (sameCourseOnDay.length >= pps) {
                             cellBg = 'bg-gray-100 dark:bg-[#1e1f20] opacity-40';
-                            hint = '<span class="text-gray-300 dark:text-gray-600 text-[10px]">ลงแล้ว</span>';
+                            hint = `<span class="text-gray-300 dark:text-gray-600 text-[10px]">${__t.placed}</span>`;
                             clickable = false;
                         } else {
                             cellBg = 'bg-emerald-50 dark:bg-emerald-900/10 hover:bg-emerald-100 dark:hover:bg-emerald-900/20 ring-1 ring-inset ring-emerald-200 dark:ring-emerald-800';
@@ -353,14 +388,13 @@ function renderGrid() {
         // Breaks
         const breaks = dayConfigs[teachingDays[0]]?.breaks || {};
         if (breaks[String(p)]) {
-            html += `<tr><td colspan="${teachingDays.length + 1}" class="py-1 text-center text-[10px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/10 border border-gray-200 dark:border-[#3a3b3c]">พัก ${breaks[String(p)]} นาที</td></tr>`;
+            html += `<tr><td colspan="${teachingDays.length + 1}" class="py-1 text-center text-[10px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/10 border border-gray-200 dark:border-[#3a3b3c]">${__t.breakMin.replace(':min', breaks[String(p)])}</td></tr>`;
         }
     }
 
     html += '</tbody></table>';
     document.getElementById('grid-container').innerHTML = html;
 
-    // Update remaining counts in sidebar
     updateSidebarCounts();
 }
 
@@ -384,7 +418,7 @@ function updateSidebarCounts() {
 // Cell click: open modal to place course
 function cellClick(day, period) {
     if (!selectedCourse) {
-        showAlert('กรุณาเลือกวิชาจากรายการด้านซ้ายก่อน', 'info');
+        showAlert(__t.selectCourseFirst, 'info');
         return;
     }
 
@@ -392,25 +426,22 @@ function cellClick(day, period) {
     const needed = parseInt(selectedCourse.dataset.periodsNeeded);
     const placed = entries.filter(e => e.opened_course_id === ocId).length;
     if (placed >= needed) {
-        showAlert('วิชานี้จัดครบคาบแล้ว', 'warning');
+        showAlert(__t.courseFullyScheduled, 'warning');
         return;
     }
 
-    // ตรวจวันที่สอนได้
     const prefDays = JSON.parse(selectedCourse.dataset.preferredDays || '[]').map(Number);
     if (prefDays.length > 0 && !prefDays.includes(day)) {
-        showAlert('วิชานี้ไม่สามารถลงในวัน' + dayNames[day] + 'ได้\nวันที่สอนได้: ' + prefDays.map(d => dayNames[d]).join(', '), 'error');
+        showAlert(__t.cannotPlaceOnDay + dayNames[day] + '\n' + __t.availableDays + ': ' + prefDays.map(d => dayNames[d]).join(', '), 'error');
         return;
     }
 
-    // ตรวจวิชาเดียวกันห้ามซ้ำในวันเดียว
     const alreadyOnDay = entries.some(e => e.opened_course_id === ocId && e.day === day);
     if (alreadyOnDay) {
-        showAlert('วิชา' + selectedCourse.dataset.courseName + ' ถูกจัดในวัน' + dayNames[day] + ' แล้ว\nไม่สามารถลงซ้ำในวันเดียวกันได้', 'error');
+        showAlert(selectedCourse.dataset.courseName + ' ' + __t.courseAlreadyOnDay + dayNames[day] + '\n' + __t.cannotDuplicateDay, 'error');
         return;
     }
 
-    // ตรวจคาบต่อครั้ง — ต้องมีคาบว่างติดกันพอ
     const pps = parseInt(selectedCourse.dataset.periodsPerSession) || 1;
     if (pps > 1) {
         const dc = dayConfigs[String(day)];
@@ -418,12 +449,12 @@ function cellClick(day, period) {
         for (let i = 0; i < pps; i++) {
             const checkP = period + i;
             if (checkP > maxP) {
-                showAlert(`วิชานี้ต้องใช้ ${pps} คาบติดกัน แต่เหลือคาบไม่พอ\n(คาบ ${period}-${period+pps-1} เกินจำนวนคาบของวันนี้)`, 'error');
+                showAlert(__t.needConsecutivePeriods.replace(':pps', pps) + '\n' + __t.periodRange.replace(':start', period).replace(':end', period+pps-1), 'error');
                 return;
             }
             const occupied = entries.find(e => e.day === day && e.period === checkP);
             if (occupied) {
-                showAlert(`วิชานี้ต้องใช้ ${pps} คาบติดกัน (คาบ ${period}-${period+pps-1})\nแต่คาบที่ ${checkP} มีวิชา "${occupied.course_name}" อยู่แล้ว`, 'error');
+                showAlert(__t.needConsecutiveButOccupied.replace(':pps', pps).replace(':start', period).replace(':end', period+pps-1) + '\n' + __t.butPeriodOccupied.replace(':p', checkP).replace(':name', occupied.course_name), 'error');
                 return;
             }
         }
@@ -432,30 +463,30 @@ function cellClick(day, period) {
     pendingDay = day;
     pendingPeriod = period;
 
-    const sessionLabel = pps > 1 ? ` (${pps} คาบติด: คาบ ${period}-${period+pps-1})` : '';
+    const sessionLabel = pps > 1 ? ` (${__t.consecutiveLabel.replace(':pps', pps).replace(':start', period).replace(':end', period+pps-1)})` : '';
     document.getElementById('modal-course-name').textContent = selectedCourse.dataset.courseName + sessionLabel;
-    document.getElementById('modal-title').textContent = `วางวิชา — วัน${dayNames[day]} คาบ ${period}${pps > 1 ? '-'+(period+pps-1) : ''}`;
+    document.getElementById('modal-title').textContent = __t.placeCourseTitle.replace(':day', dayNames[day]).replace(':period', pps > 1 ? period+'-'+(period+pps-1) : period);
 
     // Populate teachers
     const teachers = JSON.parse(selectedCourse.dataset.teachers);
     const tSelect = document.getElementById('modal-teacher');
     tSelect.innerHTML = teachers.length === 0
-        ? '<option value="">ไม่มีครูที่กำหนด</option>'
+        ? `<option value="">${__t.noTeacherAssigned}</option>`
         : teachers.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
 
-    // Populate rooms — rooms ที่ผูกกับวิชาแสดงก่อน + rooms ทั้งหมดแสดงด้านล่าง
+    // Populate rooms
     const courseRooms = JSON.parse(selectedCourse.dataset.rooms);
     const courseRoomIds = courseRooms.map(r => r.id);
     const otherRooms = allRooms.filter(r => !courseRoomIds.includes(r.id));
     const rSelect = document.getElementById('modal-room');
-    let roomHtml = '<option value="">ไม่ระบุ</option>';
+    let roomHtml = `<option value="">${__t.notSpecified}</option>`;
     if (courseRooms.length > 0) {
-        roomHtml += '<optgroup label="ห้องที่กำหนดไว้กับวิชา">';
+        roomHtml += `<optgroup label="${__t.courseRooms}">`;
         roomHtml += courseRooms.map(r => `<option value="${r.id}">${r.label}</option>`).join('');
         roomHtml += '</optgroup>';
     }
     if (otherRooms.length > 0) {
-        roomHtml += '<optgroup label="ห้องอื่น ๆ">';
+        roomHtml += `<optgroup label="${__t.otherRooms}">`;
         roomHtml += otherRooms.map(r => `<option value="${r.id}">${r.label}</option>`).join('');
         roomHtml += '</optgroup>';
     }
@@ -464,7 +495,6 @@ function cellClick(day, period) {
     document.getElementById('modal-conflicts').classList.add('hidden');
     document.getElementById('placeModal').style.display = 'flex';
 
-    // Auto check conflicts
     autoCheckConflict();
 }
 
@@ -490,11 +520,11 @@ function autoCheckConflict() {
             if (violations.length > 0) {
                 let html = '';
                 if (hardViolations.length > 0) {
-                    html += '<div class="font-bold mb-1 text-rose-700 dark:text-rose-300"><i class="fas fa-times-circle mr-1"></i>ข้อผิดพลาด (ห้ามวาง):</div>';
+                    html += `<div class="font-bold mb-1 text-rose-700 dark:text-rose-300"><i class="fas fa-times-circle mr-1"></i>${__t.hardErrors}:</div>`;
                     html += hardViolations.map(v => `<div class="text-xs mt-1 text-rose-600 dark:text-rose-400">- ${v.message}</div>`).join('');
                 }
                 if (softViolations.length > 0) {
-                    html += '<div class="font-bold mb-1 mt-2 text-amber-700 dark:text-amber-300"><i class="fas fa-exclamation-triangle mr-1"></i>คำเตือน (วางได้แต่ไม่แนะนำ):</div>';
+                    html += `<div class="font-bold mb-1 mt-2 text-amber-700 dark:text-amber-300"><i class="fas fa-exclamation-triangle mr-1"></i>${__t.softWarnings}:</div>`;
                     html += softViolations.map(v => `<div class="text-xs mt-1 text-amber-600 dark:text-amber-400">- ${v.message}</div>`).join('');
                 }
                 panel.innerHTML = html;
@@ -519,11 +549,10 @@ async function confirmPlace() {
     const pps = parseInt(selectedCourse.dataset.periodsPerSession) || 1;
 
     if (!teacherId) {
-        showAlert('กรุณาเลือกครูผู้สอน', 'warning');
+        showAlert(__t.pleaseSelectTeacher, 'warning');
         return;
     }
 
-    // ลงทีละคาบ ตาม periods_per_session
     const periodsToPlace = [];
     for (let i = 0; i < pps; i++) {
         periodsToPlace.push(pendingPeriod + i);
@@ -561,7 +590,7 @@ async function confirmPlace() {
             });
         } else {
             const msgs = (data.violations || []).map(v => v.message).join('\n');
-            showAlert(`ไม่สามารถวางคาบที่ ${p} ได้\n` + msgs, 'error');
+            showAlert(__t.cannotPlacePeriod.replace(':p', p) + '\n' + msgs, 'error');
             allSuccess = false;
             break;
         }
@@ -594,7 +623,7 @@ function drop(e, day, period) {
             renderGrid();
         } else {
             const msgs = (data.violations || []).map(v => v.message).join('\n');
-            showAlert('ไม่สามารถย้ายได้\n' + msgs, 'error');
+            showAlert(__t.cannotMove + '\n' + msgs, 'error');
         }
     });
     dragEntryId = null;
@@ -619,28 +648,25 @@ async function removeEntry(entryId) {
     const entry = entries.find(e => e.id === entryId);
     if (!entry) return;
 
-    // หา entries ทั้งหมดของวิชาเดียวกัน + วันเดียวกัน (session group)
     const sessionEntries = entries.filter(e =>
         e.opened_course_id === entry.opened_course_id && e.day === entry.day
     ).sort((a, b) => a.period - b.period);
 
-    // เช็คว่ามีตัวที่ถูกล็อคอยู่ไหม
     const lockedInSession = sessionEntries.filter(e => e.is_locked);
     if (lockedInSession.length > 0) {
         const lockedPeriods = lockedInSession.map(e => e.period).join(', ');
-        showAlert(`ไม่สามารถลบได้ เนื่องจากคาบที่ ${lockedPeriods} ถูกล็อคอยู่`, 'warning');
+        showAlert(__t.cannotDeleteLocked.replace(':periods', lockedPeriods), 'warning');
         return;
     }
 
     const periodList = sessionEntries.map(e => e.period).join(', ');
     const msg = sessionEntries.length > 1
-        ? `ลบ "${entry.course_name}"\nวัน${dayNames[entry.day]} คาบที่ ${periodList} (${sessionEntries.length} คาบ)`
-        : `ลบ "${entry.course_name}"\nวัน${dayNames[entry.day]} คาบที่ ${entry.period}`;
+        ? __t.deleteCourseDayPeriods.replace(':name', entry.course_name).replace(':day', dayNames[entry.day]).replace(':periods', periodList).replace(':count', sessionEntries.length)
+        : __t.deleteCourseDayPeriod.replace(':name', entry.course_name).replace(':day', dayNames[entry.day]).replace(':period', entry.period);
 
-    const ok = await showConfirm('ยืนยันการลบ', msg);
+    const ok = await showConfirm(__t.confirmDelete, msg);
     if (!ok) return;
 
-    // ลบทุก entry ใน session group
     for (const se of sessionEntries) {
         const res = await fetch(`/admin/timetable/api/entries/${se.id}`, {
             method: 'DELETE',
@@ -664,13 +690,13 @@ function checkAllConflicts() {
             panel.classList.remove('hidden');
 
             if (data.total_conflicts === 0) {
-                list.innerHTML = '<div class="text-emerald-600 dark:text-emerald-400 text-center py-4 font-bold"><i class="fas fa-check-circle mr-1"></i> ไม่พบ Conflict ทั้งหมดถูกต้อง!</div>';
+                list.innerHTML = `<div class="text-emerald-600 dark:text-emerald-400 text-center py-4 font-bold"><i class="fas fa-check-circle mr-1"></i> ${__t.noConflictsFound}</div>`;
             } else {
                 list.innerHTML = `<div class="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                    พบ <span class="font-bold text-rose-600">${data.hard_violations}</span> Hard |
+                    <span class="font-bold text-rose-600">${data.hard_violations}</span> Hard |
                     <span class="font-bold text-amber-600">${data.soft_violations}</span> Soft
                 </div>
-                <a href="/admin/timetable/conflicts/${solutionId}" class="text-indigo-600 dark:text-indigo-400 text-sm hover:underline">ดูรายละเอียดทั้งหมด</a>`;
+                <a href="/admin/timetable/conflicts/${solutionId}" class="text-indigo-600 dark:text-indigo-400 text-sm hover:underline">${__t.viewAllDetails}</a>`;
             }
         });
 }

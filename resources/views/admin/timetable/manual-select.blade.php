@@ -12,8 +12,8 @@
                     <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
                 </a>
                 <div>
-                    <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">จัดตารางเรียนด้วยมือ</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">เลือกห้องเรียนที่ต้องการจัดตาราง</p>
+                    <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ __('Manual Timetable Scheduling') }}</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">{{ __('Select classroom to schedule') }}</p>
                 </div>
             </div>
         </div>
@@ -29,8 +29,8 @@
         @if($classroomGroups->isEmpty())
         <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-12 text-center">
             <div class="text-gray-300 dark:text-gray-600 mb-4"><i class="fas fa-inbox text-5xl"></i></div>
-            <p class="text-gray-500 dark:text-gray-400 text-lg font-medium">ไม่พบวิชาที่เปิดสอน</p>
-            <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">กรุณาเพิ่มวิชาที่เปิดสอนใน "Opened Courses" ก่อน</p>
+            <p class="text-gray-500 dark:text-gray-400 text-lg font-medium">{{ __('No opened courses found') }}</p>
+            <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">{{ __('Please add opened courses first') }}</p>
         </div>
         @else
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -54,7 +54,7 @@
                     </div>
                     @if($isComplete)
                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-bold">
-                        <i class="fas fa-check-circle text-[9px]"></i> ครบ
+                        <i class="fas fa-check-circle text-[9px]"></i> {{ __('Complete') }}
                     </span>
                     @endif
                 </div>
@@ -62,11 +62,11 @@
                 <div class="flex items-center gap-4 text-sm mb-3">
                     <div class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
                         <i class="fas fa-book text-[10px]"></i>
-                        <span>{{ $group['course_count'] }} วิชา</span>
+                        <span>{{ $group['course_count'] }} {{ __('courses') }}</span>
                     </div>
                     <div class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
                         <i class="fas fa-clock text-[10px]"></i>
-                        <span>{{ $entryCount }}/{{ $totalPeriods }} คาบ</span>
+                        <span>{{ $entryCount }}/{{ $totalPeriods }} {{ __('periods') }}</span>
                     </div>
                 </div>
 

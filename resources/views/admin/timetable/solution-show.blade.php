@@ -12,16 +12,16 @@
                     <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
                 </a>
                 <div>
-                    <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">ตารางเรียน — Solution #{{ $solution->rank }}</h1>
+                    <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ __('Timetable') }} — {{ __('Solution') }} #{{ $solution->rank }}</h1>
                     <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">
-                        Fitness: {{ number_format($solution->fitness_score, 0) }} |
-                        Hard: {{ $solution->hard_violations }} | Soft: {{ $solution->soft_violations }}
+                        {{ __('Fitness') }}: {{ number_format($solution->fitness_score, 0) }} |
+                        {{ __('Hard') }}: {{ $solution->hard_violations }} | {{ __('Soft') }}: {{ $solution->soft_violations }}
                     </p>
                 </div>
             </div>
             <div class="flex items-center space-x-3">
-                <button onclick="recalcFitness()" class="btn-app text-sm" title="คำนวณ Fitness ใหม่">
-                    <i class="fas fa-sync-alt text-[10px]"></i> Recalculate
+                <button onclick="recalcFitness()" class="btn-app text-sm" title="{{ __('Recalculate Fitness') }}">
+                    <i class="fas fa-sync-alt text-[10px]"></i> {{ __('Recalculate') }}
                 </button>
             </div>
         </div>
@@ -29,22 +29,22 @@
         {{-- Filter Tabs --}}
         <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-4 mb-6">
             <div class="flex flex-wrap items-center gap-3">
-                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">มุมมอง:</label>
+                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('View') }}:</label>
                 <select id="viewMode" onchange="changeView()" class="px-4 py-2 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-xl text-sm text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none">
-                    <option value="classroom">รายห้องเรียน</option>
-                    <option value="teacher">รายครู</option>
-                    <option value="room">รายห้อง</option>
+                    <option value="classroom">{{ __('By Classroom') }}</option>
+                    <option value="teacher">{{ __('By Teacher') }}</option>
+                    <option value="room">{{ __('By Room') }}</option>
                 </select>
 
                 <select id="filterEntity" onchange="renderGrid()" class="px-4 py-2 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-xl text-sm text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none">
-                    <option value="">-- เลือก --</option>
+                    <option value="">-- {{ __('Select') }} --</option>
                 </select>
             </div>
         </div>
 
         {{-- Grid Container --}}
         <div id="grid-container" class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-4 overflow-x-auto">
-            <p class="text-center text-gray-400 dark:text-gray-500 py-12">เลือกมุมมองและห้องเรียน/ครู/ห้อง เพื่อดูตาราง</p>
+            <p class="text-center text-gray-400 dark:text-gray-500 py-12">{{ __('Select view and entity to display timetable') }}</p>
         </div>
     </div>
 </div>
@@ -59,6 +59,17 @@ let classrooms = @json($classroomsJson);
 let teachers = @json($teachersJson);
 let rooms = @json($roomsJson);
 
+const __t = {
+    period: @json(__('Period')),
+    day: @json(__('Day')),
+    select: '-- ' + @json(__('Select')) + ' --',
+    selectViewPrompt: @json(__('Select view to display timetable')),
+    noScheduleData: @json(__('No schedule data found for this level')),
+    breakMin: @json(__('Break :min minutes')),
+    cannotMove: @json(__('Cannot move')),
+    recalcDone: @json(__('Recalculation done')),
+};
+
 const subjectColors = [
     'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700 text-indigo-800 dark:text-indigo-300',
     'bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300',
@@ -70,7 +81,7 @@ const subjectColors = [
     'bg-cyan-100 dark:bg-cyan-900/30 border-cyan-300 dark:border-cyan-700 text-cyan-800 dark:text-cyan-300',
 ];
 
-const dayNames = {1:'จันทร์', 2:'อังคาร', 3:'พุธ', 4:'พฤหัสบดี', 5:'ศุกร์', 6:'เสาร์', 7:'อาทิตย์'};
+const dayNames = {1:@json(__('Monday')), 2:@json(__('Tuesday')), 3:@json(__('Wednesday')), 4:@json(__('Thursday')), 5:@json(__('Friday')), 6:@json(__('Saturday')), 7:@json(__('Sunday'))};
 
 // Load entries
 fetch(`/admin/timetable/api/solutions/${solutionId}/entries`)
@@ -80,7 +91,7 @@ fetch(`/admin/timetable/api/solutions/${solutionId}/entries`)
 function changeView() {
     const mode = document.getElementById('viewMode').value;
     const select = document.getElementById('filterEntity');
-    select.innerHTML = '<option value="">-- เลือก --</option>';
+    select.innerHTML = `<option value="">${__t.select}</option>`;
 
     if (mode === 'classroom') {
         classrooms.forEach(c => {
@@ -103,7 +114,7 @@ function renderGrid() {
     const container = document.getElementById('grid-container');
 
     if (!value) {
-        container.innerHTML = '<p class="text-center text-gray-400 dark:text-gray-500 py-12">เลือกมุมมองเพื่อดูตาราง</p>';
+        container.innerHTML = `<p class="text-center text-gray-400 dark:text-gray-500 py-12">${__t.selectViewPrompt}</p>`;
         return;
     }
 
@@ -117,7 +128,6 @@ function renderGrid() {
         eduLevelId = parseInt(opt.dataset.edu);
     } else if (mode === 'teacher') {
         filtered = allEntries.filter(e => e.teacher_id === parseInt(value));
-        // Use first entry's education level
         if (filtered.length > 0) {
             const oc = openedCourses.find(o => o.id === filtered[0].opened_course_id);
             eduLevelId = oc?.education_level_id;
@@ -130,10 +140,9 @@ function renderGrid() {
         }
     }
 
-    // Find schedule for this education level
     const schedule = yearlySchedules[eduLevelId];
     if (!schedule) {
-        container.innerHTML = '<p class="text-center text-gray-400 py-12">ไม่พบข้อมูลตารางเวลาสำหรับระดับชั้นนี้</p>';
+        container.innerHTML = `<p class="text-center text-gray-400 py-12">${__t.noScheduleData}</p>`;
         return;
     }
 
@@ -142,14 +151,12 @@ function renderGrid() {
     const periodDuration = schedule.period_duration || 50;
     const globalStart = schedule.start_time || '08:00';
 
-    // Find max periods across all days
     let maxPeriods = 0;
     teachingDays.forEach(d => {
         const dc = dayConfigs[d];
         if (dc && dc.periods > maxPeriods) maxPeriods = dc.periods;
     });
 
-    // Build time labels
     function calcTimes(dayStr) {
         const dc = dayConfigs[dayStr] || {};
         const startTime = dc.start_time || globalStart;
@@ -164,21 +171,19 @@ function renderGrid() {
         return times;
     }
 
-    // Build HTML table
     let html = '<table class="w-full border-collapse" style="min-width:600px">';
-    html += '<thead><tr><th class="p-2 text-xs font-semibold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-[#3a3b3c] bg-gray-50 dark:bg-[#3a3b3c] w-20">คาบ</th>';
+    html += `<thead><tr><th class="p-2 text-xs font-semibold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-[#3a3b3c] bg-gray-50 dark:bg-[#3a3b3c] w-20">${__t.period}</th>`;
     teachingDays.forEach(d => {
-        html += `<th class="p-2 text-xs font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-[#3a3b3c] bg-gray-50 dark:bg-[#3a3b3c]">${dayNames[parseInt(d)] || 'วัน '+d}</th>`;
+        html += `<th class="p-2 text-xs font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-[#3a3b3c] bg-gray-50 dark:bg-[#3a3b3c]">${dayNames[parseInt(d)] || __t.day+' '+d}</th>`;
     });
     html += '</tr></thead><tbody>';
 
     for (let p = 1; p <= maxPeriods; p++) {
         html += '<tr>';
-        // Period label with time from first day
         const firstDay = teachingDays[0];
         const times = calcTimes(firstDay);
         const timeLabel = times[p-1] ? `<br><span class="text-[10px] text-gray-400">${times[p-1].start}-${times[p-1].end}</span>` : '';
-        html += `<td class="p-2 text-center text-xs font-medium text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-[#3a3b3c] bg-gray-50 dark:bg-[#3a3b3c]">คาบ ${p}${timeLabel}</td>`;
+        html += `<td class="p-2 text-center text-xs font-medium text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-[#3a3b3c] bg-gray-50 dark:bg-[#3a3b3c]">${__t.period} ${p}${timeLabel}</td>`;
 
         teachingDays.forEach(d => {
             const dayInt = parseInt(d);
@@ -217,11 +222,10 @@ function renderGrid() {
 
         html += '</tr>';
 
-        // Check for breaks after this period (show in first day's config)
         const breaks = dayConfigs[teachingDays[0]]?.breaks || {};
         if (breaks[String(p)]) {
             html += `<tr><td colspan="${teachingDays.length + 1}" class="py-1 text-center text-[10px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/10 border border-gray-200 dark:border-[#3a3b3c]">
-                พัก ${breaks[String(p)]} นาที
+                ${__t.breakMin.replace(':min', breaks[String(p)])}
             </td></tr>`;
         }
     }
@@ -256,7 +260,7 @@ function drop(e, day, period) {
             renderGrid();
         } else {
             const msgs = (data.violations || []).map(v => v.message).join('\n');
-            alert('ไม่สามารถย้ายได้:\n' + msgs);
+            alert(__t.cannotMove + ':\n' + msgs);
         }
     });
     dragEntryId = null;
@@ -279,7 +283,7 @@ function recalcFitness() {
     fetch(`/admin/timetable/api/solutions/${solutionId}/fitness`)
         .then(r => r.json())
         .then(data => {
-            alert(`คำนวณใหม่แล้ว\nHard: ${data.hard_violations}\nSoft: ${data.soft_violations}\nTotal conflicts: ${data.total_conflicts}`);
+            alert(`${__t.recalcDone}\nHard: ${data.hard_violations}\nSoft: ${data.soft_violations}\nTotal conflicts: ${data.total_conflicts}`);
             location.reload();
         });
 }

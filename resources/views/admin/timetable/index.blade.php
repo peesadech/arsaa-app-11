@@ -12,18 +12,18 @@
                     <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
                 </a>
                 <div>
-                    <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">จัดตารางเรียน</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">Timetable Scheduling</p>
+                    <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ __('Timetable Scheduling') }}</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">{{ __('Timetable Scheduling Subtitle') }}</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
                 <a href="{{ route('admin.timetable.manual.select') }}" class="btn-app">
-                    <i class="fas fa-hand-pointer text-[10px]"></i> จัดด้วยมือ
+                    <i class="fas fa-hand-pointer text-[10px]"></i> {{ __('Manual Scheduling') }}
                 </a>
-                <a href="{{ route('admin.timetable.generate') }}" class="btn-app">
-                    <i class="fas fa-magic text-[10px]"></i> Auto Generate
-                </a>
+                <button type="button" class="btn-app opacity-50 cursor-not-allowed" disabled>
+                    <i class="fas fa-magic text-[10px]"></i> {{ __('Auto Generate') }}
+                </button>
             </div>
         </div>
 
@@ -43,27 +43,27 @@
         @if($activeSolution)
         <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-6 mb-8">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white">ตารางเรียนปัจจุบัน</h2>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white">{{ __('Current Timetable') }}</h2>
                 <a href="{{ route('admin.timetable.solutions.show', $activeSolution->id) }}" class="btn-app text-sm">
-                    <i class="fas fa-eye text-[10px]"></i> ดูตาราง
+                    <i class="fas fa-eye text-[10px]"></i> {{ __('View Timetable') }}
                 </a>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="text-center p-4 bg-gray-50 dark:bg-[#3a3b3c] rounded-2xl">
                     <div class="text-2xl font-bold {{ $activeSolution->hard_violations > 0 ? 'text-rose-600' : 'text-emerald-600' }}">{{ $activeSolution->hard_violations }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Hard Violations</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ __('Hard Violations') }}</div>
                 </div>
                 <div class="text-center p-4 bg-gray-50 dark:bg-[#3a3b3c] rounded-2xl">
                     <div class="text-2xl font-bold text-amber-600">{{ $activeSolution->soft_violations }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Soft Violations</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ __('Soft Violations') }}</div>
                 </div>
                 <div class="text-center p-4 bg-gray-50 dark:bg-[#3a3b3c] rounded-2xl">
                     <div class="text-2xl font-bold text-indigo-600">{{ number_format($activeSolution->fitness_score, 0) }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Fitness Score</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ __('Fitness Score') }}</div>
                 </div>
                 <div class="text-center p-4 bg-gray-50 dark:bg-[#3a3b3c] rounded-2xl">
                     <div class="text-2xl font-bold text-gray-700 dark:text-gray-300">{{ $activeSolution->conflicts->count() }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Total Conflicts</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ __('Total Conflicts') }}</div>
                 </div>
             </div>
         </div>
@@ -71,20 +71,20 @@
 
         {{-- Generation History --}}
         <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-6">
-            <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">ประวัติการ Generate</h2>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ __('Generation History') }}</h2>
 
             @if($generations->isEmpty())
-            <p class="text-center text-gray-400 dark:text-gray-500 py-8">ยังไม่มีการ Generate ตาราง</p>
+            <p class="text-center text-gray-400 dark:text-gray-500 py-8">{{ __('No generation history') }}</p>
             @else
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-gray-100 dark:border-[#3a3b3c]">
-                            <th class="text-left py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">วันที่</th>
-                            <th class="text-left py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">สถานะ</th>
-                            <th class="text-left py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">Progress</th>
-                            <th class="text-left py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">Solutions</th>
-                            <th class="text-left py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">ผู้สร้าง</th>
+                            <th class="text-left py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">{{ __('Date') }}</th>
+                            <th class="text-left py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">{{ __('Status') }}</th>
+                            <th class="text-left py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">{{ __('Progress') }}</th>
+                            <th class="text-left py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">{{ __('Solutions') }}</th>
+                            <th class="text-left py-3 px-4 text-gray-500 dark:text-gray-400 font-medium">{{ __('Created By') }}</th>
                             <th class="text-right py-3 px-4 text-gray-500 dark:text-gray-400 font-medium"></th>
                         </tr>
                     </thead>
@@ -106,11 +106,11 @@
                             <td class="py-3 px-4 text-right">
                                 @if($gen->status === 'completed')
                                 <a href="{{ route('admin.timetable.generations.show', $gen->id) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-medium">
-                                    ดูผลลัพธ์
+                                    {{ __('View Results') }}
                                 </a>
                                 @elseif($gen->status === 'running' || $gen->status === 'pending')
                                 <a href="{{ route('admin.timetable.generations.show', $gen->id) }}" class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
-                                    ดูความคืบหน้า
+                                    {{ __('View Progress') }}
                                 </a>
                                 @endif
                             </td>
