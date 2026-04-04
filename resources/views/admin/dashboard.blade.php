@@ -103,20 +103,69 @@
             </div>
         </div>
 
+        {{-- Teacher Term Status Block --}}
+        @if($currentYear && $currentSemester)
+        <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-[#3a3b3c] px-5 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                        <i class="fas fa-user-check text-emerald-600 dark:text-emerald-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-800 dark:text-white">{{ __('Teacher Term Status') }}</p>
+                        <p class="text-xs text-gray-400">{{ __('Manage teachers and their assigned courses') }}</p>
+                    </div>
+                </div>
+                <a href="{{ route('admin.teacher-term-status.index') }}" class="btn-app">
+                    <i class="fas fa-cog text-[10px]"></i> {{ __('Manage') }}
+                </a>
+            </div>
+            <div class="flex items-center gap-6 mt-3 pl-[52px]">
+                <div class="flex items-baseline gap-1.5">
+                    <span class="text-xl font-bold text-slate-800 dark:text-white">{{ $teacherActiveCount }}</span>
+                    <span class="text-[10px] text-gray-400">{{ __('Total Active') }}</span>
+                </div>
+                <div class="w-px h-5 bg-gray-200 dark:bg-[#3a3b3c]"></div>
+                <div class="flex items-baseline gap-1.5">
+                    <span class="text-xl font-bold text-emerald-600">{{ $teacherTermSchedulable }}</span>
+                    <span class="text-[10px] text-gray-400">{{ __('Can Schedule') }}</span>
+                </div>
+                <div class="w-px h-5 bg-gray-200 dark:bg-[#3a3b3c]"></div>
+                <div class="flex items-baseline gap-1.5">
+                    <span class="text-xl font-bold text-slate-800 dark:text-white">{{ $teacherTermConfigured }}</span>
+                    <span class="text-[10px] text-gray-400">{{ __('Configured') }}</span>
+                </div>
+                @if($teacherTermConfigured === 0 && $teacherActiveCount > 0)
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[11px] font-bold">
+                    <i class="fas fa-exclamation-circle text-[9px]"></i> {{ __('Not Yet Configured') }}
+                </span>
+                @elseif($teacherTermConfigured > 0 && $teacherTermConfigured < $teacherActiveCount)
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[11px] font-bold">
+                    <i class="fas fa-exclamation-circle text-[9px]"></i> {{ __('Not All Configured') }}
+                </span>
+                @elseif($teacherTermConfigured >= $teacherActiveCount && $teacherActiveCount > 0)
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[11px] font-bold">
+                    <i class="fas fa-check-circle text-[9px]"></i> {{ __('Configured All') }}
+                </span>
+                @endif
+            </div>
+        </div>
+        @endif
+
         {{-- Timetable Scheduling Block --}}
         @if($currentYear && $currentSemester)
-        <div class="mt-4 bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-[#3a3b3c] px-5 py-4 flex items-center justify-between">
+        <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-[#3a3b3c] px-5 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
                     <i class="fas fa-calendar-alt text-indigo-600 dark:text-indigo-400"></i>
                 </div>
                 <div>
-                    <p class="text-sm font-bold text-gray-800 dark:text-white">จัดตารางเรียน</p>
-                    <p class="text-xs text-gray-400">Timetable Scheduling — Auto & Manual</p>
+                    <p class="text-sm font-bold text-gray-800 dark:text-white">{{ __('Timetable Scheduling') }}</p>
+                    <p class="text-xs text-gray-400">{{ __('Timetable Scheduling Subtitle') }}</p>
                 </div>
             </div>
             <a href="{{ route('admin.timetable.index') }}" class="btn-app">
-                <i class="fas fa-magic text-[10px]"></i> จัดตาราง
+                <i class="fas fa-magic text-[10px]"></i> {{ __('Timetable Scheduling') }}
             </a>
         </div>
         @endif

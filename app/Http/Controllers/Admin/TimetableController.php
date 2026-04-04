@@ -9,6 +9,7 @@ use App\Models\Grade;
 use App\Models\OpenedCourse;
 use App\Models\Room;
 use App\Models\Teacher;
+use App\Models\TeacherTermCourse;
 use App\Models\TimetableConflict;
 use App\Models\TimetableEntry;
 use App\Models\TimetableGeneration;
@@ -610,8 +611,14 @@ class TimetableController extends Controller
             ->with('openedCourse.course.subjectGroup', 'teacher', 'room')
             ->get();
 
-        // All teachers and rooms for course selection
-        $allTeachers = Teacher::where('status', 1)->get();
+        // All teachers schedulable for this term
+        $allTeachers = Teacher::where('status', 1)
+            ->whereDoesntHave('termStatuses', function ($q) use ($yearId, $semesterId) {
+                $q->where('academic_year_id', $yearId)
+                  ->where('semester_id', $semesterId)
+                  ->where('can_be_scheduled', false);
+            })
+            ->get();
         $allRooms = Room::where('status', 1)->with('building')->get();
 
         $allRoomsJson = $allRooms->map(function ($r) {
@@ -638,10 +645,21 @@ class TimetableController extends Controller
             ];
         })->values();
 
+        // Schedulable teacher IDs for this term (for JS filtering)
+        $schedulableTeacherIds = $allTeachers->pluck('id')->toArray();
+
+        // Build per-course term teachers: teachers assigned via teacher_term_courses for this term
+        $termCourseTeachers = TeacherTermCourse::where('academic_year_id', $yearId)
+            ->where('semester_id', $semesterId)
+            ->whereIn('teacher_id', $schedulableTeacherIds)
+            ->with('teacher')
+            ->get()
+            ->groupBy('course_id');
+
         return view('admin.timetable.manual-editor', compact(
             'grade', 'classroom', 'solution', 'schedule',
             'openedCourses', 'entries', 'entriesJson', 'allTeachers', 'allRooms', 'allRoomsJson',
-            'yearId', 'semesterId'
+            'yearId', 'semesterId', 'schedulableTeacherIds', 'termCourseTeachers'
         ));
     }
 

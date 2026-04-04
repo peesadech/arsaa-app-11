@@ -161,6 +161,40 @@ class ConstraintChecker
             }
         }
 
+        // Soft: Teacher max periods per day
+        $termStatus = $this->data->getTeacherTermStatus($teacherId);
+        if ($termStatus && $termStatus->max_periods_per_day) {
+            $teacherPeriodsToday = TimetableEntry::where('solution_id', $solutionId)
+                ->where('teacher_id', $teacherId)
+                ->where('day', $day)
+                ->when($excludeEntryId, fn($q) => $q->where('id', '!=', $excludeEntryId))
+                ->count();
+            if ($teacherPeriodsToday >= $termStatus->max_periods_per_day) {
+                $teacher = $this->data->getTeacher($teacherId);
+                $violations[] = new Violation(
+                    'teacher_max_periods_day',
+                    'soft',
+                    "ครู{$teacher->name} ถึงขีดจำกัด {$termStatus->max_periods_per_day} คาบ/วัน แล้ว"
+                );
+            }
+        }
+
+        // Soft: Teacher max periods per week
+        if ($termStatus && $termStatus->max_periods_per_week) {
+            $teacherPeriodsWeek = TimetableEntry::where('solution_id', $solutionId)
+                ->where('teacher_id', $teacherId)
+                ->when($excludeEntryId, fn($q) => $q->where('id', '!=', $excludeEntryId))
+                ->count();
+            if ($teacherPeriodsWeek >= $termStatus->max_periods_per_week) {
+                $teacher = $this->data->getTeacher($teacherId);
+                $violations[] = new Violation(
+                    'teacher_max_periods_week',
+                    'soft',
+                    "ครู{$teacher->name} ถึงขีดจำกัด {$termStatus->max_periods_per_week} คาบ/สัปดาห์ แล้ว"
+                );
+            }
+        }
+
         $hasHard = collect($violations)->contains(fn($v) => $v->severity === 'hard');
         return new ValidationResult(!$hasHard, $violations);
     }

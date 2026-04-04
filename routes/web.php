@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\BuildingController;
 use App\Http\Controllers\Admin\CourseTypeController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\TeacherController;
+use App\Http\Controllers\Admin\TeacherTermStatusController;
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\TimetableController;
 use App\Http\Controllers\Admin\TimetableExportController;
@@ -259,6 +260,14 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::get('/admin/teachers/{id}/edit', [TeacherController::class, 'edit'])->name('admin.teachers.edit');
     Route::put('/admin/teachers/{id}', [TeacherController::class, 'update'])->name('admin.teachers.update');
     Route::delete('/admin/teachers/{id}', [TeacherController::class, 'destroy'])->name('admin.teachers.destroy');
+
+    // Teacher Term Status
+    Route::get('/admin/teacher-term-status', [TeacherTermStatusController::class, 'index'])->name('admin.teacher-term-status.index');
+    Route::get('/admin/teacher-term-status/data', [TeacherTermStatusController::class, 'data'])->name('admin.teacher-term-status.data');
+    Route::get('/admin/teacher-term-status/{teacherId}/edit', [TeacherTermStatusController::class, 'edit'])->name('admin.teacher-term-status.edit');
+    Route::put('/admin/teacher-term-status/{teacherId}', [TeacherTermStatusController::class, 'update'])->name('admin.teacher-term-status.update');
+    Route::post('/admin/teacher-term-status/bulk-initialize', [TeacherTermStatusController::class, 'bulkInitialize'])->name('admin.teacher-term-status.bulk-initialize');
+    Route::post('/admin/teacher-term-status/bulk-update', [TeacherTermStatusController::class, 'bulkUpdate'])->name('admin.teacher-term-status.bulk-update');
 
     // User Management
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');

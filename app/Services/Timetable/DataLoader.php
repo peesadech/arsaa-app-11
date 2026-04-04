@@ -5,6 +5,7 @@ namespace App\Services\Timetable;
 use App\Models\OpenedCourse;
 use App\Models\YearlySchedule;
 use App\Models\Teacher;
+use App\Models\TeacherTermStatus;
 use App\Models\Room;
 use Illuminate\Support\Collection;
 
@@ -20,6 +21,7 @@ class DataLoader
     private array $teacherBlocked = [];
     private array $roomBlocked = [];
     private array $courseEducationLevel = [];
+    private array $teacherTermStatuses = [];
 
     public function __construct(
         private int $academicYearId,
@@ -83,8 +85,24 @@ class DataLoader
         if (empty($teacherIds)) return;
 
         $teachers = Teacher::whereIn('id', $teacherIds)->get();
+
+        // Load term statuses in bulk (single query)
+        $termStatuses = TeacherTermStatus::whereIn('teacher_id', $teacherIds)
+            ->where('academic_year_id', $this->academicYearId)
+            ->where('semester_id', $this->semesterId)
+            ->get()
+            ->keyBy('teacher_id');
+
         foreach ($teachers as $teacher) {
+            // Skip globally inactive teachers
+            if ($teacher->status !== 1) continue;
+
+            // Skip teachers not schedulable for this term
+            $termStatus = $termStatuses->get($teacher->id);
+            if ($termStatus && !$termStatus->can_be_scheduled) continue;
+
             $this->teacherMap[$teacher->id] = $teacher;
+            $this->teacherTermStatuses[$teacher->id] = $termStatus;
         }
     }
 
@@ -123,15 +141,38 @@ class DataLoader
     private function buildTeacherBlocked(): void
     {
         foreach ($this->teacherMap as $teacherId => $teacher) {
-            $unavailable = $teacher->unavailable_periods ?? [];
-            foreach ($unavailable as $entry) {
-                $eduLevelId = $entry['education_level_id'] ?? null;
-                $day = (int) ($entry['day'] ?? 0);
-                $startPeriod = (int) ($entry['start_period'] ?? 0);
-                $endPeriod = (int) ($entry['end_period'] ?? 0);
+            // Use term-specific unavailable_periods if exists, fallback to global
+            $termStatus = $this->teacherTermStatuses[$teacherId] ?? null;
+            $termUnavailable = $termStatus?->unavailable_periods ?? null;
+            $unavailable = $termUnavailable ?? $teacher->unavailable_periods ?? [];
 
-                for ($p = $startPeriod; $p <= $endPeriod; $p++) {
-                    $this->teacherBlocked[$teacherId][$eduLevelId][$day][$p] = true;
+            if (!is_array($unavailable) || empty($unavailable)) continue;
+
+            // Detect format: legacy = sequential array of objects with 'education_level_id' key
+            // Term = nested object { eduLevelId: { day: [periods] } }
+            $isLegacy = array_is_list($unavailable) && isset($unavailable[0]['education_level_id']);
+
+            if ($isLegacy) {
+                foreach ($unavailable as $entry) {
+                    $eduLevelId = $entry['education_level_id'] ?? null;
+                    $day = (int) ($entry['day'] ?? 0);
+                    $startPeriod = (int) ($entry['start_period'] ?? 0);
+                    $endPeriod = (int) ($entry['end_period'] ?? 0);
+
+                    for ($p = $startPeriod; $p <= $endPeriod; $p++) {
+                        $this->teacherBlocked[$teacherId][$eduLevelId][$day][$p] = true;
+                    }
+                }
+            } else {
+                // Term format: { eduLevelId: { day: [period, ...] } }
+                foreach ($unavailable as $eduLevelId => $days) {
+                    if (!is_array($days)) continue;
+                    foreach ($days as $day => $periods) {
+                        if (!is_array($periods)) continue;
+                        foreach ($periods as $p) {
+                            $this->teacherBlocked[$teacherId][(int)$eduLevelId][(int)$day][(int)$p] = true;
+                        }
+                    }
                 }
             }
         }
@@ -217,7 +258,13 @@ class DataLoader
 
     public function getTeachersForCourse(int $courseId): array
     {
-        return $this->courseTeachers[$courseId] ?? [];
+        $allTeachers = $this->courseTeachers[$courseId] ?? [];
+        return array_values(array_filter($allTeachers, fn($id) => isset($this->teacherMap[$id])));
+    }
+
+    public function getTeacherTermStatus(int $teacherId): ?TeacherTermStatus
+    {
+        return $this->teacherTermStatuses[$teacherId] ?? null;
     }
 
     public function getRoomsForCourse(int $courseId): array

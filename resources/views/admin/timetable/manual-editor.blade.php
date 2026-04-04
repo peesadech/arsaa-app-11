@@ -37,6 +37,22 @@
                             $placed = $entries->where('opened_course_id', $oc->id)->count();
                             $needed = $oc->course->periods_per_week ?? 1;
                             $remaining = max(0, $needed - $placed);
+
+                            // Use term courses if available, otherwise fallback to global
+                            $termTeachersForCourse = $termCourseTeachers[$oc->course_id] ?? null;
+                            if ($termTeachersForCourse && $termTeachersForCourse->isNotEmpty()) {
+                                $teachersJson = $termTeachersForCourse->map(fn($tc) => [
+                                    'id' => $tc->teacher_id,
+                                    'name' => $tc->teacher->name,
+                                    'schedulable' => in_array($tc->teacher_id, $schedulableTeacherIds),
+                                ])->values();
+                            } else {
+                                $teachersJson = $oc->course->teachers->map(fn($t) => [
+                                    'id' => $t->id,
+                                    'name' => $t->name,
+                                    'schedulable' => in_array($t->id, $schedulableTeacherIds),
+                                ])->values();
+                            }
                         @endphp
                         <div class="course-item p-3 rounded-xl border cursor-pointer transition-all
                                     {{ $remaining === 0 ? 'bg-gray-50 dark:bg-[#3a3b3c]/50 border-gray-200 dark:border-[#3a3b3c] opacity-60' : 'bg-white dark:bg-[#3a3b3c] border-gray-200 dark:border-[#4a4b4c] hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-sm' }}"
@@ -48,7 +64,7 @@
                              data-periods-needed="{{ $needed }}"
                              data-periods-per-session="{{ $oc->course->periods_per_session ?? 1 }}"
                              data-color-idx="{{ $colorIdx }}"
-                             data-teachers='@json($oc->course->teachers->map(function($t) { return ["id" => $t->id, "name" => $t->name]; }))'
+                             data-teachers='@json($teachersJson)'
                              data-rooms='@json($oc->course->rooms->map(function($r) { return ["id" => $r->id, "label" => $r->room_number . ($r->building ? " (".$r->building->name_th.")" : "")]; }))'
                              data-preferred-days='@json($oc->course->preferred_days ?? [])'
                              onclick="selectCourse(this)">
@@ -73,7 +89,17 @@
                             </div>
                             @endif
                             <div class="text-[10px] text-gray-400 dark:text-gray-500">
-                                {{ __('Teacher') }}: {{ $oc->course->teachers->pluck('name')->join(', ') ?: '-' }}
+                                {{ __('Teacher') }}:
+                                @php $displayTeachers = $teachersJson; @endphp
+                                @forelse($displayTeachers as $t)
+                                    @if($t['schedulable'])
+                                        <span>{{ $t['name'] }}</span>{{ !$loop->last ? ',' : '' }}
+                                    @else
+                                        <span class="line-through text-rose-400" title="{{ __('Cannot schedule this term') }}">{{ $t['name'] }}</span>{{ !$loop->last ? ',' : '' }}
+                                    @endif
+                                @empty
+                                    -
+                                @endforelse
                             </div>
                         </div>
                         @endforeach
@@ -181,6 +207,8 @@ const __t = {
     consecutiveLabel: @json(__(':pps consecutive: Period :start-:end')),
     placeCourseTitle: @json(__('Place Course — :day Period :period')),
     noTeacherAssigned: @json(__('No teacher assigned')),
+    noSchedulableTeacher: @json(__('No schedulable teacher for this term')),
+    unavailableThisTerm: @json(__('Unavailable this term')),
     courseRooms: @json(__('Rooms assigned to course')),
     otherRooms: @json(__('Other rooms')),
     notSpecified: @json(__('Not specified')),
@@ -245,6 +273,7 @@ const classroomId = {{ $classroom->id }};
 
 const schedule = @json($schedule);
 const allRooms = @json($allRoomsJson);
+const schedulableTeacherIds = new Set(@json($schedulableTeacherIds));
 const dayConfigs = schedule.day_configs || {};
 // Only show days that have periods > 0 (exclude holidays/non-teaching days)
 const teachingDays = (schedule.teaching_days || []).filter(d => {
@@ -471,12 +500,25 @@ function cellClick(day, period) {
     document.getElementById('modal-course-name').textContent = selectedCourse.dataset.courseName + sessionLabel;
     document.getElementById('modal-title').textContent = __t.placeCourseTitle.replace(':day', dayNames[day]).replace(':period', pps > 1 ? period+'-'+(period+pps-1) : period);
 
-    // Populate teachers
-    const teachers = JSON.parse(selectedCourse.dataset.teachers);
+    // Populate teachers (only schedulable for this term)
+    const allCourseTeachers = JSON.parse(selectedCourse.dataset.teachers);
+    const teachers = allCourseTeachers.filter(t => schedulableTeacherIds.has(t.id));
+    const unavailableTeachers = allCourseTeachers.filter(t => !schedulableTeacherIds.has(t.id));
     const tSelect = document.getElementById('modal-teacher');
-    tSelect.innerHTML = teachers.length === 0
-        ? `<option value="">${__t.noTeacherAssigned}</option>`
-        : teachers.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+    let teacherHtml = '';
+    if (teachers.length === 0 && unavailableTeachers.length === 0) {
+        teacherHtml = `<option value="">${__t.noTeacherAssigned}</option>`;
+    } else if (teachers.length === 0) {
+        teacherHtml = `<option value="">${__t.noSchedulableTeacher}</option>`;
+    } else {
+        teacherHtml = teachers.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+    }
+    if (unavailableTeachers.length > 0) {
+        teacherHtml += `<optgroup label="${__t.unavailableThisTerm}">`;
+        teacherHtml += unavailableTeachers.map(t => `<option value="${t.id}" disabled class="text-gray-400">${t.name}</option>`).join('');
+        teacherHtml += '</optgroup>';
+    }
+    tSelect.innerHTML = teacherHtml;
 
     // Populate rooms
     const courseRooms = JSON.parse(selectedCourse.dataset.rooms);

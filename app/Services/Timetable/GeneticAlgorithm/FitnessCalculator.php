@@ -19,6 +19,8 @@ class FitnessCalculator
     private const SOFT_TEACHER_GAP = -10;
     private const SOFT_COURSE_SPREAD = -8;
     private const SOFT_MORNING_CORE = -3;
+    private const SOFT_TEACHER_MAX_DAY = -15;
+    private const SOFT_TEACHER_MAX_WEEK = -15;
 
     public function __construct(private DataLoader $data)
     {
@@ -40,6 +42,8 @@ class FitnessCalculator
             'teacher_gap' => 0,
             'course_spread' => 0,
             'morning_core' => 0,
+            'teacher_max_day' => 0,
+            'teacher_max_week' => 0,
         ];
 
         $genes = $chromosome->getGenes();
@@ -199,6 +203,42 @@ class FitnessCalculator
                 $score += self::SOFT_MORNING_CORE;
                 $softViolations++;
                 $breakdown['morning_core']++;
+            }
+        }
+
+        // 11. Teacher max periods per day (from term status)
+        foreach ($teacherDayPeriodGenes as $teacherId => $days) {
+            $termStatus = $this->data->getTeacherTermStatus($teacherId);
+            if (!$termStatus || !$termStatus->max_periods_per_day) continue;
+            foreach ($days as $day => $periods) {
+                $count = 0;
+                foreach ($periods as $genesInSlot) {
+                    $count += count($genesInSlot);
+                }
+                if ($count > $termStatus->max_periods_per_day) {
+                    $excess = $count - $termStatus->max_periods_per_day;
+                    $score += self::SOFT_TEACHER_MAX_DAY * $excess;
+                    $softViolations += $excess;
+                    $breakdown['teacher_max_day'] += $excess;
+                }
+            }
+        }
+
+        // 12. Teacher max periods per week (from term status)
+        foreach ($teacherDayPeriodGenes as $teacherId => $days) {
+            $termStatus = $this->data->getTeacherTermStatus($teacherId);
+            if (!$termStatus || !$termStatus->max_periods_per_week) continue;
+            $weekTotal = 0;
+            foreach ($days as $periods) {
+                foreach ($periods as $genesInSlot) {
+                    $weekTotal += count($genesInSlot);
+                }
+            }
+            if ($weekTotal > $termStatus->max_periods_per_week) {
+                $excess = $weekTotal - $termStatus->max_periods_per_week;
+                $score += self::SOFT_TEACHER_MAX_WEEK * $excess;
+                $softViolations += $excess;
+                $breakdown['teacher_max_week'] += $excess;
             }
         }
 

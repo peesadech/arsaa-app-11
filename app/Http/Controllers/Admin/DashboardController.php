@@ -14,6 +14,8 @@ use App\Models\GlobalSchedule;
 use App\Models\OpenedCourse;
 use App\Models\OpenedGrade;
 use App\Models\Semester;
+use App\Models\Teacher;
+use App\Models\TeacherTermStatus;
 use App\Models\YearlySchedule;
 use Illuminate\Http\Request;
 
@@ -72,11 +74,23 @@ class DashboardController extends Controller
         $yearlyScheduleTotal = $educationLevels->count();
         $yearlyScheduleConfigured = $yearlyScheduleMap->count();
 
+        // Teacher term status summary
+        $teacherActiveCount = Teacher::where('status', 1)->count();
+        $teacherTermCounts = ($academicYearId && $semesterId)
+            ? TeacherTermStatus::where('academic_year_id', $academicYearId)
+                ->where('semester_id', $semesterId)
+                ->selectRaw('count(*) as total, sum(can_be_scheduled) as schedulable')
+                ->first()
+            : null;
+        $teacherTermConfigured = $teacherTermCounts->total ?? 0;
+        $teacherTermSchedulable = $teacherTermCounts->schedulable ?? 0;
+
         return view('admin.dashboard', compact(
             'currentYear', 'currentSemester', 'openedGrades',
             'academicYearId', 'semesterId',
             'openedClassroomCount', 'openedCourseCount', 'openedCourseTotalCount',
-            'yearlyScheduleTotal', 'yearlyScheduleConfigured'
+            'yearlyScheduleTotal', 'yearlyScheduleConfigured',
+            'teacherActiveCount', 'teacherTermConfigured', 'teacherTermSchedulable'
         ));
     }
 
