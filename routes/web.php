@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\YearlyScheduleController;
 use App\Http\Controllers\Admin\EducationLevelController;
 use App\Http\Controllers\Admin\SubjectGroupController;
 use App\Http\Controllers\Admin\BuildingController;
+use App\Http\Controllers\Admin\FloorController;
 use App\Http\Controllers\Admin\CourseTypeController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\TeacherController;
@@ -129,6 +130,15 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
     Route::put('/admin/subject-groups/{id}', [SubjectGroupController::class, 'update'])->name('admin.subject-groups.update');
     Route::delete('/admin/subject-groups/{id}', [SubjectGroupController::class, 'destroy'])->name('admin.subject-groups.destroy');
 
+    // Floors
+    Route::get('/admin/floors', [FloorController::class, 'index'])->name('admin.floors.index');
+    Route::get('/admin/floors/data', [FloorController::class, 'data'])->name('admin.floors.data');
+    Route::get('/admin/floors/create', [FloorController::class, 'create'])->name('admin.floors.create');
+    Route::post('/admin/floors', [FloorController::class, 'store'])->name('admin.floors.store');
+    Route::get('/admin/floors/{id}/edit', [FloorController::class, 'edit'])->name('admin.floors.edit');
+    Route::put('/admin/floors/{id}', [FloorController::class, 'update'])->name('admin.floors.update');
+    Route::delete('/admin/floors/{id}', [FloorController::class, 'destroy'])->name('admin.floors.destroy');
+
     // Buildings
     Route::get('/admin/buildings', [BuildingController::class, 'index'])->name('admin.buildings.index');
     Route::get('/admin/buildings/data', [BuildingController::class, 'data'])->name('admin.buildings.data');
@@ -150,6 +160,7 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
     // Rooms
     Route::get('/admin/rooms', [RoomController::class, 'index'])->name('admin.rooms.index');
     Route::get('/admin/rooms/data', [RoomController::class, 'data'])->name('admin.rooms.data');
+    Route::get('/admin/rooms/floors-by-building', [RoomController::class, 'floorsByBuilding'])->name('admin.rooms.floors-by-building');
     Route::get('/admin/rooms/create', [RoomController::class, 'create'])->name('admin.rooms.create');
     Route::post('/admin/rooms', [RoomController::class, 'store'])->name('admin.rooms.store');
     Route::get('/admin/rooms/{id}/edit', [RoomController::class, 'edit'])->name('admin.rooms.edit');

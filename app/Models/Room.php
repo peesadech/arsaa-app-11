@@ -9,6 +9,7 @@ class Room extends Model
     protected $fillable = [
         'room_number',
         'building_id',
+        'floor_id',
         'description',
         'unavailable_periods',
         'status',
@@ -21,6 +22,11 @@ class Room extends Model
     public function building()
     {
         return $this->belongsTo(Building::class);
+    }
+
+    public function floor()
+    {
+        return $this->belongsTo(Floor::class);
     }
 
     public function courses()

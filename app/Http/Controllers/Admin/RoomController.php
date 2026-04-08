@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Models\Building;
+use App\Models\Floor;
 use App\Models\Course;
 use App\Models\SubjectGroup;
 use App\Models\EducationLevel;
@@ -23,7 +24,7 @@ class RoomController extends Controller
 
     public function data(Request $request)
     {
-        $rooms = Room::with(['building', 'courses'])->select('rooms.*');
+        $rooms = Room::with(['building', 'floor', 'courses'])->select('rooms.*');
 
         if ($request->filled('status')) {
             $rooms->where('rooms.status', $request->status);
@@ -37,6 +38,10 @@ class RoomController extends Controller
             ->addColumn('building_name', function ($room) {
                 if (!$room->building) return '<span class="text-gray-400 text-[10px] italic">-</span>';
                 return '<span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-bold">' . e($room->building->name_th) . '</span>';
+            })
+            ->addColumn('floor_name', function ($room) {
+                if (!$room->floor) return '<span class="text-gray-400 text-[10px] italic">-</span>';
+                return '<span class="px-2 py-0.5 rounded-full bg-violet-50 text-violet-600 text-[10px] font-bold">' . e($room->floor->name_th) . '</span>';
             })
             ->addColumn('courses_list', function ($room) {
                 if ($room->courses->isEmpty()) return '<span class="text-gray-400 text-[10px] italic">-</span>';
@@ -58,7 +63,7 @@ class RoomController extends Controller
                 $btn .= '</div>';
                 return $btn;
             })
-            ->rawColumns(['building_name', 'courses_list', 'status', 'action'])
+            ->rawColumns(['building_name', 'floor_name', 'courses_list', 'status', 'action'])
             ->make(true);
     }
 
@@ -78,6 +83,7 @@ class RoomController extends Controller
         $data = $request->validate([
             'room_number' => 'required|string|max:255',
             'building_id' => 'required|exists:buildings,id',
+            'floor_id' => 'nullable|exists:floors,id',
             'description' => 'nullable|string',
             'unavailable_periods' => 'nullable|string',
             'status' => 'required|in:1,2',
@@ -116,6 +122,7 @@ class RoomController extends Controller
         $data = $request->validate([
             'room_number' => 'required|string|max:255',
             'building_id' => 'required|exists:buildings,id',
+            'floor_id' => 'nullable|exists:floors,id',
             'description' => 'nullable|string',
             'unavailable_periods' => 'nullable|string',
             'status' => 'required|in:1,2',
@@ -133,6 +140,16 @@ class RoomController extends Controller
         $room->courses()->sync($data['course_ids'] ?? []);
 
         return redirect()->route('admin.rooms.index')->with('status', 'Room updated successfully!');
+    }
+
+    public function floorsByBuilding(Request $request)
+    {
+        $floors = Floor::where('building_id', $request->building_id)
+            ->where('status', 1)
+            ->orderBy('name_th')
+            ->get(['id', 'name_th', 'name_en']);
+
+        return response()->json($floors);
     }
 
     public function destroy($id)

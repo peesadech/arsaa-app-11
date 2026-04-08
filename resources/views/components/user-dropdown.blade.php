@@ -89,6 +89,28 @@
                         </div>
                         <span class="font-medium text-sm">{{ __('User Management') }}</span>
                     </a>
+                    <a href="{{ route('admin.courses.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-book text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">{{ __('Course Management') }}</span>
+                    </a>
+                </div>
+
+                @if(collect(auth()->user()?->getRoleNames() ?? [])->contains(fn($r) => strtoupper($r) === 'SUPERADMIN'))
+                <!-- Admin Config toggle button -->
+                <a href="javascript:void(0)" onclick="document.getElementById('admin-config-submenu').classList.toggle('open'); this.querySelector('.admin-config-arrow').classList.toggle('rotate-180')" class="flex items-center justify-between p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors group cursor-pointer">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center text-xl">
+                            <i class="fas fa-tools text-base"></i>
+                        </div>
+                        <span class="font-bold text-sm">{{ __('Admin Config') }}</span>
+                    </div>
+                    <i class="fas fa-chevron-down admin-config-arrow text-gray-400 text-xs transition-transform duration-200"></i>
+                </a>
+
+                <!-- Admin Config Sub-menu -->
+                <div id="admin-config-submenu" class="setting-submenu ml-5 border-l-2 {{ $theme === 'dark' ? 'border-zinc-700' : 'border-gray-200' }} pl-2 space-y-0.5">
                     <a href="{{ route('admin.grades.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-layer-group text-xs text-gray-400"></i>
@@ -100,12 +122,6 @@
                             <i class="fas fa-chalkboard text-xs text-gray-400"></i>
                         </div>
                         <span class="font-medium text-sm">{{ __('Classroom Management') }}</span>
-                    </a>
-                    <a href="{{ route('admin.courses.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
-                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
-                            <i class="fas fa-book text-xs text-gray-400"></i>
-                        </div>
-                        <span class="font-medium text-sm">{{ __('Course Management') }}</span>
                     </a>
                     <a href="{{ route('admin.course-types.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
@@ -125,7 +141,6 @@
                         </div>
                         <span class="font-medium text-sm">{{ __('Semester') }}</span>
                     </a>
-                    @if(collect(auth()->user()?->getRoleNames() ?? [])->contains(fn($r) => strtoupper($r) === 'SUPERADMIN'))
                     <a href="{{ route('admin.education-levels.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
                             <i class="fas fa-school text-xs text-gray-400"></i>
@@ -137,6 +152,12 @@
                             <i class="fas fa-th-large text-xs text-gray-400"></i>
                         </div>
                         <span class="font-medium text-sm">{{ __('Subject Group') }}</span>
+                    </a>
+                    <a href="{{ route('admin.floors.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-layer-group text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">{{ __('Floor') }}</span>
                     </a>
                     <a href="{{ route('admin.buildings.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
@@ -192,8 +213,8 @@
                         </div>
                         <span class="font-medium text-sm">{{ __('General Settings') }}</span>
                     </a>
-                    @endif
                 </div>
+                @endif
                 @endif
 
                 <a

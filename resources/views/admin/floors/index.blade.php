@@ -140,16 +140,16 @@
                     <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
                 </a>
                 <div>
-                    <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ __('Room Management') }}</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1 px-1">{{ __('Manage room numbers and assigned courses') }}</p>
+                    <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ __('Floor Management') }}</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1 px-1">{{ __('Manage building floors') }}</p>
                 </div>
             </div>
 
             <div>
-                <a href="{{ route('admin.rooms.create') }}"
+                <a href="{{ route('admin.floors.create') }}"
                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-bold rounded-2xl shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5 active:scale-95">
                     <i class="fas fa-plus mr-2 opacity-75"></i>
-                    {{ __('New Room') }}
+                    {{ __('New Floor') }}
                 </a>
             </div>
         </div>
@@ -173,7 +173,7 @@
                             </div>
                             <div>
                                 <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">{{ __('Quick Filters') }}</h3>
-                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">{{ __('Refine room list') }}</p>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">{{ __('Refine floor list') }}</p>
                             </div>
                         </div>
 
@@ -182,8 +182,8 @@
                             <div class="relative group">
                                 <select id="buildingFilter" class="appearance-none block w-full md:w-48 pl-4 pr-10 py-2.5 bg-white dark:bg-[#242526] border-2 border-gray-100 dark:border-[#3a3b3c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-0 focus:border-indigo-500 transition-all cursor-pointer">
                                     <option value="">{{ __('All Buildings') }}</option>
-                                    @foreach($buildings as $b)
-                                        <option value="{{ $b->id }}">{{ $b->name_th }}</option>
+                                    @foreach(\App\Models\Building::where('status', 1)->orderBy('name_th')->get() as $building)
+                                        <option value="{{ $building->id }}">{{ $building->name_th }}</option>
                                     @endforeach
                                 </select>
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
@@ -207,13 +207,12 @@
                 </div>
 
                 <div class="overflow-x-auto lg:overflow-visible">
-                    <table id="roomsTable" class="w-full text-left border-collapse whitespace-nowrap lg:whitespace-normal">
+                    <table id="floorsTable" class="w-full text-left border-collapse whitespace-nowrap lg:whitespace-normal">
                         <thead>
                             <tr class="bg-gray-50/50 dark:bg-[#18191a]/30 border-b border-gray-100 dark:border-[#3a3b3c]/50">
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest first:rounded-tl-2xl">{{ __('Room Number') }}</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest first:rounded-tl-2xl">{{ __('Name') }}</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ __('Name (English)') }}</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ __('Building') }}</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ __('Floor') }}</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ __('Courses') }}</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ __('Description') }}</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center">{{ __('Status') }}</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-right last:rounded-tr-2xl">{{ __('Action') }}</th>
@@ -228,9 +227,9 @@
 
             <!-- Contextual Footer -->
             <div class="px-8 py-5 bg-gray-50/50 dark:bg-[#18191a]/30 border-t border-gray-100 dark:border-[#3a3b3c]/50 flex items-center justify-between text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                <span>{{ __('Room Management System') }}</span>
+                <span>{{ __('Floor Management System') }}</span>
                 <span class="flex items-center">
-                    <i class="fas fa-door-open mr-2"></i> {{ __('Administrative Control') }}
+                    <i class="fas fa-layer-group mr-2"></i> {{ __('Administrative Control') }}
                 </span>
             </div>
         </div>
@@ -283,7 +282,7 @@
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
 
     <script>
-        const LANG_SEARCH_ROOMS = @json(__('Search rooms...'));
+        const LANG_SEARCH_FLOORS = @json(__('Search floors...'));
         const LANG_SHOW = @json(__('Show'));
 
         $(document).ready(function() {
@@ -299,7 +298,7 @@
                 }
             });
 
-            $('#roomsTable').DataTable({
+            $('#floorsTable').DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
@@ -312,24 +311,23 @@
                     { extend: 'print', className: 'btn btn-sm' }
                 ],
                 ajax: {
-                    url: "{{ route('admin.rooms.data') }}",
+                    url: "{{ route('admin.floors.data') }}",
                     data: function (d) {
                         d.status = $('#statusFilter').val();
                         d.building_id = $('#buildingFilter').val();
                     }
                 },
                 columns: [
-                    { data: 'room_number', name: 'room_number', className: 'px-6 py-4 font-bold text-gray-800 dark:text-gray-200' },
-                    { data: 'building_name', name: 'building_id', orderable: false, searchable: false, className: 'px-6 py-4' },
-                    { data: 'floor_name', name: 'floor_id', orderable: false, searchable: false, className: 'px-6 py-4' },
-                    { data: 'courses_list', name: 'courses_list', orderable: false, searchable: false, className: 'px-6 py-4' },
+                    { data: 'name_th', name: 'name_th', className: 'px-6 py-4 font-bold text-gray-800 dark:text-gray-200' },
+                    { data: 'name_en', name: 'name_en', className: 'px-6 py-4' },
+                    { data: 'building_name', name: 'building.name_th', className: 'px-6 py-4' },
                     { data: 'description', name: 'description', className: 'px-6 py-4 text-xs' },
                     { data: 'status', name: 'status', orderable: true, className: 'px-6 py-4 text-center' },
                     { data: 'action', name: 'action', orderable: false, searchable: false, className: 'px-6 py-4 text-right' }
                 ],
                 language: {
                     search: "",
-                    searchPlaceholder: LANG_SEARCH_ROOMS,
+                    searchPlaceholder: LANG_SEARCH_FLOORS,
                     lengthMenu: LANG_SHOW + " _MENU_",
                     paginate: {
                         previous: '<i class="fas fa-chevron-left"></i>',
@@ -343,13 +341,13 @@
             });
 
             $('#statusFilter, #buildingFilter').on('change', function() {
-                $('#roomsTable').DataTable().draw();
+                $('#floorsTable').DataTable().draw();
             });
         });
 
         function confirmDelete(id, name) {
             $('#itemNameToDelete').text(name);
-            $('#deleteForm').attr('action', '/admin/rooms/' + id);
+            $('#deleteForm').attr('action', '/admin/floors/' + id);
             $('#deleteModal').removeClass('hidden');
             $('body').css('overflow', 'hidden');
         }

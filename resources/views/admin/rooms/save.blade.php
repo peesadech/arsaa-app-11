@@ -133,6 +133,31 @@
                         </div>
                     </div>
 
+                    <!-- Floor -->
+                    <div class="space-y-2">
+                        <label for="floor_id" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
+                            {{ __('Floor') }}
+                        </label>
+                        <div class="group relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
+                                <i class="fas fa-layer-group text-sm"></i>
+                            </div>
+                            <select
+                                id="floor_id"
+                                name="floor_id"
+                                class="block w-full pl-10 pr-10 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white appearance-none focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200 @error('floor_id') border-rose-300 bg-rose-50 dark:bg-rose-900/20 @enderror"
+                            >
+                                <option value="">{{ __('-- Select Floor --') }}</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                                <i class="fas fa-chevron-down text-sm"></i>
+                            </div>
+                        </div>
+                        @error('floor_id')
+                            <p class="text-[10px] font-bold text-rose-500 mt-1 px-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Courses (Multi-select via Modal) -->
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
@@ -395,10 +420,43 @@
     // Courses data from server
     let selectedCourses = @json($selectedCoursesJson);
 
+    const FLOOR_URL = "{{ route('admin.rooms.floors-by-building') }}";
+    const OLD_FLOOR_ID = "{{ old('floor_id', $isEdit ? $room->floor_id : '') }}";
+
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
         renderSelectedCourses();
+
+        // Load floors when building changes
+        const buildingSelect = document.getElementById('building_id');
+        buildingSelect.addEventListener('change', function() {
+            loadFloors(this.value);
+        });
+
+        // Load floors on initial load if building is selected
+        if (buildingSelect.value) {
+            loadFloors(buildingSelect.value, OLD_FLOOR_ID);
+        }
     });
+
+    function loadFloors(buildingId, preselectId) {
+        const floorSelect = document.getElementById('floor_id');
+        floorSelect.innerHTML = '<option value="">{{ __("-- Select Floor --") }}</option>';
+
+        if (!buildingId) return;
+
+        fetch(FLOOR_URL + '?building_id=' + buildingId)
+            .then(res => res.json())
+            .then(floors => {
+                floors.forEach(floor => {
+                    const opt = document.createElement('option');
+                    opt.value = floor.id;
+                    opt.textContent = floor.name_th + ' / ' + floor.name_en;
+                    if (preselectId && preselectId == floor.id) opt.selected = true;
+                    floorSelect.appendChild(opt);
+                });
+            });
+    }
 
     function openCourseModal() {
         // Sync checkboxes with current selection
