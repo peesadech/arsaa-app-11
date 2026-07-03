@@ -289,7 +289,14 @@
                                         <input type="file" name="document_files[{{ $docType->id }}]" accept=".jpg,.jpeg,.png,.pdf"
                                                class="block w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 cursor-pointer">
                                         @if($doc?->file_path)
+                                        @php $isImage = in_array(strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION)), ['jpg','jpeg','png','gif','webp','bmp']); @endphp
+                                        @if($isImage)
+                                        <a href="{{ asset($doc->file_path) }}" target="_blank" class="inline-block mt-1">
+                                            <img src="{{ asset($doc->file_path) }}" alt="{{ $docType->name_th }}" class="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-[#3a3b3c] hover:opacity-80">
+                                        </a>
+                                        @else
                                         <a href="{{ asset($doc->file_path) }}" target="_blank" class="text-[11px] text-indigo-500 hover:underline"><i class="fas fa-paperclip mr-1"></i>{{ __('View attached file') }}</a>
+                                        @endif
                                         @endif
                                     </td>
                                     <td class="py-3">
