@@ -94,6 +94,10 @@ class AcademicYearController extends Controller
         $request->session()->put('current_academic_year_id', $request->academic_year_id);
         $request->session()->put('current_semester_id', $request->semester_id);
 
+        if ($request->boolean('redirect_dashboard')) {
+            return redirect()->route('admin.dashboard');
+        }
+
         return back();
     }
 

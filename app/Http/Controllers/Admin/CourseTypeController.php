@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CourseType;
+use App\Models\GradingScheme;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -16,13 +17,19 @@ class CourseTypeController extends Controller
 
     public function data(Request $request)
     {
-        $courseTypes = CourseType::select('course_types.*');
+        $courseTypes = CourseType::with('gradingScheme')->select('course_types.*');
 
         if ($request->filled('status')) {
             $courseTypes->where('status', $request->status);
         }
 
         return DataTables::of($courseTypes)
+            ->addColumn('grading_scheme', function ($courseType) {
+                if (! $courseType->gradingScheme) {
+                    return '<span class="text-gray-400 text-[10px] italic">-</span>';
+                }
+                return '<span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-bold">' . e($courseType->gradingScheme->name) . '</span>';
+            })
             ->addColumn('status', function ($courseType) {
                 $statusText = $courseType->status == 1 ? 'Active' : 'Not Active';
                 $colorClass = $courseType->status == 1 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
@@ -36,13 +43,14 @@ class CourseTypeController extends Controller
                 $btn .= '</div>';
                 return $btn;
             })
-            ->rawColumns(['status', 'action'])
+            ->rawColumns(['grading_scheme', 'status', 'action'])
             ->make(true);
     }
 
     public function create()
     {
-        return view('admin.course-types.save');
+        $gradingSchemes = GradingScheme::where('status', 1)->get();
+        return view('admin.course-types.save', compact('gradingSchemes'));
     }
 
     public function store(Request $request)
@@ -51,6 +59,7 @@ class CourseTypeController extends Controller
             'name_th' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'grading_scheme_id' => 'nullable|exists:grading_schemes,id',
             'status' => 'required|in:1,2',
         ]);
 
@@ -62,7 +71,8 @@ class CourseTypeController extends Controller
     public function edit($id)
     {
         $courseType = CourseType::findOrFail($id);
-        return view('admin.course-types.save', compact('courseType'));
+        $gradingSchemes = GradingScheme::where('status', 1)->get();
+        return view('admin.course-types.save', compact('courseType', 'gradingSchemes'));
     }
 
     public function update(Request $request, $id)
@@ -72,6 +82,7 @@ class CourseTypeController extends Controller
             'name_th' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'grading_scheme_id' => 'nullable|exists:grading_schemes,id',
             'status' => 'required|in:1,2',
         ]);
 

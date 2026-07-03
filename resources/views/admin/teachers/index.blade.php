@@ -145,7 +145,13 @@
                 </div>
             </div>
 
-            <div>
+            <div class="flex flex-wrap items-center gap-2">
+                <form action="{{ route('admin.teachers.create-accounts') }}" method="POST" onsubmit="return confirm('{{ __('Create login accounts for all teachers without one?') }}')">
+                    @csrf
+                    <button type="submit" class="btn-app" title="{{ __('Create login accounts for teachers that do not have one yet') }}">
+                        <i class="fas fa-user-lock text-[10px]"></i> {{ __('Create missing accounts') }}
+                    </button>
+                </form>
                 <a href="{{ route('admin.teachers.create') }}"
                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-bold rounded-2xl shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5 active:scale-95">
                     <i class="fas fa-chalkboard-teacher mr-2 opacity-75"></i>

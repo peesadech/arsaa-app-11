@@ -200,6 +200,7 @@
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest first:rounded-tl-2xl">{{ __('Name') }}</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ __('Name (English)') }}</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ __('Description') }}</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ __('Grading Scheme') }}</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center">{{ __('Status') }}</th>
                                 <th class="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest text-right last:rounded-tr-2xl">{{ __('Action') }}</th>
                             </tr>
@@ -306,6 +307,7 @@
                     { data: 'name_th', name: 'name_th', className: 'px-6 py-4 font-bold text-gray-800 dark:text-gray-200' },
                     { data: 'name_en', name: 'name_en', className: 'px-6 py-4' },
                     { data: 'description', name: 'description', className: 'px-6 py-4 text-xs' },
+                    { data: 'grading_scheme', name: 'grading_scheme', orderable: false, searchable: false, className: 'px-6 py-4' },
                     { data: 'status', name: 'status', orderable: true, className: 'px-6 py-4 text-center' },
                     { data: 'action', name: 'action', orderable: false, searchable: false, className: 'px-6 py-4 text-right' }
                 ],

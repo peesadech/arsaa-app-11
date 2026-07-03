@@ -17,6 +17,9 @@ class LoginController extends Controller
             if ($roles->intersect(['SUPERADMIN', 'ADMIN'])->isNotEmpty()) {
                 return route('admin.dashboard');
             }
+            if ($roles->contains('TEACHER')) {
+                return route('teacher.dashboard');
+            }
         }
 
         return route('profile.index');
@@ -46,6 +49,9 @@ class LoginController extends Controller
         $userRoles = $user->getRoleNames()->map(fn($r) => strtoupper($r));
         if ($userRoles->intersect(['SUPERADMIN', 'ADMIN'])->isNotEmpty()) {
             return redirect()->route('admin.dashboard');
+        }
+        if ($userRoles->contains('TEACHER')) {
+            return redirect()->route('teacher.dashboard');
         }
 
         return redirect()->route('profile.index');

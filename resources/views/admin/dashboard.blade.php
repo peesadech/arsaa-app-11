@@ -14,6 +14,18 @@
 <div class="min-h-screen bg-gray-50/50 dark:bg-[#18191a] py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
     <div class="max-w-7xl mx-auto space-y-8">
 
+        {{-- Term Setup shortcut --}}
+        @if($currentYear && $currentSemester)
+        <div class="flex justify-end gap-2">
+            <a href="{{ route('admin.term-setup.existing') }}" class="btn-app">
+                <i class="fas fa-calendar-check text-[10px]"></i> {{ __('Existing terms') }}
+            </a>
+            <a href="{{ route('admin.term-setup.index') }}" class="btn-app">
+                <i class="fas fa-rocket text-[10px]"></i> {{ __('New Term Setup') }}
+            </a>
+        </div>
+        @endif
+
         {{-- Stats Row --}}
         <div class="flex gap-4">
             {{-- Opened Grades Block (30%) --}}

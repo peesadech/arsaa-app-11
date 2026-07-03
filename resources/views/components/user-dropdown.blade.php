@@ -63,6 +63,20 @@
 
             <!-- Management Section -->
             <div class="space-y-1">
+                @if(collect(auth()->user()?->getRoleNames() ?? [])->map(fn($r) => strtoupper($r))->contains('TEACHER'))
+                <a href="{{ route('teacher.dashboard') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                    <div class="w-10 h-10 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center text-xl">
+                        <i class="fas fa-tachometer-alt text-base"></i>
+                    </div>
+                    <span class="font-bold text-sm">{{ __('Teacher Dashboard') }}</span>
+                </a>
+                <a href="{{ route('teacher.scores.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                    <div class="w-10 h-10 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center text-xl">
+                        <i class="fas fa-clipboard-check text-base"></i>
+                    </div>
+                    <span class="font-bold text-sm">{{ __('My Courses') }}</span>
+                </a>
+                @endif
                 @if(collect(auth()->user()?->getRoleNames() ?? [])->map(fn($r) => strtoupper($r))->intersect(['ADMIN', 'SUPERADMIN'])->isNotEmpty())
                 <!-- Setting toggle button -->
                 <a href="javascript:void(0)" onclick="document.getElementById('setting-submenu').classList.toggle('open'); this.querySelector('.setting-arrow').classList.toggle('rotate-180')" class="flex items-center justify-between p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors group cursor-pointer">
@@ -94,6 +108,36 @@
                             <i class="fas fa-book text-xs text-gray-400"></i>
                         </div>
                         <span class="font-medium text-sm">{{ __('Course Management') }}</span>
+                    </a>
+                    <a href="{{ route('admin.students.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-user-graduate text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">{{ __('Student Management') }}</span>
+                    </a>
+                    <a href="{{ route('admin.student-enrollments.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-door-open text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">{{ __('Student Enrollment') }}</span>
+                    </a>
+                    <a href="{{ route('admin.student-scores.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-clipboard-check text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">{{ __('Academic Results') }}</span>
+                    </a>
+                    <a href="{{ route('admin.student-reports.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-chart-bar text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">{{ __('Student Reports') }}</span>
+                    </a>
+                    <a href="{{ route('admin.student-master.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-database text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">{{ __('Student Master Data') }}</span>
                     </a>
                 </div>
 
@@ -128,6 +172,12 @@
                             <i class="fas fa-tags text-xs text-gray-400"></i>
                         </div>
                         <span class="font-medium text-sm">{{ __('Course Type') }}</span>
+                    </a>
+                    <a href="{{ route('admin.grading-schemes.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
+                        <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">
+                            <i class="fas fa-award text-xs text-gray-400"></i>
+                        </div>
+                        <span class="font-medium text-sm">{{ __('Grading Scheme') }}</span>
                     </a>
                     <a href="{{ route('admin.academic-years.index') }}" class="flex items-center space-x-3 p-2 rounded-lg {{ $theme === 'dark' ? 'hover:bg-[#3a3b3c]' : 'hover:bg-gray-50' }} transition-colors">
                         <div class="w-8 h-8 rounded-full {{ $theme === 'dark' ? 'bg-zinc-700' : 'bg-gray-100' }} flex items-center justify-center">

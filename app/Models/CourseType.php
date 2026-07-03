@@ -10,6 +10,12 @@ class CourseType extends Model
         'name_th',
         'name_en',
         'description',
+        'grading_scheme_id',
         'status',
     ];
+
+    public function gradingScheme()
+    {
+        return $this->belongsTo(GradingScheme::class, 'grading_scheme_id');
+    }
 }

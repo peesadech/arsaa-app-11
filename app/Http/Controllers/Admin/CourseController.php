@@ -8,6 +8,7 @@ use App\Models\Grade;
 use App\Models\Semester;
 use App\Models\SubjectGroup;
 use App\Models\CourseType;
+use App\Models\GradingScheme;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -65,7 +66,8 @@ class CourseController extends Controller
         $semesters = Semester::all();
         $subjectGroups = SubjectGroup::where('status', 1)->get();
         $courseTypes = CourseType::where('status', 1)->get();
-        return view('admin.courses.save', compact('grades', 'semesters', 'subjectGroups', 'courseTypes'));
+        $gradingSchemes = GradingScheme::where('status', 1)->get();
+        return view('admin.courses.save', compact('grades', 'semesters', 'subjectGroups', 'courseTypes', 'gradingSchemes'));
     }
 
     public function store(Request $request)
@@ -76,6 +78,7 @@ class CourseController extends Controller
             'semester_id' => 'required|exists:semesters,id',
             'subject_group_id' => 'required|exists:subject_groups,id',
             'course_type_id' => 'required|exists:course_types,id',
+            'grading_scheme_id' => 'nullable|exists:grading_schemes,id',
             'periods_per_week' => 'required|integer|min:1|max:20',
             'periods_per_session' => 'required|integer|min:1|max:10',
             'preferred_days' => 'nullable|array',
@@ -95,7 +98,8 @@ class CourseController extends Controller
         $semesters = Semester::all();
         $subjectGroups = SubjectGroup::where('status', 1)->get();
         $courseTypes = CourseType::where('status', 1)->get();
-        return view('admin.courses.save', compact('course', 'grades', 'semesters', 'subjectGroups', 'courseTypes'));
+        $gradingSchemes = GradingScheme::where('status', 1)->get();
+        return view('admin.courses.save', compact('course', 'grades', 'semesters', 'subjectGroups', 'courseTypes', 'gradingSchemes'));
     }
 
     public function update(Request $request, $id)
@@ -107,6 +111,7 @@ class CourseController extends Controller
             'semester_id' => 'required|exists:semesters,id',
             'subject_group_id' => 'required|exists:subject_groups,id',
             'course_type_id' => 'required|exists:course_types,id',
+            'grading_scheme_id' => 'nullable|exists:grading_schemes,id',
             'periods_per_week' => 'required|integer|min:1|max:20',
             'periods_per_session' => 'required|integer|min:1|max:10',
             'preferred_days' => 'nullable|array',

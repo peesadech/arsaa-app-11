@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Teacher extends Model
 {
     protected $fillable = [
+        'user_id',
         'name',
         'email',
         'password',
@@ -24,6 +25,11 @@ class Teacher extends Model
         'password',
         'remember_token',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function courses()
     {
@@ -58,6 +64,27 @@ class Teacher extends Model
             ->where('academic_year_id', $yearId)
             ->where('semester_id', $semesterId)
             ->first();
+    }
+
+    /**
+     * วิชาที่เปิดสอนในเทอมนั้นที่ครูคนนี้สอน (pivot global + วิชารายเทอม)
+     */
+    public function openedCoursesForTerm(int $yearId, int $semesterId)
+    {
+        $courseIds = $this->courses()->pluck('courses.id')
+            ->merge(
+                TeacherTermCourse::where('teacher_id', $this->id)
+                    ->where('academic_year_id', $yearId)
+                    ->where('semester_id', $semesterId)
+                    ->pluck('course_id')
+            )
+            ->unique();
+
+        return OpenedCourse::where('academic_year_id', $yearId)
+            ->where('semester_id', $semesterId)
+            ->whereIn('course_id', $courseIds)
+            ->with('course.subjectGroup', 'grade', 'classroom')
+            ->get();
     }
 
     public function isSchedulableForTerm(int $yearId, int $semesterId): bool

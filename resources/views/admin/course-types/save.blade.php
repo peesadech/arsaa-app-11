@@ -142,6 +142,36 @@
                         @enderror
                     </div>
 
+                    <!-- Grading Scheme (default ของประเภทวิชานี้) -->
+                    <div class="space-y-2">
+                        <label for="grading_scheme_id" class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
+                            {{ __('Grading Scheme') }} <span class="normal-case font-normal text-gray-400">({{ __('default for courses of this type') }})</span>
+                        </label>
+                        <div class="group relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 {{ $focusText }} transition-colors">
+                                <i class="fas fa-award text-sm"></i>
+                            </div>
+                            <select
+                                id="grading_scheme_id"
+                                name="grading_scheme_id"
+                                class="block w-full pl-10 pr-10 py-4 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white appearance-none focus:outline-none focus:ring-0 {{ $focusRing }} focus:bg-white dark:focus:bg-[#3a3b3c] transition-all duration-200"
+                            >
+                                <option value="">{{ __('— None —') }}</option>
+                                @foreach($gradingSchemes as $scheme)
+                                    <option value="{{ $scheme->id }}" {{ old('grading_scheme_id', $isEdit ? $courseType->grading_scheme_id : '') == $scheme->id ? 'selected' : '' }}>
+                                        {{ $scheme->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                                <i class="fas fa-chevron-down text-sm"></i>
+                            </div>
+                        </div>
+                        @error('grading_scheme_id')
+                            <p class="text-[10px] font-bold text-rose-500 mt-1 px-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Status -->
                     <div class="space-y-3">
                         <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">

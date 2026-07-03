@@ -42,6 +42,22 @@
             </div>
         </div>
 
+        {{-- Scheduled periods warning (สำหรับ flow ครูลาออก/สอนแทน) --}}
+        @if(($scheduledPeriodsCount ?? 0) > 0)
+        <div class="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl flex flex-wrap items-center gap-3">
+            <i class="fas fa-exclamation-triangle text-amber-500"></i>
+            <div class="flex-1 text-sm text-amber-700 dark:text-amber-300">
+                {{ __('This teacher has :count periods in the active timetable for this term', ['count' => $scheduledPeriodsCount]) }}
+                @if(!$termStatus->can_be_scheduled)
+                <span class="font-bold">— {{ __('but is not schedulable. Please assign substitutes.') }}</span>
+                @endif
+            </div>
+            <a href="{{ route('admin.teacher-substitution.show', $teacher->id) }}" class="btn-app">
+                <i class="fas fa-exchange-alt text-[10px]"></i> {{ __('Manage Substitution') }}
+            </a>
+        </div>
+        @endif
+
         {{-- Form --}}
         <form id="termForm" action="{{ route('admin.teacher-term-status.update', $teacher->id) }}" method="POST">
             @csrf

@@ -28,9 +28,19 @@ use App\Http\Controllers\Admin\SubjectGroupController;
 use App\Http\Controllers\Admin\BuildingController;
 use App\Http\Controllers\Admin\FloorController;
 use App\Http\Controllers\Admin\CourseTypeController;
+use App\Http\Controllers\Admin\GradingSchemeController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\TeacherTermStatusController;
+use App\Http\Controllers\Admin\TeacherSubstitutionController;
+use App\Http\Controllers\Admin\TermSetupController;
+use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\StudentMasterDataController;
+use App\Http\Controllers\Admin\StudentEnrollmentController;
+use App\Http\Controllers\Admin\StudentScoreController;
+use App\Http\Controllers\Admin\StudentReportController;
+use App\Http\Controllers\Teacher\MyScoreController;
+use App\Http\Controllers\Teacher\TeacherDashboardController;
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\TimetableController;
 use App\Http\Controllers\Admin\TimetableExportController;
@@ -62,6 +72,9 @@ Route::get('/home', function () {
         if ($roles->intersect(['SUPERADMIN', 'ADMIN'])->isNotEmpty()) {
             return redirect()->route('admin.dashboard');
         }
+        if ($roles->contains('TEACHER')) {
+            return redirect()->route('teacher.dashboard');
+        }
     }
     return redirect()->route('profile.index');
 })->middleware('auth')->name('home');
@@ -73,6 +86,14 @@ Route::group(['middleware' => ['auth']], function () {
 
 // Language Switcher (any user)
 Route::get('/locale/{code}', [LanguageController::class, 'switchLocale'])->name('locale.switch');
+
+// Teacher area — dashboard + บันทึกคะแนนเฉพาะวิชาที่ตัวเองสอน
+Route::middleware(['auth', 'role:Teacher'])->group(function () {
+    Route::get('/teacher/dashboard', [TeacherDashboardController::class, 'index'])->name('teacher.dashboard');
+    Route::get('/teacher/scores', [MyScoreController::class, 'index'])->name('teacher.scores.index');
+    Route::get('/teacher/scores/{openedCourseId}', [MyScoreController::class, 'entry'])->name('teacher.scores.entry');
+    Route::post('/teacher/scores/{openedCourseId}', [MyScoreController::class, 'save'])->name('teacher.scores.save');
+});
 
 // SuperAdmin only
 Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
@@ -156,6 +177,15 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
     Route::get('/admin/course-types/{id}/edit', [CourseTypeController::class, 'edit'])->name('admin.course-types.edit');
     Route::put('/admin/course-types/{id}', [CourseTypeController::class, 'update'])->name('admin.course-types.update');
     Route::delete('/admin/course-types/{id}', [CourseTypeController::class, 'destroy'])->name('admin.course-types.destroy');
+
+    // Grading Schemes (รูปแบบการคิดเกรด)
+    Route::get('/admin/grading-schemes', [GradingSchemeController::class, 'index'])->name('admin.grading-schemes.index');
+    Route::get('/admin/grading-schemes/data', [GradingSchemeController::class, 'data'])->name('admin.grading-schemes.data');
+    Route::get('/admin/grading-schemes/create', [GradingSchemeController::class, 'create'])->name('admin.grading-schemes.create');
+    Route::post('/admin/grading-schemes', [GradingSchemeController::class, 'store'])->name('admin.grading-schemes.store');
+    Route::get('/admin/grading-schemes/{id}/edit', [GradingSchemeController::class, 'edit'])->name('admin.grading-schemes.edit');
+    Route::put('/admin/grading-schemes/{id}', [GradingSchemeController::class, 'update'])->name('admin.grading-schemes.update');
+    Route::delete('/admin/grading-schemes/{id}', [GradingSchemeController::class, 'destroy'])->name('admin.grading-schemes.destroy');
 
     // Rooms
     Route::get('/admin/rooms', [RoomController::class, 'index'])->name('admin.rooms.index');
@@ -267,6 +297,7 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::get('/admin/teachers/search-courses', [TeacherController::class, 'searchCourses'])->name('admin.teachers.search-courses');
     Route::get('/admin/teachers/schedule-data', [TeacherController::class, 'scheduleData'])->name('admin.teachers.schedule-data');
     Route::get('/admin/teachers/create', [TeacherController::class, 'create'])->name('admin.teachers.create');
+    Route::post('/admin/teachers/create-accounts', [TeacherController::class, 'createAccounts'])->name('admin.teachers.create-accounts');
     Route::post('/admin/teachers', [TeacherController::class, 'store'])->name('admin.teachers.store');
     Route::get('/admin/teachers/{id}/edit', [TeacherController::class, 'edit'])->name('admin.teachers.edit');
     Route::put('/admin/teachers/{id}', [TeacherController::class, 'update'])->name('admin.teachers.update');
@@ -279,6 +310,47 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::put('/admin/teacher-term-status/{teacherId}', [TeacherTermStatusController::class, 'update'])->name('admin.teacher-term-status.update');
     Route::post('/admin/teacher-term-status/bulk-initialize', [TeacherTermStatusController::class, 'bulkInitialize'])->name('admin.teacher-term-status.bulk-initialize');
     Route::post('/admin/teacher-term-status/bulk-update', [TeacherTermStatusController::class, 'bulkUpdate'])->name('admin.teacher-term-status.bulk-update');
+
+    Route::get('/admin/teacher-substitution/{teacherId}', [TeacherSubstitutionController::class, 'show'])->name('admin.teacher-substitution.show');
+    Route::post('/admin/teacher-substitution/{teacherId}', [TeacherSubstitutionController::class, 'apply'])->name('admin.teacher-substitution.apply');
+
+    Route::get('/admin/term-setup', [TermSetupController::class, 'index'])->name('admin.term-setup.index');
+    Route::get('/admin/term-setup/existing', [TermSetupController::class, 'existing'])->name('admin.term-setup.existing');
+    Route::post('/admin/term-setup/clone', [TermSetupController::class, 'cloneFromTerm'])->name('admin.term-setup.clone');
+
+    // ===== Student Module =====
+    Route::get('/admin/students', [StudentController::class, 'index'])->name('admin.students.index');
+    Route::get('/admin/students/data', [StudentController::class, 'data'])->name('admin.students.data');
+    Route::get('/admin/students/create', [StudentController::class, 'create'])->name('admin.students.create');
+    Route::post('/admin/students', [StudentController::class, 'store'])->name('admin.students.store');
+    Route::get('/admin/students/{id}/edit', [StudentController::class, 'edit'])->name('admin.students.edit');
+    Route::put('/admin/students/{id}', [StudentController::class, 'update'])->name('admin.students.update');
+    Route::delete('/admin/students/{id}', [StudentController::class, 'destroy'])->name('admin.students.destroy');
+
+    Route::get('/admin/student-master', [StudentMasterDataController::class, 'index'])->name('admin.student-master.index');
+    Route::post('/admin/student-master', [StudentMasterDataController::class, 'store'])->name('admin.student-master.store');
+    Route::put('/admin/student-master/{id}', [StudentMasterDataController::class, 'update'])->name('admin.student-master.update');
+    Route::delete('/admin/student-master/{id}', [StudentMasterDataController::class, 'destroy'])->name('admin.student-master.destroy');
+    Route::post('/admin/student-master/grade-settings', [StudentMasterDataController::class, 'storeGradeSetting'])->name('admin.student-master.grade-settings.store');
+    Route::put('/admin/student-master/grade-settings/{id}', [StudentMasterDataController::class, 'updateGradeSetting'])->name('admin.student-master.grade-settings.update');
+    Route::delete('/admin/student-master/grade-settings/{id}', [StudentMasterDataController::class, 'destroyGradeSetting'])->name('admin.student-master.grade-settings.destroy');
+
+    Route::get('/admin/student-enrollments', [StudentEnrollmentController::class, 'index'])->name('admin.student-enrollments.index');
+    Route::get('/admin/student-enrollments/search', [StudentEnrollmentController::class, 'searchStudents'])->name('admin.student-enrollments.search');
+    Route::post('/admin/student-enrollments', [StudentEnrollmentController::class, 'store'])->name('admin.student-enrollments.store');
+    Route::post('/admin/student-enrollments/{id}/move', [StudentEnrollmentController::class, 'move'])->name('admin.student-enrollments.move');
+    Route::post('/admin/student-enrollments/{id}/remove', [StudentEnrollmentController::class, 'remove'])->name('admin.student-enrollments.remove');
+
+    Route::get('/admin/student-scores', [StudentScoreController::class, 'index'])->name('admin.student-scores.index');
+    Route::get('/admin/student-scores/{openedCourseId}', [StudentScoreController::class, 'entry'])->name('admin.student-scores.entry');
+    Route::post('/admin/student-scores/{openedCourseId}', [StudentScoreController::class, 'save'])->name('admin.student-scores.save');
+
+    Route::get('/admin/student-reports', [StudentReportController::class, 'index'])->name('admin.student-reports.index');
+    Route::get('/admin/student-reports/students-csv', [StudentReportController::class, 'studentsCsv'])->name('admin.student-reports.students-csv');
+    Route::get('/admin/student-reports/profile/{id}', [StudentReportController::class, 'profile'])->name('admin.student-reports.profile');
+    Route::get('/admin/student-reports/transcript/{id}', [StudentReportController::class, 'transcript'])->name('admin.student-reports.transcript');
+    Route::get('/admin/student-reports/class-scores', [StudentReportController::class, 'classScores'])->name('admin.student-reports.class-scores');
+    Route::get('/admin/student-reports/incomplete-documents', [StudentReportController::class, 'incompleteDocuments'])->name('admin.student-reports.incomplete-documents');
 
     // User Management
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');

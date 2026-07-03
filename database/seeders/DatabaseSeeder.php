@@ -30,6 +30,9 @@ class DatabaseSeeder extends Seeder
         );
         $admin->assignRole('SuperAdmin');
 
-        $this->call(LanguageSeeder::class);
+        $this->call([
+            LanguageSeeder::class,
+            StudentMasterDataSeeder::class,
+        ]);
     }
 }

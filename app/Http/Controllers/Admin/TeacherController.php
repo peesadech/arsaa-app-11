@@ -10,13 +10,18 @@ use App\Models\GlobalSchedule;
 use App\Models\Grade;
 use App\Models\SubjectGroup;
 use App\Models\Semester;
+use App\Services\TeacherAccountService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class TeacherController extends Controller
 {
+    public function __construct(private TeacherAccountService $accountService)
+    {
+    }
     public function index()
     {
         return view('admin.teachers.index');
@@ -97,11 +102,18 @@ class TeacherController extends Controller
             $data['image_path'] = $this->handleImageUpload($request->input('image_base64'));
         }
 
-        $teacher = Teacher::create($data);
+        $teacher = DB::transaction(function () use ($data, $request) {
+            $teacher = Teacher::create($data);
 
-        if ($request->has('courses')) {
-            $teacher->courses()->sync($request->input('courses'));
-        }
+            if ($request->has('courses')) {
+                $teacher->courses()->sync($request->input('courses'));
+            }
+
+            // สร้างบัญชี login (users + role Teacher) ให้อัตโนมัติ
+            $this->accountService->syncAccount($teacher);
+
+            return $teacher;
+        });
 
         return redirect()->route('admin.teachers.index')->with('status', 'Teacher created successfully!');
     }
@@ -151,8 +163,13 @@ class TeacherController extends Controller
             $data['image_path'] = $this->handleImageUpload($request->input('image_base64'));
         }
 
-        $teacher->update($data);
-        $teacher->courses()->sync($request->input('courses', []));
+        DB::transaction(function () use ($teacher, $data, $request) {
+            $teacher->update($data);
+            $teacher->courses()->sync($request->input('courses', []));
+
+            // sync ชื่อ/email/รหัสผ่านไปบัญชี login
+            $this->accountService->syncAccount($teacher->fresh());
+        });
 
         return redirect()->route('admin.teachers.index')->with('status', 'Teacher updated successfully!');
     }
@@ -166,8 +183,20 @@ class TeacherController extends Controller
             Storage::disk('public')->delete($storagePath);
         }
 
+        $this->accountService->deleteAccount($teacher);
         $teacher->delete();
         return redirect()->route('admin.teachers.index')->with('status', 'Teacher deleted successfully!');
+    }
+
+    /**
+     * สร้างบัญชี login ให้ครูเก่าที่ยังไม่มี (backfill)
+     */
+    public function createAccounts()
+    {
+        $count = $this->accountService->createMissingAccounts();
+
+        return redirect()->route('admin.teachers.index')
+            ->with('status', __(':count teacher accounts created', ['count' => $count]));
     }
 
     public function searchCourses(Request $request)

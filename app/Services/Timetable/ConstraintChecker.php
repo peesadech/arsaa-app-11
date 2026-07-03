@@ -45,11 +45,11 @@ class ConstraintChecker
         if ($teacherClash) {
             $clashCourse = $teacherClash->openedCourse->course->name ?? '?';
             $clashClass = $teacherClash->openedCourse->classroom->name ?? '?';
-            $teacher = $this->data->getTeacher($teacherId);
+            $teacherName = $this->data->getTeacher($teacherId)?->name ?? '?';
             $violations[] = new Violation(
                 'teacher_clash',
                 'hard',
-                "ครู{$teacher->name} สอนวิชา{$clashCourse} ห้อง {$clashClass} ในคาบนี้แล้ว"
+                "ครู{$teacherName} สอนวิชา{$clashCourse} ห้อง {$clashClass} ในคาบนี้แล้ว"
             );
         }
 
@@ -98,11 +98,11 @@ class ConstraintChecker
 
         // Hard: Teacher unavailable
         if ($eduLevelId && !$this->data->isTeacherAvailable($teacherId, $eduLevelId, $day, $period)) {
-            $teacher = $this->data->getTeacher($teacherId);
+            $teacherName = $this->data->getTeacher($teacherId)?->name ?? '?';
             $violations[] = new Violation(
                 'teacher_unavailable',
                 'hard',
-                "ครู{$teacher->name} ไม่ว่างในวัน{$this->dayName($day)} คาบที่ {$period}"
+                "ครู{$teacherName} ไม่ว่างในวัน{$this->dayName($day)} คาบที่ {$period}"
             );
         }
 
@@ -170,11 +170,11 @@ class ConstraintChecker
                 ->when($excludeEntryId, fn($q) => $q->where('id', '!=', $excludeEntryId))
                 ->count();
             if ($teacherPeriodsToday >= $termStatus->max_periods_per_day) {
-                $teacher = $this->data->getTeacher($teacherId);
+                $teacherName = $this->data->getTeacher($teacherId)?->name ?? '?';
                 $violations[] = new Violation(
                     'teacher_max_periods_day',
                     'soft',
-                    "ครู{$teacher->name} ถึงขีดจำกัด {$termStatus->max_periods_per_day} คาบ/วัน แล้ว"
+                    "ครู{$teacherName} ถึงขีดจำกัด {$termStatus->max_periods_per_day} คาบ/วัน แล้ว"
                 );
             }
         }
@@ -186,11 +186,11 @@ class ConstraintChecker
                 ->when($excludeEntryId, fn($q) => $q->where('id', '!=', $excludeEntryId))
                 ->count();
             if ($teacherPeriodsWeek >= $termStatus->max_periods_per_week) {
-                $teacher = $this->data->getTeacher($teacherId);
+                $teacherName = $this->data->getTeacher($teacherId)?->name ?? '?';
                 $violations[] = new Violation(
                     'teacher_max_periods_week',
                     'soft',
-                    "ครู{$teacher->name} ถึงขีดจำกัด {$termStatus->max_periods_per_week} คาบ/สัปดาห์ แล้ว"
+                    "ครู{$teacherName} ถึงขีดจำกัด {$termStatus->max_periods_per_week} คาบ/สัปดาห์ แล้ว"
                 );
             }
         }

@@ -12,14 +12,17 @@ use App\Models\SubjectGroup;
 use App\Models\Teacher;
 use App\Models\TeacherTermCourse;
 use App\Models\TeacherTermStatus;
+use App\Services\TeacherSubstitutionService;
 use App\Services\TeacherTermStatusService;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
 class TeacherTermStatusController extends Controller
 {
-    public function __construct(private TeacherTermStatusService $service)
-    {
+    public function __construct(
+        private TeacherTermStatusService $service,
+        private TeacherSubstitutionService $substitutionService,
+    ) {
     }
 
     private function resolveYearSemester(Request $request): array
@@ -172,10 +175,17 @@ class TeacherTermStatusController extends Controller
         // Term unavailable periods (fallback to global)
         $termUnavailable = $termStatus->unavailable_periods ?? $teacher->unavailable_periods ?? [];
 
+        // จำนวนคาบที่ครูคนนี้ถูกจัดไว้ในตารางเรียนที่ใช้งานอยู่ (สำหรับ flow สอนแทน)
+        $activeSolution = $this->substitutionService->getActiveSolution($yearId, $semesterId);
+        $scheduledPeriodsCount = $activeSolution
+            ? $this->substitutionService->getAffectedEntries($activeSolution->id, $teacherId)->count()
+            : 0;
+
         return view('admin.teacher-term-status.save', compact(
             'teacher', 'academicYear', 'semester', 'termStatus', 'logs',
             'currentCourseIds', 'hasTermCourses', 'selectedCourses',
-            'educationLevels', 'subjectGroups', 'semesters', 'termUnavailable'
+            'educationLevels', 'subjectGroups', 'semesters', 'termUnavailable',
+            'scheduledPeriodsCount'
         ));
     }
 
@@ -227,6 +237,20 @@ class TeacherTermStatusController extends Controller
                 'semester_id' => $semesterId,
                 'course_id' => $courseId,
             ]);
+        }
+
+        // ถ้าครูถูกปิดไม่ให้จัดตาราง แต่ยังมีคาบค้างในตารางเรียนที่ใช้งานอยู่ → พาไป flow สอนแทน
+        $termStatus = $termStatus->fresh();
+        if (!$termStatus->can_be_scheduled) {
+            $activeSolution = $this->substitutionService->getActiveSolution($yearId, $semesterId);
+            $affectedCount = $activeSolution
+                ? $this->substitutionService->getAffectedEntries($activeSolution->id, $teacherId)->count()
+                : 0;
+
+            if ($affectedCount > 0) {
+                return redirect()->route('admin.teacher-substitution.show', $teacherId)
+                    ->with('status', __('Status updated. This teacher still has :count scheduled periods — please assign substitutes.', ['count' => $affectedCount]));
+            }
         }
 
         return redirect()->route('admin.teacher-term-status.edit', $teacherId)
