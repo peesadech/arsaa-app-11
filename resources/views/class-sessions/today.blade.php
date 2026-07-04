@@ -1,4 +1,4 @@
-<x-layouts.admin :header="__('Class Periods')" :subheader="$date->isToday() ? __('Today') . ' · ' . $date->format('D, d M Y') : $date->format('D, d M Y')">
+<x-layouts.admin :header="__('Attendance')" :subheader="$date->isToday() ? __('Today') . ' · ' . $date->format('D, d M Y') : $date->format('D, d M Y')">
     <x-slot name="actions">
         <form method="GET" action="{{ route('class-sessions.today') }}" class="flex items-center gap-2" data-no-progress>
             <input type="date" name="date" value="{{ $date->toDateString() }}" onchange="this.form.submit()"
