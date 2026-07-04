@@ -140,6 +140,8 @@
         @include('layouts.partials.academic-modals')
     @endauth
 
+    @include('layouts.partials.progress')
+
     @stack('scripts')
 </body>
 </html>

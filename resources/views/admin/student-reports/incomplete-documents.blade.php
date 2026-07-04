@@ -29,7 +29,7 @@
         <tr>
             <td class="center">{{ $i + 1 }}</td>
             <td>{{ $student->student_code }}</td>
-            <td>{{ $student->name_th }}</td>
+            <td>{{ $student->name_th }}@if($student->name_cn)<br><span style="color:#666">{{ $student->name_cn }}</span>@endif</td>
             <td class="center"><span class="badge green">{{ $student->received_count }}/{{ $totalTypes }}</span></td>
             <td class="center"><span class="badge red">{{ $student->missing_count }}</span></td>
             <td>{{ $missing->pluck('name_th')->join(', ') }}</td>

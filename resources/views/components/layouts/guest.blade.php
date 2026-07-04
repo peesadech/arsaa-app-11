@@ -61,6 +61,7 @@
     </div>
 
     <x-flash />
+    @include('layouts.partials.progress')
     @stack('scripts')
 </body>
 </html>

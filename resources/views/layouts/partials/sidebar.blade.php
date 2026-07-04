@@ -9,6 +9,7 @@
     // เมนูสำหรับครู (ไม่ใช่ admin) — เห็นเฉพาะของตัวเอง
     $teacherNav = [
         ['label' => __('Dashboard'), 'route' => 'teacher.dashboard', 'icon' => 'home'],
+        ['label' => __('Class Periods'), 'route' => 'class-sessions.today', 'icon' => 'clipboard'],
         ['label' => __('My Scores'), 'route' => 'teacher.scores.index', 'icon' => 'award'],
     ];
 
@@ -17,30 +18,13 @@
     $adminNav = [
         ['label' => __('Dashboard'), 'route' => 'admin.dashboard', 'icon' => 'home'],
 
-        ['label' => __('Academic'), 'icon' => 'academic', 'children' => [
-            ['label' => __('Academic Years'),  'route' => 'admin.academic-years.index'],
-            ['label' => __('Semesters'),       'route' => 'admin.semesters.index'],
-            ['label' => __('Education Levels'),'route' => 'admin.education-levels.index'],
-            ['label' => __('Subject Groups'),  'route' => 'admin.subject-groups.index'],
-            ['label' => __('Course Types'),    'route' => 'admin.course-types.index'],
-            ['label' => __('Courses'),         'route' => 'admin.courses.index'],
-            ['label' => __('Opened Courses'),  'route' => 'admin.opened-courses.index'],
-            ['label' => __('Teachers'),        'route' => 'admin.teachers.index'],
-            ['label' => __('Teacher Term Status'), 'route' => 'admin.teacher-term-status.index'],
-        ]],
+        ['label' => __('Timetable'), 'route' => 'admin.timetable.index', 'icon' => 'calendar'],
 
-        ['label' => __('Timetable'), 'icon' => 'calendar', 'children' => [
-            ['label' => __('Timetable'),        'route' => 'admin.timetable.index'],
-            ['label' => __('Global Schedule'),  'route' => 'admin.global-schedule.index'],
-            ['label' => __('Yearly Schedule'),  'route' => 'admin.yearly-schedule.index'],
-            ['label' => __('Term Setup'),       'route' => 'admin.term-setup.index'],
-        ]],
-
-        ['label' => __('Facilities'), 'icon' => 'building', 'children' => [
-            ['label' => __('Buildings'),  'route' => 'admin.buildings.index'],
-            ['label' => __('Floors'),     'route' => 'admin.floors.index'],
-            ['label' => __('Rooms'),      'route' => 'admin.rooms.index'],
-            ['label' => __('Classrooms'), 'route' => 'admin.classrooms.index'],
+        ['label' => __('Yearly/Semester'), 'icon' => 'cog', 'children' => [
+            ['label' => __('Global Schedule'),           'route' => 'admin.global-schedule.index'],
+            ['label' => __('Yearly/Semester Schedule'),  'route' => 'admin.yearly-schedule.index'],
+            ['label' => __('Semester Setup'),            'route' => 'admin.term-setup.index'],
+            ['label' => __('Teacher Term Status'),       'route' => 'admin.teacher-term-status.index'],
         ]],
 
         ['label' => __('Student'), 'icon' => 'users', 'children' => [
@@ -49,8 +33,8 @@
         ]],
 
         ['label' => __('Teaching'), 'icon' => 'clipboard', 'children' => [
-            ['label' => __('Class Periods'),   'disabled' => true],
-            ['label' => __('Attendance'),      'disabled' => true],
+            ['label' => __('Class Periods'),   'route' => 'class-sessions.today'],
+            ['label' => __('Attendance'),      'route' => 'class-sessions.today'],
             ['label' => __('Teaching Log'),    'disabled' => true],
             ['label' => __('Homework'),        'disabled' => true],
         ]],
@@ -61,18 +45,35 @@
             ['label' => __('Academic Results'),'route' => 'admin.student-reports.class-scores'],
         ]],
 
-        ['label' => __('Master Data'), 'icon' => 'layers', 'children' => [
-            ['label' => __('Grade Levels'),        'route' => 'admin.grades.index'],
-            ['label' => __('Student Master Data'), 'route' => 'admin.student-master.index'],
-            ['label' => __('Student Status'),      'disabled' => true],
-            ['label' => __('Attendance Status'),   'disabled' => true],
-            ['label' => __('Score Type'),          'disabled' => true],
-        ]],
-
         ['label' => __('Reports'), 'icon' => 'chart', 'children' => [
+            ['label' => __('Attendance Report'),    'route' => 'admin.attendance-reports.index'],
             ['label' => __('Student Reports'),      'route' => 'admin.student-reports.index'],
             ['label' => __('Academic Results'),     'route' => 'admin.student-reports.class-scores'],
             ['label' => __('Incomplete Documents'), 'route' => 'admin.student-reports.incomplete-documents'],
+        ]],
+
+        // System Config — รวม Academic + Facilities + Master Data เดิม (อยู่เหนือ Settings)
+        ['label' => __('System Config'), 'icon' => 'layers', 'children' => [
+            // Academic
+            ['label' => __('Academic Years'),  'route' => 'admin.academic-years.index'],
+            ['label' => __('Semesters'),       'route' => 'admin.semesters.index'],
+            ['label' => __('Education Levels'),'route' => 'admin.education-levels.index'],
+            ['label' => __('Subject Groups'),  'route' => 'admin.subject-groups.index'],
+            ['label' => __('Course Types'),    'route' => 'admin.course-types.index'],
+            ['label' => __('Courses'),         'route' => 'admin.courses.index'],
+            ['label' => __('Opened Courses'),  'route' => 'admin.opened-courses.index'],
+            ['label' => __('Teachers'),        'route' => 'admin.teachers.index'],
+            // Facilities
+            ['label' => __('Buildings'),  'route' => 'admin.buildings.index'],
+            ['label' => __('Floors'),     'route' => 'admin.floors.index'],
+            ['label' => __('Rooms'),      'route' => 'admin.rooms.index'],
+            ['label' => __('Classrooms'), 'route' => 'admin.classrooms.index'],
+            // Master Data
+            ['label' => __('Grade Levels'),        'route' => 'admin.grades.index'],
+            ['label' => __('Student Master Data'), 'route' => 'admin.student-master.index'],
+            ['label' => __('Attendance Status'),   'route' => 'admin.attendance-statuses.index'],
+            ['label' => __('Student Status'),      'disabled' => true],
+            ['label' => __('Score Type'),          'disabled' => true],
         ]],
 
         ['label' => __('Settings'), 'icon' => 'cog', 'children' => [

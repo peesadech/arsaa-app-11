@@ -72,6 +72,9 @@
                             <td class="py-2 pr-3 text-xs text-slate-400">{{ $i + 1 }}</td>
                             <td class="py-2 pr-3">
                                 <div class="text-sm font-semibold text-slate-800">{{ $student->name_th }}</div>
+                                @if($student->name_cn)
+                                    <div class="text-xs text-slate-500">{{ $student->name_cn }}</div>
+                                @endif
                                 <div class="text-xs text-slate-400">{{ $student->student_code }}</div>
                             </td>
                             <td class="py-2 pr-3 text-right"><input type="number" name="scores[{{ $student->id }}][score_collect]" value="{{ $score->score_collect ?? '' }}" step="0.01" min="0" max="100" class="{{ $scoreInputClass }}" data-part></td>

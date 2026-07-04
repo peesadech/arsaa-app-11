@@ -29,7 +29,7 @@
         <tr>
             <td class="center">{{ $i + 1 }}</td>
             <td>{{ $enrollment->student->student_code ?? '?' }}</td>
-            <td>{{ $enrollment->student->name_th ?? '?' }}</td>
+            <td>{{ $enrollment->student->name_th ?? '?' }}@if($enrollment->student->name_cn ?? false)<br><span style="color:#666">{{ $enrollment->student->name_cn }}</span>@endif</td>
             @foreach($openedCourses as $oc)
                 @php $score = $scores->get($enrollment->student_id . '-' . $oc->id); @endphp
                 <td class="center">

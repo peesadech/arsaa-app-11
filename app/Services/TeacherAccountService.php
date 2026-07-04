@@ -31,12 +31,14 @@ class TeacherAccountService
             $user->name = $teacher->name;
             $user->email = $teacher->email;
             $user->password = $teacher->password; // hash เดียวกับตาราง teachers
+            $user->status = $teacher->status;     // ปิดครู = ปิด login (1=active, 2=inactive)
             $user->save();
         } else {
             $user = new User();
             $user->name = $teacher->name;
             $user->email = $teacher->email;
             $user->password = $teacher->password;
+            $user->status = $teacher->status;
             $user->save();
         }
 

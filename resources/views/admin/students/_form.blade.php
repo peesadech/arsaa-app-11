@@ -352,6 +352,56 @@
             </div>
             @endif
         </x-card>
+
+        {{-- Attendance summary by subject --}}
+        @php
+            $attByCourse = app(\App\Services\ClassSessionService::class)->summaryByCourseForStudent($student->id);
+            $attThreshold = (float) config('attendance.min_percent', 80);
+        @endphp
+        <x-card>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-sm font-semibold text-slate-700 uppercase tracking-wide">{{ __('Attendance Summary') }}</h2>
+            </div>
+            @if($attByCourse->isEmpty())
+            <p class="text-sm text-slate-400">{{ __('No attendance records yet') }}</p>
+            @else
+            <div class="overflow-x-auto">
+                <table class="w-full" style="min-width:640px">
+                    <thead>
+                        <tr class="text-left text-[10px] font-semibold text-slate-400 uppercase tracking-wide border-b border-slate-100">
+                            <th class="py-2 pr-3">{{ __('Course') }}</th>
+                            <th class="py-2 pr-3 text-center">{{ __('Sessions') }}</th>
+                            <th class="py-2 pr-3 text-center">{{ __('Present') }}</th>
+                            <th class="py-2 pr-3 text-center">{{ __('Late') }}</th>
+                            <th class="py-2 pr-3 text-center">{{ __('Leave') }}</th>
+                            <th class="py-2 pr-3 text-center">{{ __('Absent') }}</th>
+                            <th class="py-2 pr-3 text-center">{{ __('Activity') }}</th>
+                            <th class="py-2 text-center">{{ __('Attendance %') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($attByCourse as $row)
+                        <tr class="border-b border-slate-50 text-xs text-slate-600">
+                            <td class="py-2 pr-3 font-medium text-slate-800">{{ $row['course'] }}</td>
+                            <td class="py-2 pr-3 text-center">{{ $row['sessions'] }}</td>
+                            <td class="py-2 pr-3 text-center text-emerald-600 font-semibold">{{ $row['present'] }}</td>
+                            <td class="py-2 pr-3 text-center text-amber-600">{{ $row['late'] }}</td>
+                            <td class="py-2 pr-3 text-center text-blue-600">{{ $row['leave'] }}</td>
+                            <td class="py-2 pr-3 text-center text-red-600">{{ $row['absent'] }}</td>
+                            <td class="py-2 pr-3 text-center text-sky-600">{{ $row['activity'] }}</td>
+                            <td class="py-2 text-center">
+                                <span class="badge {{ $row['percent'] >= $attThreshold ? 'badge-green' : ($row['percent'] >= 60 ? 'badge-amber' : 'badge-red') }}">{{ $row['percent'] }}%</span>
+                                @if($row['sessions'] > 0 && $row['percent'] < $attThreshold)
+                                    <div class="text-[10px] font-bold text-red-500 mt-0.5">{{ __('Exam eligibility risk') }}</div>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @endif
+        </x-card>
     </div>
     @endif
 

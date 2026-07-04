@@ -44,6 +44,9 @@ use App\Http\Controllers\Teacher\TeacherDashboardController;
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\TimetableController;
 use App\Http\Controllers\Admin\TimetableExportController;
+use App\Http\Controllers\Admin\AttendanceStatusController;
+use App\Http\Controllers\Admin\AttendanceReportController;
+use App\Http\Controllers\ClassSessionController;
 use App\Http\Controllers\Api\RoleController as ApiRoleController;
 use App\Http\Controllers\Api\PermissionController as ApiPermissionController;
 use App\Http\Controllers\Api\UserRoleController as ApiUserRoleController;
@@ -93,6 +96,22 @@ Route::middleware(['auth', 'role:Teacher'])->group(function () {
     Route::get('/teacher/scores', [MyScoreController::class, 'index'])->name('teacher.scores.index');
     Route::get('/teacher/scores/{openedCourseId}', [MyScoreController::class, 'entry'])->name('teacher.scores.entry');
     Route::post('/teacher/scores/{openedCourseId}', [MyScoreController::class, 'save'])->name('teacher.scores.save');
+});
+
+// Class Session & Attendance — ใช้ได้ทั้งครูและ admin
+Route::middleware(['auth', 'role:Teacher|admin|SuperAdmin'])->group(function () {
+    Route::get('/class-sessions/today', [ClassSessionController::class, 'today'])->name('class-sessions.today');
+    Route::post('/class-sessions/open', [ClassSessionController::class, 'open'])->name('class-sessions.open');
+    Route::get('/class-sessions/{id}', [ClassSessionController::class, 'show'])->whereNumber('id')->name('class-sessions.show');
+    Route::post('/class-sessions/{id}/attendance', [ClassSessionController::class, 'saveAttendance'])->whereNumber('id')->name('class-sessions.save-attendance');
+    Route::post('/class-sessions/{id}/teaching-log', [ClassSessionController::class, 'saveTeachingLog'])->whereNumber('id')->name('class-sessions.save-teaching-log');
+    Route::post('/class-sessions/{id}/homework', [ClassSessionController::class, 'storeHomework'])->whereNumber('id')->name('class-sessions.store-homework');
+    Route::delete('/class-sessions/{id}/homework/{homeworkId}', [ClassSessionController::class, 'deleteHomework'])->whereNumber('id')->whereNumber('homeworkId')->name('class-sessions.delete-homework');
+    Route::post('/class-sessions/{id}/assessment', [ClassSessionController::class, 'storeAssessment'])->whereNumber('id')->name('class-sessions.store-assessment');
+    Route::delete('/class-sessions/{id}/assessment/{assessmentId}', [ClassSessionController::class, 'deleteAssessment'])->whereNumber('id')->whereNumber('assessmentId')->name('class-sessions.delete-assessment');
+    Route::post('/class-sessions/{id}/files', [ClassSessionController::class, 'uploadFile'])->whereNumber('id')->name('class-sessions.upload-file');
+    Route::delete('/class-sessions/{id}/files/{fileId}', [ClassSessionController::class, 'deleteFile'])->whereNumber('id')->whereNumber('fileId')->name('class-sessions.delete-file');
+    Route::post('/class-sessions/{id}/status', [ClassSessionController::class, 'updateStatus'])->whereNumber('id')->name('class-sessions.status');
 });
 
 // SuperAdmin only
@@ -226,6 +245,18 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     // Dashboard
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/user-assignments', [UserAssignmentController::class, 'index'])->name('admin.user-assignments');
+
+    // Attendance Status (Master Data)
+    Route::get('/admin/attendance-statuses', [AttendanceStatusController::class, 'index'])->name('admin.attendance-statuses.index');
+    Route::get('/admin/attendance-statuses/create', [AttendanceStatusController::class, 'create'])->name('admin.attendance-statuses.create');
+    Route::post('/admin/attendance-statuses', [AttendanceStatusController::class, 'store'])->name('admin.attendance-statuses.store');
+    Route::get('/admin/attendance-statuses/{id}/edit', [AttendanceStatusController::class, 'edit'])->name('admin.attendance-statuses.edit');
+    Route::put('/admin/attendance-statuses/{id}', [AttendanceStatusController::class, 'update'])->name('admin.attendance-statuses.update');
+    Route::delete('/admin/attendance-statuses/{id}', [AttendanceStatusController::class, 'destroy'])->name('admin.attendance-statuses.destroy');
+
+    // Attendance Report
+    Route::get('/admin/attendance-reports', [AttendanceReportController::class, 'index'])->name('admin.attendance-reports.index');
+    Route::get('/admin/attendance-reports/student/{studentId}', [AttendanceReportController::class, 'student'])->whereNumber('studentId')->name('admin.attendance-reports.student');
 
     // Opened Grades
     Route::get('/admin/dashboard/available-grades', [DashboardController::class, 'availableGrades'])->name('admin.dashboard.available-grades');
