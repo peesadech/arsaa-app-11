@@ -171,9 +171,9 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
 
     // Course Types
     Route::get('/admin/course-types', [CourseTypeController::class, 'index'])->name('admin.course-types.index');
-    Route::get('/admin/course-types/data', [CourseTypeController::class, 'data'])->name('admin.course-types.data');
     Route::get('/admin/course-types/create', [CourseTypeController::class, 'create'])->name('admin.course-types.create');
     Route::post('/admin/course-types', [CourseTypeController::class, 'store'])->name('admin.course-types.store');
+    Route::get('/admin/course-types/{id}', [CourseTypeController::class, 'show'])->whereNumber('id')->name('admin.course-types.show');
     Route::get('/admin/course-types/{id}/edit', [CourseTypeController::class, 'edit'])->name('admin.course-types.edit');
     Route::put('/admin/course-types/{id}', [CourseTypeController::class, 'update'])->name('admin.course-types.update');
     Route::delete('/admin/course-types/{id}', [CourseTypeController::class, 'destroy'])->name('admin.course-types.destroy');

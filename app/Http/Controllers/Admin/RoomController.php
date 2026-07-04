@@ -16,10 +16,48 @@ use Yajra\DataTables\Facades\DataTables;
 
 class RoomController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = Room::with(['building', 'floor', 'courses']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('building_id')) {
+            $query->where('building_id', $request->building_id);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where('room_number', 'like', "%{$s}%");
+        }
+
+        $sortBy = in_array($request->get('sort_by'), ['room_number', 'status', 'id'])
+            ? $request->get('sort_by') : 'id';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $rooms = $query->paginate($perPage)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.rooms._rows', compact('rooms'))->render(),
+                'meta' => [
+                    'total'        => $rooms->total(),
+                    'per_page'     => $rooms->perPage(),
+                    'current_page' => $rooms->currentPage(),
+                    'last_page'    => $rooms->lastPage(),
+                    'from'         => $rooms->firstItem() ?? 0,
+                    'to'           => $rooms->lastItem() ?? 0,
+                ],
+            ]);
+        }
+
         $buildings = Building::where('status', 1)->get();
-        return view('admin.rooms.index', compact('buildings'));
+
+        return view('admin.rooms.index', compact('rooms', 'buildings'));
     }
 
     public function data(Request $request)

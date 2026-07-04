@@ -22,9 +22,45 @@ class TeacherController extends Controller
     public function __construct(private TeacherAccountService $accountService)
     {
     }
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.teachers.index');
+        $query = Teacher::with(['courses.subjectGroup', 'user']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('name', 'like', "%{$s}%")
+                  ->orWhere('email', 'like', "%{$s}%");
+            });
+        }
+
+        $sortBy = in_array($request->get('sort_by'), ['name', 'email', 'status', 'id'])
+            ? $request->get('sort_by') : 'id';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $teachers = $query->paginate($perPage)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.teachers._rows', compact('teachers'))->render(),
+                'meta' => [
+                    'total'        => $teachers->total(),
+                    'per_page'     => $teachers->perPage(),
+                    'current_page' => $teachers->currentPage(),
+                    'last_page'    => $teachers->lastPage(),
+                    'from'         => $teachers->firstItem() ?? 0,
+                    'to'           => $teachers->lastItem() ?? 0,
+                ],
+            ]);
+        }
+
+        return view('admin.teachers.index', compact('teachers'));
     }
 
     public function data(Request $request)
@@ -75,7 +111,7 @@ class TeacherController extends Controller
         $subjectGroups = SubjectGroup::where('status', 1)->get();
         $semesters = Semester::all();
         $educationLevels = EducationLevel::where('status', 1)->get();
-        return view('admin.teachers.save', compact('subjectGroups', 'semesters', 'educationLevels'));
+        return view('admin.teachers.create', compact('subjectGroups', 'semesters', 'educationLevels'));
     }
 
     public function store(Request $request)
@@ -125,7 +161,7 @@ class TeacherController extends Controller
         $semesters = Semester::all();
         $educationLevels = EducationLevel::where('status', 1)->get();
         $teacherCourseIds = $teacher->courses->pluck('id')->toArray();
-        return view('admin.teachers.save', compact('teacher', 'subjectGroups', 'semesters', 'educationLevels', 'teacherCourseIds'));
+        return view('admin.teachers.edit', compact('teacher', 'subjectGroups', 'semesters', 'educationLevels', 'teacherCourseIds'));
     }
 
     public function update(Request $request, $id)

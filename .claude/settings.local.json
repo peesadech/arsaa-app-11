@@ -1,6 +1,25 @@
 {
   "permissions": {
+    "defaultMode": "acceptEdits",
+    "ask": [
+      "Bash(rm:*)",
+      "Bash(rmdir:*)",
+      "Bash(unlink:*)",
+      "PowerShell(Remove-Item:*)",
+      "PowerShell(ri:*)",
+      "PowerShell(del:*)",
+      "PowerShell(erase:*)",
+      "PowerShell(rd:*)",
+      "PowerShell(rm:*)"
+    ],
     "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash",
+      "PowerShell",
       "Bash(cp \"D:/myWork/arsaa-app/courseio/resources/js/components/ExampleComponent.vue\" \"D:/myWork/arsaa-app/arsaa-app/resources/js/components/ExampleComponent.vue\")",
       "Bash(cp \"D:/myWork/arsaa-app/courseio/resources/js/components/PermissionManager.vue\" \"D:/myWork/arsaa-app/arsaa-app/resources/js/components/PermissionManager.vue\")",
       "Bash(cp \"D:/myWork/arsaa-app/courseio/resources/js/components/PermissionTypeCreate.vue\" \"D:/myWork/arsaa-app/arsaa-app/resources/js/components/PermissionTypeCreate.vue\")",

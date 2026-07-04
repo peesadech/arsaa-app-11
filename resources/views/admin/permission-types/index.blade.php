@@ -1,357 +1,215 @@
-@extends('layouts.app')
+<x-layouts.admin :header="__('Permission Categories')" :subheader="__('Manage and organize your system access levels')">
+    <x-slot name="actions">
+        <x-button icon="plus" :href="route('admin.permission-types.create')">{{ __('Permission Category') }}</x-button>
+    </x-slot>
 
-@push('styles')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap4.min.css">
-    <style>
-        .dataTables_wrapper .dataTables_paginate .paginate_button {
-            padding: 0 !important;
-            margin: 0 !important;
-            border: none !important;
-        }
-        .dataTables_wrapper .dataTables_length select,
-        .dataTables_wrapper .dataTables_filter input {
-            border: 2px solid #f3f4f6 !important;
-            border-radius: 12px !important;
-            padding: 10px 16px !important;
-            outline: none !important;
-            height: auto !important;
-            font-weight: 500 !important;
-            background: white !important;
-        }
-        .dark .dataTables_wrapper .dataTables_length select,
-        .dark .dataTables_wrapper .dataTables_filter input {
-            background: #242526 !important;
-            border-color: #3a3b3c !important;
-            color: #e4e6eb !important;
-        }
-        .dataTables_wrapper .dataTables_filter input:focus {
-            border-color: #6366f1 !important;
-        }
-        .dark .dataTables_wrapper .dataTables_filter input:focus {
-            border-color: #818cf8 !important;
-        }
-        .dataTables_wrapper .dataTables_length {
-            width: 100% !important;
-            margin-bottom: 0 !important;
-        }
-        .dataTables_wrapper .dataTables_length label {
-            width: 100% !important;
-            display: flex !important;
-            align-items: center !important;
-            font-size: 0.875rem !important;
-            color: #6b7280 !important;
-            font-weight: 600 !important;
-        }
-        .dataTables_wrapper .dataTables_length select {
-            flex: 1 !important;
-            margin: 0 0.75rem !important;
-            max-width: 120px !important;
-            min-height: 46px !important;
-        }
-        .dataTables_wrapper .dataTables_filter {
-            width: 100% !important;
-        }
-        .dataTables_wrapper .dataTables_filter label {
-            width: 100% !important;
-            display: flex !important;
-            align-items: center !important;
-        }
-        .dataTables_wrapper .dataTables_filter input {
-            flex: 1 !important;
-            margin-left: 0 !important;
-        }
+    @push('styles')
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap4.min.css">
+        <style>
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+                padding: 0 !important; margin: 0 !important; border: none !important;
+            }
+            .dataTables_wrapper .dataTables_length select,
+            .dataTables_wrapper .dataTables_filter input {
+                border: 1px solid #e2e8f0 !important; border-radius: 0.5rem !important;
+                padding: 8px 14px !important; outline: none !important; height: auto !important;
+                font-weight: 500 !important; background: white !important; color: #334155 !important;
+            }
+            .dataTables_wrapper .dataTables_filter input:focus { border-color: #60a5fa !important; }
+            .dataTables_wrapper .dataTables_length { width: 100% !important; margin-bottom: 0 !important; }
+            .dataTables_wrapper .dataTables_length label {
+                width: 100% !important; display: flex !important; align-items: center !important;
+                font-size: 0.875rem !important; color: #64748b !important; font-weight: 500 !important;
+            }
+            .dataTables_wrapper .dataTables_length select {
+                flex: 1 !important; margin: 0 0.75rem !important; max-width: 120px !important; min-height: 42px !important;
+            }
+            .dataTables_wrapper .dataTables_filter { width: 100% !important; }
+            .dataTables_wrapper .dataTables_filter label { width: 100% !important; display: flex !important; align-items: center !important; }
+            .dataTables_wrapper .dataTables_filter input { flex: 1 !important; margin-left: 0 !important; }
+            table.dataTable thead th { border-bottom: 1px solid #f1f5f9 !important; }
+            table.dataTable.no-footer { border-bottom: none !important; }
+            .pagination .page-item.active .page-link {
+                background-color: #2563eb !important; border-color: #2563eb !important; color: white !important;
+                box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3) !important;
+            }
+            .pagination .page-link {
+                border-radius: 0.5rem !important; margin: 0 4px !important; font-weight: 600 !important;
+                color: #475569 !important; border: 1px solid #e2e8f0 !important; background: white;
+            }
+            table.dataTable tbody tr { background-color: transparent !important; }
+            .dt-buttons.btn-group { margin-bottom: 1.5rem; gap: 0.5rem; }
+            .dt-buttons .btn {
+                border-radius: 0.5rem !important; font-size: 0.75rem !important; font-weight: 600 !important;
+                text-transform: uppercase !important; letter-spacing: 0.05em !important; padding: 0.6rem 1.2rem !important;
+                border: 1px solid #e2e8f0 !important; background: white !important; color: #64748b !important;
+                transition: all 0.2s !important; box-shadow: none !important;
+            }
+            .dt-buttons .btn:hover { border-color: #2563eb !important; color: #2563eb !important; background: #eff6ff !important; }
+            .dt-buttons .btn i { margin-right: 0.5rem; }
+        </style>
+    @endpush
 
-        table.dataTable thead th {
-            border-bottom: 1px solid #f3f4f6 !important;
-        }
-        table.dataTable.no-footer {
-            border-bottom: none !important;
-        }
-        /* Custom Pagination Styling */
-        .pagination .page-item.active .page-link {
-            background-color: #6366f1 !important;
-            border-color: #6366f1 !important;
-            color: white !important;
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3) !important;
-        }
-        .pagination .page-link {
-            border-radius: 12px !important;
-            margin: 0 4px !important;
-            font-weight: 700 !important;
-            color: #4b5563 !important;
-            border: 2px solid #f3f4f6 !important;
-            background: white;
-        }
-        .dark .pagination .page-link {
-            background: #242526;
-            border-color: #3a3b3c !important;
-            color: #b0b3b8 !important;
-        }
-        table.dataTable tbody tr {
-            background-color: transparent !important;
-        }
-        /* Style DataTables Buttons */
-        .dt-buttons.btn-group {
-            margin-bottom: 1.5rem;
-            gap: 0.5rem;
-        }
-        .dt-buttons .btn {
-            border-radius: 12px !important;
-            font-size: 0.75rem !important;
-            font-weight: 800 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.05em !important;
-            padding: 0.6rem 1.2rem !important;
-            border: 2px solid #f3f4f6 !important;
-            background: white !important;
-            color: #6b7280 !important;
-            transition: all 0.2s !important;
-            box-shadow: none !important;
-        }
-        .dark .dt-buttons .btn {
-            background: #242526 !important;
-            border-color: #3a3b3c !important;
-            color: #b0b3b8 !important;
-        }
-        .dt-buttons .btn:hover {
-            border-color: #6366f1 !important;
-            color: #6366f1 !important;
-            background: #f5f3ff !important;
-            transform: translateY(-1px);
-        }
-        .dark .dt-buttons .btn:hover {
-            background: #3a3b3c !important;
-            border-color: #818cf8 !important;
-            color: #818cf8 !important;
-        }
-        .dt-buttons .btn i {
-            margin-right: 0.5rem;
-        }
-    </style>
-@endpush
-
-@section('content')
-<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-6xl mx-auto">
-        <!-- Header Section -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10 space-y-4 md:space-y-0">
-           <a href="{{ route('admin.dashboard') }}"
-               class="group flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-sm border border-gray-200 text-gray-500 hover:text-indigo-600 hover:border-indigo-300 transition-all duration-200">
-                <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
-            </a>
-            <div>
-                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">{{ __('Permission Categories') }}</h1>
-                <p class="text-sm text-gray-500 font-medium px-1 mt-1">{{ __('Manage and organize your system access levels') }}</p>
-            </div>
-            <div>
-                <a href="{{ route('admin.permission-types.create') }}"
-                   class="inline-flex items-center px-6 py-3 border border-transparent text-base font-bold rounded-2xl shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5 active:scale-95">
-                    <i class="fas fa-plus-circle mr-2 opacity-75"></i>
-                    {{ __('Permission Category') }}
-                </a>
+    <x-card padded="false">
+        <div class="p-4 sm:p-6">
+            <div class="overflow-x-auto lg:overflow-visible">
+                <table id="permissionTypesTable" class="w-full text-left border-collapse whitespace-nowrap lg:whitespace-normal">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100">
+                            <th class="px-4 sm:px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wide">{{ __('ID') }}</th>
+                            <th class="px-4 sm:px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wide">{{ __('Category Name') }}</th>
+                            <th class="px-4 sm:px-6 py-3 text-xs font-medium text-slate-500 uppercase tracking-wide text-right">{{ __('Action') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-slate-600 text-sm">
+                        {{-- DataTables will populate this --}}
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Main Content Card -->
-        <div class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden transform transition-all">
-            <div class="p-4 sm:p-6 lg:p-8">
-                <div class="overflow-x-auto lg:overflow-visible">
-                    <table id="permissionTypesTable" class="w-full text-left border-collapse whitespace-nowrap lg:whitespace-normal">
-                        <thead>
-                            <tr class="bg-gray-50/50 border-b border-gray-100">
-                                <th class="px-4 sm:px-6 lg:px-8 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest">{{ __('ID') }}</th>
-                                <th class="px-4 sm:px-6 lg:px-8 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest">{{ __('Category Name') }}</th>
-                                <th class="px-4 sm:px-6 lg:px-8 py-2 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">{{ __('Action') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50 text-gray-600 text-sm">
-                            <!-- DataTables will populate this -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Contextual Footer -->
-            <div class="px-8 py-5 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-gray-400 uppercase tracking-widest">
-                <span>{{ __('Management System Optimized') }}</span>
-                <span class="flex items-center">
-                    <i class="fas fa-shield-alt mr-2"></i> {{ __('Authorized Access Only') }}
-                </span>
-            </div>
+        <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-400 uppercase tracking-wide">
+            <span>{{ __('Management System Optimized') }}</span>
+            <span class="flex items-center gap-2">
+                <x-icon name="shield" class="h-4 w-4" /> {{ __('Authorized Access Only') }}
+            </span>
         </div>
-    </div>
-</div>
+    </x-card>
 
-<!-- Delete Modal -->
-<div id="deleteModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal()"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div class="sm:flex sm:items-start">
-                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-2xl bg-rose-50 sm:mx-0 sm:h-12 sm:w-12 border border-rose-100 shadow-inner">
-                        <i class="fas fa-exclamation-triangle text-rose-600 text-xl"></i>
-                    </div>
-                    <div class="mt-3 text-center sm:mt-0 sm:ml-6 sm:text-left">
-                        <h3 class="text-xl leading-6 font-extrabold text-gray-900 tracking-tight" id="modal-title">{{ __('Confirm Deletion') }}</h3>
-                        <div class="mt-2 text-sm text-gray-500 leading-relaxed">
-                            {{ __('Are you sure you want to permanently remove') }} <span id="deleteItemName" class="font-bold text-gray-900 px-1.5 py-0.5 bg-gray-100 rounded-lg"></span>{{ __('? This action cannot be undone.') }}
+    {{-- Delete Modal --}}
+    <div id="deleteModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-slate-900/50 transition-opacity" aria-hidden="true" onclick="closeModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-slate-100">
+                <div class="p-6">
+                    <div class="flex items-start gap-4">
+                        <div class="h-12 w-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+                            <x-icon name="trash" class="h-6 w-6" />
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900" id="modal-title">{{ __('Confirm Deletion') }}</h3>
+                            <p class="text-sm text-slate-500 mt-1">
+                                {{ __('Are you sure you want to permanently remove') }} <span id="deleteItemName" class="font-medium text-slate-700"></span>{{ __('? This action cannot be undone.') }}
+                            </p>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="bg-gray-50/50 px-4 py-6 sm:px-8 sm:flex sm:flex-row-reverse space-y-3 sm:space-y-0">
-                <button type="button" id="confirmDeleteBtn" class="w-full inline-flex justify-center rounded-2xl border border-transparent shadow-lg shadow-rose-200/50 px-8 py-3 bg-rose-600 text-base font-bold text-white hover:bg-rose-700 focus:outline-none transition-all duration-200 sm:ml-3 sm:w-auto transform active:scale-95">{{ __('Delete') }}</button>
-                <button type="button" onclick="closeModal()" class="w-full inline-flex justify-center rounded-2xl border-2 border-gray-100 px-8 py-3 bg-white text-base font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-200 focus:outline-none transition-all duration-200 sm:w-auto transform active:scale-95">{{ __('Cancel') }}</button>
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
+                    <button type="button" onclick="closeModal()" class="btn-secondary">{{ __('Cancel') }}</button>
+                    <button type="button" id="confirmDeleteBtn" class="btn-danger">{{ __('Delete') }}</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-@endsection
+    @push('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
 
-@push('scripts')
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap4.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-<!-- <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script> -->
-<!-- <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script> -->
+    <script>
+        $(function() {
+            const LANG_SEARCH_CATEGORIES = @json(__('Search categories...'));
+            const LANG_SHOW = @json(__('Show'));
+            const LANG_ALL = @json(__('All'));
 
-<script>
-    $(function() {
-        const LANG_SEARCH_CATEGORIES = @json(__('Search categories...'));
-        const LANG_SHOW = @json(__('Show'));
-        const LANG_ALL = @json(__('All'));
-
-        // Auto-dismiss alert
-        const alert = document.getElementById('statusAlert');
-        if (alert) {
-            setTimeout(() => {
-                alert.classList.remove('opacity-100');
-                alert.classList.add('opacity-0', 'translate-y-4');
+            // Auto-dismiss alert
+            const alert = document.getElementById('statusAlert');
+            if (alert) {
                 setTimeout(() => {
-                    alert.remove();
-                }, 500);
-            }, 2000);
-        }
+                    alert.classList.remove('opacity-100');
+                    alert.classList.add('opacity-0', 'translate-y-4');
+                    setTimeout(() => { alert.remove(); }, 500);
+                }, 2000);
+            }
 
-        let currentDeleteId = null;
+            let currentDeleteId = null;
 
-        var table = $('#permissionTypesTable').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "{{ route('admin.permission-types.data') }}",
-                error: function (xhr, error, code) {
-                    console.log("DataTable Error:", xhr.responseText);
-                }
-            },
-            dom: '<"flex flex-wrap items-center justify-between mb-6"B><"grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6"lf>rt<"flex flex-col md:flex-row md:items-center md:justify-between mt-6"ip>',
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, LANG_ALL]],
-            // buttons: [
-            //     {
-            //         extend: 'copy',
-            //         text: '<i class="fas fa-copy"></i> Copy',
-            //         className: 'btn-copy'
-            //     },
-            //     {
-            //         extend: 'csv',
-            //         text: '<i class="fas fa-file-csv"></i> CSV',
-            //         className: 'btn-csv'
-            //     },
-            //     {
-            //         extend: 'excel',
-            //         text: '<i class="fas fa-file-excel"></i> Excel',
-            //         className: 'btn-excel'
-            //     },
-            //     {
-            //         extend: 'pdf',
-            //         text: '<i class="fas fa-file-pdf"></i> PDF',
-            //         className: 'btn-pdf',
-            //         orientation: 'portrait',
-            //         pageSize: 'A4',
-            //         exportOptions: {
-            //             columns: [0, 1] // Export ID and Category Name
-            //         }
-            //     },
-            //     {
-            //         extend: 'print',
-            //         text: '<i class="fas fa-print"></i> Print',
-            //         className: 'btn-print'
-            //     }
-            // ],
-            columns: [
-                {
-                    data: 'permissionType_id',
-                    name: 'permissionType_id',
-                    render: function(data) {
-                        return '<span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-gray-400 text-xs font-bold">#' + data + '</span>';
+            var table = $('#permissionTypesTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('admin.permission-types.data') }}",
+                    error: function (xhr, error, code) {
+                        console.log("DataTable Error:", xhr.responseText);
                     }
                 },
-                {
-                    data: 'permissionType_name',
-                    name: 'permissionType_name',
-                    render: function(data, type, row) {
-                        let img_path = row.permissionType_image_path;
-                        let img = img_path
-                            ? '<img src="' + img_path + '" class="w-full h-full object-cover">'
-                            : '<i class="fas fa-layer-group"></i>';
+                dom: '<"flex flex-wrap items-center justify-between mb-6"B><"grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6"lf>rt<"flex flex-col md:flex-row md:items-center md:justify-between mt-6"ip>',
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, LANG_ALL]],
+                columns: [
+                    {
+                        data: 'permissionType_id',
+                        name: 'permissionType_id',
+                        render: function(data) {
+                            return '<span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 text-slate-500 text-xs font-bold">#' + data + '</span>';
+                        }
+                    },
+                    {
+                        data: 'permissionType_name',
+                        name: 'permissionType_name',
+                        render: function(data, type, row) {
+                            let img_path = row.permissionType_image_path;
+                            let img = img_path
+                                ? '<img src="' + img_path + '" class="w-full h-full object-cover">'
+                                : '<i class="fas fa-layer-group"></i>';
 
-                        return '<div class="flex items-center space-x-3">' +
-                               '<div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-50 dark:border-indigo-900/50 overflow-hidden">' + img + '</div>' +
-                               '<span class="text-base font-bold text-gray-800 dark:text-gray-200 tracking-tight">' + data + '</span>' +
-                               '</div>';
+                            return '<div class="flex items-center space-x-3">' +
+                                   '<div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600 border border-brand-100 overflow-hidden">' + img + '</div>' +
+                                   '<span class="text-base font-semibold text-slate-800">' + data + '</span>' +
+                                   '</div>';
+                        }
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-right'
                     }
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false,
-                    className: 'text-right'
+                ],
+                language: {
+                    search: "",
+                    searchPlaceholder: LANG_SEARCH_CATEGORIES,
+                    lengthMenu: LANG_SHOW + " _MENU_",
+                    paginate: {
+                        previous: '<i class="fas fa-chevron-left"></i>',
+                        next: '<i class="fas fa-chevron-right"></i>'
+                    }
                 }
-            ],
-            language: {
-                search: "",
-                searchPlaceholder: LANG_SEARCH_CATEGORIES,
-                lengthMenu: LANG_SHOW + " _MENU_",
-                paginate: {
-                    previous: '<i class="fas fa-chevron-left"></i>',
-                    next: '<i class="fas fa-chevron-right"></i>'
+            });
+
+            window.confirmDelete = function(id, name) {
+                currentDeleteId = id;
+                $('#deleteItemName').text(name);
+                $('#deleteModal').removeClass('hidden');
+                $('body').css('overflow', 'hidden');
+            };
+
+            window.closeModal = function() {
+                $('#deleteModal').addClass('hidden');
+                $('body').css('overflow', 'auto');
+            };
+
+            $('#confirmDeleteBtn').on('click', function() {
+                if (currentDeleteId) {
+                    let form = $('<form>', {
+                        "method": "POST",
+                        "action": "/admin/permission-types/" + currentDeleteId
+                    });
+                    form.append($('<input>', { "name": "_token", "value": "{{ csrf_token() }}", "type": "hidden" }));
+                    form.append($('<input>', { "name": "_method", "value": "DELETE", "type": "hidden" }));
+                    form.appendTo('body').submit();
                 }
-            }
+            });
         });
-
-        window.confirmDelete = function(id, name) {
-            currentDeleteId = id;
-            $('#deleteItemName').text(name);
-            $('#deleteModal').removeClass('hidden');
-            $('body').css('overflow', 'hidden');
-        };
-
-        window.closeModal = function() {
-            $('#deleteModal').addClass('hidden');
-            $('body').css('overflow', 'auto');
-        };
-
-        $('#confirmDeleteBtn').on('click', function() {
-            if (currentDeleteId) {
-                let form = $('<form>', {
-                    "method": "POST",
-                    "action": "/admin/permission-types/" + currentDeleteId
-                });
-                form.append($('<input>', { "name": "_token", "value": "{{ csrf_token() }}", "type": "hidden" }));
-                form.append($('<input>', { "name": "_method", "value": "DELETE", "type": "hidden" }));
-                form.appendTo('body').submit();
-            }
-        });
-    });
-</script>
-@endpush
+    </script>
+    @endpush
+</x-layouts.admin>

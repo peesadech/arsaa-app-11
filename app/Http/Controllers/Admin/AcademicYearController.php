@@ -9,9 +9,42 @@ use Yajra\DataTables\Facades\DataTables;
 
 class AcademicYearController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.academic-years.index');
+        $query = AcademicYear::query();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where('year', 'like', "%{$s}%");
+        }
+
+        $sortBy = in_array($request->get('sort_by'), ['year', 'status', 'id'])
+            ? $request->get('sort_by') : 'year';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $academicYears = $query->paginate($perPage)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.academic-years._rows', compact('academicYears'))->render(),
+                'meta' => [
+                    'total'        => $academicYears->total(),
+                    'per_page'     => $academicYears->perPage(),
+                    'current_page' => $academicYears->currentPage(),
+                    'last_page'    => $academicYears->lastPage(),
+                    'from'         => $academicYears->firstItem() ?? 0,
+                    'to'           => $academicYears->lastItem() ?? 0,
+                ],
+            ]);
+        }
+
+        return view('admin.academic-years.index', compact('academicYears'));
     }
 
     public function data(Request $request)
@@ -42,7 +75,7 @@ class AcademicYearController extends Controller
 
     public function create()
     {
-        return view('admin.academic-years.save');
+        return view('admin.academic-years.create');
     }
 
     public function store(Request $request)
@@ -60,7 +93,7 @@ class AcademicYearController extends Controller
     public function edit($id)
     {
         $academicYear = AcademicYear::findOrFail($id);
-        return view('admin.academic-years.save', compact('academicYear'));
+        return view('admin.academic-years.edit', compact('academicYear'));
     }
 
     public function update(Request $request, $id)

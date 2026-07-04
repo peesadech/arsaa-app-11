@@ -9,9 +9,42 @@ use Yajra\DataTables\Facades\DataTables;
 
 class SemesterController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.semesters.index');
+        $query = Semester::query();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where('semester_number', 'like', "%{$s}%");
+        }
+
+        $sortBy = in_array($request->get('sort_by'), ['semester_number', 'status', 'id'])
+            ? $request->get('sort_by') : 'id';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $semesters = $query->paginate($perPage)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.semesters._rows', compact('semesters'))->render(),
+                'meta' => [
+                    'total'        => $semesters->total(),
+                    'per_page'     => $semesters->perPage(),
+                    'current_page' => $semesters->currentPage(),
+                    'last_page'    => $semesters->lastPage(),
+                    'from'         => $semesters->firstItem() ?? 0,
+                    'to'           => $semesters->lastItem() ?? 0,
+                ],
+            ]);
+        }
+
+        return view('admin.semesters.index', compact('semesters'));
     }
 
     public function data(Request $request)
@@ -42,7 +75,7 @@ class SemesterController extends Controller
 
     public function create()
     {
-        return view('admin.semesters.save');
+        return view('admin.semesters.create');
     }
 
     public function store(Request $request)
@@ -60,7 +93,7 @@ class SemesterController extends Controller
     public function edit($id)
     {
         $semester = Semester::findOrFail($id);
-        return view('admin.semesters.save', compact('semester'));
+        return view('admin.semesters.edit', compact('semester'));
     }
 
     public function update(Request $request, $id)

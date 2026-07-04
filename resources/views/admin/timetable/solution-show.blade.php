@@ -1,77 +1,50 @@
-@extends('layouts.app')
+<x-layouts.admin :header="__('Timetable') . ' — ' . __('Solution') . ' #' . $solution->rank" :subheader="__('Fitness') . ': ' . number_format($solution->fitness_score, 0) . ' | ' . __('Hard') . ': ' . $solution->hard_violations . ' | ' . __('Soft') . ': ' . $solution->soft_violations">
+    <x-slot name="actions">
+        <x-button variant="secondary" icon="arrow-left" :href="route('admin.timetable.generations.show', $solution->generation_id)">{{ __('Back') }}</x-button>
+        <button onclick="doExport('pdf')" class="btn-secondary text-sm">
+            <i class="fas fa-file-pdf text-[10px]"></i> Export PDF
+        </button>
+        <button onclick="doExport('excel')" class="btn-secondary text-sm">
+            <i class="fas fa-file-excel text-[10px]"></i> Export Excel
+        </button>
+        <button onclick="doExport('word')" class="btn-secondary text-sm">
+            <i class="fas fa-file-word text-[10px]"></i> Export Word
+        </button>
+        <button onclick="recalcFitness()" class="btn-primary text-sm" title="{{ __('Recalculate Fitness') }}">
+            <i class="fas fa-sync-alt text-[10px]"></i> {{ __('Recalculate') }}
+        </button>
+    </x-slot>
 
-@php
-    $theme = (\App\Models\Setting::first()->theme ?? 'light');
-    $isDark = $theme === 'dark';
-@endphp
+    {{-- Filter Tabs --}}
+    <div class="card card-body mb-6">
+        <div class="flex flex-wrap items-center gap-3">
+            <label class="text-sm font-medium text-slate-600">{{ __('View') }}:</label>
+            <select id="viewMode" onchange="changeView()" class="form-select w-auto text-sm">
+                <option value="classroom">{{ __('By Classroom') }}</option>
+                <option value="teacher">{{ __('By Teacher') }}</option>
+                <option value="room">{{ __('By Room') }}</option>
+            </select>
 
-@section('content')
-<div class="min-h-screen bg-gray-50 dark:bg-[#18191a] py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-    <div class="max-w-[95vw] mx-auto">
+            <select id="filterEntity" onchange="renderGrid()" class="form-select w-auto text-sm">
+                <option value="">-- {{ __('Select') }} --</option>
+            </select>
 
-        {{-- Header --}}
-        <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center space-x-4">
-                <a href="{{ route('admin.timetable.generations.show', $solution->generation_id) }}"
-                   class="group flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#242526] shadow-sm border border-gray-200 dark:border-[#3a3b3c] text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 transition-all duration-200">
-                    <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
-                </a>
-                <div>
-                    <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ __('Timetable') }} — {{ __('Solution') }} #{{ $solution->rank }}</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">
-                        {{ __('Fitness') }}: {{ number_format($solution->fitness_score, 0) }} |
-                        {{ __('Hard') }}: {{ $solution->hard_violations }} | {{ __('Soft') }}: {{ $solution->soft_violations }}
-                    </p>
-                </div>
+            {{-- Layout toggle --}}
+            <div class="flex items-center gap-2 ml-auto">
+                <button id="layout-btn-normal" onclick="setLayout('normal')" class="btn-secondary text-sm btn-layout-active">
+                    <i class="fas fa-columns text-[10px]"></i> {{ __('Day = Column') }}
+                </button>
+                <button id="layout-btn-transposed" onclick="setLayout('transposed')" class="btn-secondary text-sm opacity-40">
+                    <i class="fas fa-rows text-[10px]"></i> {{ __('Period = Column') }}
+                </button>
             </div>
-            <div class="flex items-center space-x-2">
-                <button onclick="doExport('pdf')" class="btn-app text-sm">
-                    <i class="fas fa-file-pdf text-[10px]"></i>Export PDF
-                </button>
-                <button onclick="doExport('excel')" class="btn-app text-sm">
-                    <i class="fas fa-file-excel text-[10px]"></i>Export Excel
-                </button>
-                <button onclick="doExport('word')" class="btn-app text-sm">
-                    <i class="fas fa-file-word text-[10px]"></i>Export Word
-                </button>
-                <button onclick="recalcFitness()" class="btn-app text-sm" title="{{ __('Recalculate Fitness') }}">
-                    <i class="fas fa-sync-alt text-[10px]"></i> {{ __('Recalculate') }}
-                </button>
-            </div>
-        </div>
-
-        {{-- Filter Tabs --}}
-        <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-4 mb-6">
-            <div class="flex flex-wrap items-center gap-3">
-                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ __('View') }}:</label>
-                <select id="viewMode" onchange="changeView()" class="px-4 py-2 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-xl text-sm text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none">
-                    <option value="classroom">{{ __('By Classroom') }}</option>
-                    <option value="teacher">{{ __('By Teacher') }}</option>
-                    <option value="room">{{ __('By Room') }}</option>
-                </select>
-
-                <select id="filterEntity" onchange="renderGrid()" class="px-4 py-2 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-xl text-sm text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none">
-                    <option value="">-- {{ __('Select') }} --</option>
-                </select>
-
-                {{-- Layout toggle --}}
-                <div class="flex items-center gap-2 ml-auto">
-                    <button id="layout-btn-normal" onclick="setLayout('normal')" class="btn-app text-sm btn-layout-active">
-                        <i class="fas fa-columns text-[10px]"></i> {{ __('Day = Column') }}
-                    </button>
-                    <button id="layout-btn-transposed" onclick="setLayout('transposed')" class="btn-app text-sm opacity-40">
-                        <i class="fas fa-rows text-[10px]"></i> {{ __('Period = Column') }}
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        {{-- Grid Container --}}
-        <div id="grid-container" class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-4 overflow-x-auto">
-            <p class="text-center text-gray-400 dark:text-gray-500 py-12">{{ __('Select view and entity to display timetable') }}</p>
         </div>
     </div>
-</div>
+
+    {{-- Grid Container --}}
+    <div id="grid-container" class="card p-4 overflow-x-auto">
+        <p class="text-center text-slate-400 py-12">{{ __('Select view and entity to display timetable') }}</p>
+    </div>
 
 <script>
 const solutionId = {{ $solution->id }};
@@ -517,4 +490,4 @@ function postFormDownload(url, data) {
     form.remove();
 }
 </script>
-@endsection
+</x-layouts.admin>

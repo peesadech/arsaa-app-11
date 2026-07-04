@@ -10,9 +10,42 @@ use Yajra\DataTables\Facades\DataTables;
 
 class GradingSchemeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.grading-schemes.index');
+        $query = GradingScheme::withCount('details');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where('name', 'like', "%{$s}%");
+        }
+
+        $sortBy = in_array($request->get('sort_by'), ['name', 'status', 'id'])
+            ? $request->get('sort_by') : 'id';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $schemes = $query->paginate($perPage)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.grading-schemes._rows', compact('schemes'))->render(),
+                'meta' => [
+                    'total'        => $schemes->total(),
+                    'per_page'     => $schemes->perPage(),
+                    'current_page' => $schemes->currentPage(),
+                    'last_page'    => $schemes->lastPage(),
+                    'from'         => $schemes->firstItem() ?? 0,
+                    'to'           => $schemes->lastItem() ?? 0,
+                ],
+            ]);
+        }
+
+        return view('admin.grading-schemes.index', compact('schemes'));
     }
 
     public function data(Request $request)
@@ -59,7 +92,7 @@ class GradingSchemeController extends Controller
 
     public function create()
     {
-        return view('admin.grading-schemes.save');
+        return view('admin.grading-schemes.create');
     }
 
     public function store(Request $request)
@@ -78,7 +111,7 @@ class GradingSchemeController extends Controller
     public function edit($id)
     {
         $gradingScheme = GradingScheme::with('details')->findOrFail($id);
-        return view('admin.grading-schemes.save', compact('gradingScheme'));
+        return view('admin.grading-schemes.edit', compact('gradingScheme'));
     }
 
     public function update(Request $request, $id)

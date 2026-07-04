@@ -1,59 +1,46 @@
-@extends('layouts.app')
+<x-layouts.admin :header="__('Teacher Term Status')" :subheader="$teacher->name . ' — ' . __('Academic Year') . ' ' . ($academicYear->year ?? '?') . ' / ' . __('Semester') . ' ' . ($semester->semester_number ?? '?')">
+    <x-slot name="actions">
+        <x-button variant="secondary" icon="arrow-left" :href="route('admin.teacher-term-status.index')">{{ __('Back') }}</x-button>
+    </x-slot>
 
-@section('content')
-<div class="min-h-screen bg-gray-50 dark:bg-[#18191a] py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-    <div class="max-w-4xl mx-auto">
-
-        {{-- Header --}}
-        <div class="flex items-center space-x-4 mb-8">
-            <a href="{{ route('admin.teacher-term-status.index') }}"
-               class="group flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#242526] shadow-sm border border-gray-200 dark:border-[#3a3b3c] text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 transition-all duration-200">
-                <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
-            </a>
-            <div>
-                <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ __('Teacher Term Status') }}</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">
-                    {{ $teacher->name }} — {{ __('Academic Year') }} {{ $academicYear->year ?? '?' }} / {{ __('Semester') }} {{ $semester->semester_number ?? '?' }}
-                </p>
-            </div>
-        </div>
+    <div class="max-w-4xl">
 
         {{-- Flash --}}
         @if(session('status'))
-        <div class="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-2xl text-emerald-700 dark:text-emerald-300 text-sm">
+        <div class="mb-6 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-4 py-3">
             {{ session('status') }}
         </div>
         @endif
 
         {{-- Teacher Info --}}
-        <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-6 mb-6">
+        <x-card class="mb-6">
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-2xl overflow-hidden border-2 border-white shadow-sm">
+                <div class="w-14 h-14 rounded-2xl overflow-hidden border-2 border-white shadow-card">
                     <img src="{{ $teacher->image_path ? asset($teacher->image_path) : 'https://ui-avatars.com/api/?name=' . urlencode($teacher->name) . '&color=7F9CF5&background=EBF4FF' }}" class="w-full h-full object-cover" alt="">
                 </div>
                 <div>
-                    <h3 class="text-lg font-bold text-gray-800 dark:text-white">{{ $teacher->name }}</h3>
-                    <p class="text-xs text-gray-400">{{ $teacher->email }}</p>
-                    @php $masterColor = $teacher->status == 1 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'; @endphp
-                    <span class="inline-flex mt-1 px-2 py-0.5 rounded-lg {{ $masterColor }} text-[10px] font-bold uppercase">
+                    <h3 class="text-lg font-semibold text-slate-800">{{ $teacher->name }}</h3>
+                    <p class="text-xs text-slate-400">{{ $teacher->email }}</p>
+                    @php $masterBadge = $teacher->status == 1 ? 'badge-green' : 'badge-red'; @endphp
+                    <span class="{{ $masterBadge }} uppercase mt-1">
                         {{ __('Master') }}: {{ $teacher->status == 1 ? __('Active') : __('Not Active') }}
                     </span>
                 </div>
             </div>
-        </div>
+        </x-card>
 
         {{-- Scheduled periods warning (สำหรับ flow ครูลาออก/สอนแทน) --}}
         @if(($scheduledPeriodsCount ?? 0) > 0)
-        <div class="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl flex flex-wrap items-center gap-3">
+        <div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex flex-wrap items-center gap-3">
             <i class="fas fa-exclamation-triangle text-amber-500"></i>
-            <div class="flex-1 text-sm text-amber-700 dark:text-amber-300">
+            <div class="flex-1 text-sm text-amber-700">
                 {{ __('This teacher has :count periods in the active timetable for this term', ['count' => $scheduledPeriodsCount]) }}
                 @if(!$termStatus->can_be_scheduled)
                 <span class="font-bold">— {{ __('but is not schedulable. Please assign substitutes.') }}</span>
                 @endif
             </div>
-            <a href="{{ route('admin.teacher-substitution.show', $teacher->id) }}" class="btn-app">
-                <i class="fas fa-exchange-alt text-[10px]"></i> {{ __('Manage Substitution') }}
+            <a href="{{ route('admin.teacher-substitution.show', $teacher->id) }}" class="btn-primary">
+                <i class="fas fa-exchange-alt text-xs"></i> {{ __('Manage Substitution') }}
             </a>
         </div>
         @endif
@@ -63,13 +50,13 @@
             @csrf
             @method('PUT')
             <input type="hidden" name="unavailable_periods" id="unavailablePeriodsInput" value="">
-            <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-6 space-y-5">
+            <x-card>
+                <div class="space-y-5">
 
                 {{-- Status --}}
                 <div>
-                    <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Term Status') }}</label>
-                    <select name="status" id="termStatusSelect"
-                            class="w-full px-4 py-3 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none transition-all">
+                    <label class="form-label">{{ __('Term Status') }}</label>
+                    <select name="status" id="termStatusSelect" class="form-select">
                         @foreach(\App\Models\TeacherTermStatus::STATUSES as $s)
                         <option value="{{ $s }}" {{ $termStatus->status === $s ? 'selected' : '' }}>
                             {{ __(ucfirst(str_replace('_', ' ', $s))) }}
@@ -83,180 +70,166 @@
                     <label class="flex items-center gap-3 cursor-pointer">
                         <input type="hidden" name="can_be_scheduled" value="0">
                         <input type="checkbox" name="can_be_scheduled" value="1" id="canBeScheduled"
-                               class="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                               class="w-5 h-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
                                {{ $termStatus->can_be_scheduled ? 'checked' : '' }}>
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Can be scheduled') }}</span>
+                        <span class="text-sm font-medium text-slate-700">{{ __('Can be scheduled') }}</span>
                     </label>
                 </div>
 
                 {{-- Max Periods --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Max periods per day') }}</label>
-                        <input type="number" name="max_periods_per_day" value="{{ $termStatus->max_periods_per_day }}" min="1" max="20" placeholder="-"
-                               class="w-full px-4 py-3 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none transition-all">
+                        <label class="form-label">{{ __('Max periods per day') }}</label>
+                        <input type="number" name="max_periods_per_day" value="{{ $termStatus->max_periods_per_day }}" min="1" max="20" placeholder="-" class="form-input">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Max periods per week') }}</label>
-                        <input type="number" name="max_periods_per_week" value="{{ $termStatus->max_periods_per_week }}" min="1" max="100" placeholder="-"
-                               class="w-full px-4 py-3 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none transition-all">
+                        <label class="form-label">{{ __('Max periods per week') }}</label>
+                        <input type="number" name="max_periods_per_week" value="{{ $termStatus->max_periods_per_week }}" min="1" max="100" placeholder="-" class="form-input">
                     </div>
                 </div>
 
                 {{-- Effective Dates --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Effective from') }}</label>
-                        <input type="date" name="effective_from" value="{{ $termStatus->effective_from?->format('Y-m-d') }}"
-                               class="w-full px-4 py-3 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none transition-all">
+                        <label class="form-label">{{ __('Effective from') }}</label>
+                        <input type="date" name="effective_from" value="{{ $termStatus->effective_from?->format('Y-m-d') }}" class="form-input">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Effective until') }}</label>
-                        <input type="date" name="effective_until" value="{{ $termStatus->effective_until?->format('Y-m-d') }}"
-                               class="w-full px-4 py-3 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none transition-all">
+                        <label class="form-label">{{ __('Effective until') }}</label>
+                        <input type="date" name="effective_until" value="{{ $termStatus->effective_until?->format('Y-m-d') }}" class="form-input">
                     </div>
                 </div>
 
                 {{-- Assigned Courses --}}
                 <div class="space-y-3">
-                    <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
                         {{ __('Assigned Courses') }}
                         @if(!$hasTermCourses)
                         <span class="text-[10px] text-amber-500 font-normal normal-case ml-1">({{ __('Using global courses - save to set term-specific') }})</span>
                         @endif
                     </label>
-                    <div id="selectedCoursesContainer" class="flex flex-wrap gap-2 min-h-[40px] p-3 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl transition-all">
+                    <div id="selectedCoursesContainer" class="flex flex-wrap gap-2 min-h-[40px] p-3 bg-slate-50 border border-slate-200 rounded-lg">
                     </div>
-                    <button type="button" onclick="openCourseModal()"
-                        class="inline-flex items-center px-4 py-2.5 bg-white dark:bg-[#242526] border-2 border-gray-100 dark:border-[#3a3b3c] rounded-xl text-sm font-bold text-gray-600 dark:text-gray-400 hover:border-indigo-500 hover:text-indigo-600 transition-all duration-200">
-                        <i class="fas fa-plus-circle mr-2 text-xs"></i>
+                    <button type="button" onclick="openCourseModal()" class="btn-secondary">
+                        <x-icon name="plus" class="h-4 w-4" />
                         {{ __('Select Courses') }}
                     </button>
                 </div>
 
                 {{-- Unavailable Periods Schedule --}}
                 <div id="scheduleSection" class="space-y-3" style="display:none">
-                    <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">
-                        <i class="fas fa-calendar-times mr-1 text-rose-400"></i> {{ __('Unavailable Teaching Periods') }}
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                        <i class="fas fa-calendar-times mr-1 text-red-400"></i> {{ __('Unavailable Teaching Periods') }}
                     </label>
-                    <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium px-1">{{ __('Click to select periods you do not want to teach (shown by Education Level of selected courses)') }}</p>
+                    <p class="text-[10px] text-slate-400 font-medium">{{ __('Click to select periods you do not want to teach (shown by Education Level of selected courses)') }}</p>
                     <div id="scheduleGridContainer"></div>
                 </div>
 
                 {{-- Notes --}}
                 <div>
-                    <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Notes') }}</label>
-                    <textarea name="notes" rows="2"
-                              class="w-full px-4 py-3 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none transition-all resize-none">{{ $termStatus->notes }}</textarea>
+                    <label class="form-label">{{ __('Notes') }}</label>
+                    <textarea name="notes" rows="2" class="form-textarea resize-none">{{ $termStatus->notes }}</textarea>
                 </div>
 
                 {{-- Reason for change --}}
                 <div>
-                    <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Reason for change') }}</label>
-                    <input type="text" name="reason" placeholder="{{ __('Optional: reason for this change') }}"
-                           class="w-full px-4 py-3 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none transition-all">
+                    <label class="form-label">{{ __('Reason for change') }}</label>
+                    <input type="text" name="reason" placeholder="{{ __('Optional: reason for this change') }}" class="form-input">
                 </div>
 
                 {{-- Submit --}}
                 <div class="flex justify-end pt-2">
-                    <button type="button" onclick="handleSubmit()" class="btn-app px-8">
-                        <i class="fas fa-save text-[10px]"></i> {{ __('Save Changes') }}
+                    <button type="button" onclick="handleSubmit()" class="btn-primary px-8">
+                        <i class="fas fa-save text-xs"></i> {{ __('Save Changes') }}
                     </button>
                 </div>
-            </div>
+                </div>
+            </x-card>
         </form>
 
         {{-- Status Change History --}}
         @if($logs->isNotEmpty())
-        <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-6 mt-6">
-            <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-4">{{ __('Change History') }}</h3>
+        <x-card class="mt-6">
+            <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-4">{{ __('Change History') }}</h3>
             <div class="space-y-3">
                 @foreach($logs as $log)
-                <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-[#3a3b3c]/50 rounded-xl">
-                    <div class="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center shrink-0 mt-0.5">
-                        <i class="fas fa-history text-indigo-500 text-xs"></i>
+                <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div class="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fas fa-history text-brand-600 text-xs"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-sm text-gray-700 dark:text-gray-300">
+                        <div class="text-sm text-slate-700">
                             <span class="font-bold">{{ $log->old_status ?? '-' }}</span>
-                            <i class="fas fa-arrow-right text-[8px] mx-1 text-gray-400"></i>
+                            <i class="fas fa-arrow-right text-[8px] mx-1 text-slate-400"></i>
                             <span class="font-bold">{{ $log->new_status }}</span>
                             @if($log->old_can_be_scheduled !== $log->new_can_be_scheduled)
-                                <span class="text-xs text-gray-400 ml-2">({{ __('Can Schedule') }}: {{ $log->new_can_be_scheduled ? __('Yes') : __('No') }})</span>
+                                <span class="text-xs text-slate-400 ml-2">({{ __('Can Schedule') }}: {{ $log->new_can_be_scheduled ? __('Yes') : __('No') }})</span>
                             @endif
                         </div>
                         @if($log->reason)
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ $log->reason }}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">{{ $log->reason }}</p>
                         @endif
-                        <p class="text-[10px] text-gray-400 mt-1">
+                        <p class="text-[10px] text-slate-400 mt-1">
                             {{ $log->changedByUser->name ?? '-' }} — {{ $log->changed_at->format('d/m/Y H:i') }}
                         </p>
                     </div>
                 </div>
                 @endforeach
             </div>
-        </div>
+        </x-card>
         @endif
     </div>
-</div>
 
 {{-- Course Selection Modal --}}
 <div id="courseModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-modal="true">
     <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
-        <div class="fixed inset-0 bg-gray-500/75 dark:bg-black/75 backdrop-blur-sm transition-opacity" onclick="closeCourseModal()"></div>
-        <div class="inline-block align-bottom bg-white dark:bg-[#242526] rounded-[2.5rem] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-gray-100 dark:border-[#3a3b3c]">
-            <div class="px-6 pt-6 pb-4 border-b border-gray-100 dark:border-[#3a3b3c]">
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeCourseModal()"></div>
+        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-slate-100">
+            <div class="px-6 pt-6 pb-4 border-b border-slate-100">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-extrabold text-gray-900 dark:text-white tracking-tight">
-                        <i class="fas fa-book mr-2 text-indigo-500"></i>{{ __('Select Courses') }}
+                    <h3 class="text-lg font-semibold text-slate-900">
+                        <i class="fas fa-book mr-2 text-brand-600"></i>{{ __('Select Courses') }}
                     </h3>
-                    <button onclick="closeCourseModal()" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-[#3a3b3c] flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors">
+                    <button onclick="closeCourseModal()" class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
                         <i class="fas fa-times text-sm"></i>
                     </button>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <select id="modalEducationLevelFilter" class="form-select text-sm">
+                        <option value="">{{ __('All Education Levels') }}</option>
+                        @foreach($educationLevels as $el)
+                            <option value="{{ $el->id }}">{{ $el->name_th }}</option>
+                        @endforeach
+                    </select>
+                    <select id="modalSubjectGroupFilter" class="form-select text-sm">
+                        <option value="">{{ __('All Subject Groups') }}</option>
+                        @foreach($subjectGroups as $sg)
+                            <option value="{{ $sg->id }}">{{ $sg->name_th }}</option>
+                        @endforeach
+                    </select>
+                    <select id="modalSemesterFilter" class="form-select text-sm">
+                        <option value="">{{ __('All Semesters') }}</option>
+                        @foreach($semesters as $sem)
+                            <option value="{{ $sem->id }}">{{ __('Semester') }} {{ $sem->semester_number }}</option>
+                        @endforeach
+                    </select>
                     <div class="relative">
-                        <select id="modalEducationLevelFilter" class="appearance-none block w-full pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-gray-100 dark:border-[#4a4b4c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:border-indigo-500 transition-all cursor-pointer">
-                            <option value="">{{ __('All Education Levels') }}</option>
-                            @foreach($educationLevels as $el)
-                                <option value="{{ $el->id }}">{{ $el->name_th }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="relative">
-                        <select id="modalSubjectGroupFilter" class="appearance-none block w-full pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-gray-100 dark:border-[#4a4b4c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:border-indigo-500 transition-all cursor-pointer">
-                            <option value="">{{ __('All Subject Groups') }}</option>
-                            @foreach($subjectGroups as $sg)
-                                <option value="{{ $sg->id }}">{{ $sg->name_th }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="relative">
-                        <select id="modalSemesterFilter" class="appearance-none block w-full pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-gray-100 dark:border-[#4a4b4c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 focus:outline-none focus:border-indigo-500 transition-all cursor-pointer">
-                            <option value="">{{ __('All Semesters') }}</option>
-                            @foreach($semesters as $sem)
-                                <option value="{{ $sem->id }}">{{ __('Semester') }} {{ $sem->semester_number }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                            <i class="fas fa-search text-xs"></i>
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <x-icon name="search" class="h-4 w-4" />
                         </div>
-                        <input type="text" id="modalSearchInput" placeholder="{{ __('Search course name...') }}"
-                            class="block w-full pl-9 pr-4 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-gray-100 dark:border-[#4a4b4c] rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 placeholder-gray-400 focus:outline-none focus:border-indigo-500 transition-all">
+                        <input type="text" id="modalSearchInput" placeholder="{{ __('Search course name...') }}" class="form-input pl-9 text-sm">
                     </div>
                 </div>
             </div>
             <div class="px-6 py-4 max-h-[400px] overflow-y-auto" id="courseListContainer">
-                <div class="text-center py-8 text-gray-400">
+                <div class="text-center py-8 text-slate-400">
                     <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
                     <p class="text-xs font-bold">{{ __('Loading courses...') }}</p>
                 </div>
             </div>
-            <div class="px-6 py-4 border-t border-gray-100 dark:border-[#3a3b3c] bg-gray-50/50 dark:bg-[#18191a]/30 flex items-center justify-between">
-                <span class="text-xs font-bold text-gray-400"><span id="selectedCount">0</span> {{ __('courses selected') }}</span>
-                <button onclick="closeCourseModal()" class="px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-xl text-xs hover:bg-indigo-700 transition-all active:scale-95 uppercase tracking-wider">
+            <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-400"><span id="selectedCount">0</span> {{ __('courses selected') }}</span>
+                <button onclick="closeCourseModal()" class="btn-primary text-xs uppercase tracking-wide">
                     {{ __('Done') }}
                 </button>
             </div>
@@ -572,4 +545,4 @@ renderSelectedCourses();
 loadScheduleData();
 </script>
 @endpush
-@endsection
+</x-layouts.admin>

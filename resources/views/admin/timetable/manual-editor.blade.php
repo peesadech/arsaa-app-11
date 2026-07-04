@@ -1,185 +1,163 @@
-@extends('layouts.app')
+<x-layouts.admin :header="__('Schedule') . ' ' . $grade->name_th . ' / ' . $classroom->name" :subheader="__('Click empty cell to place | Drag to move | Right-click to remove')">
+    <x-slot name="actions">
+        <x-button variant="secondary" icon="arrow-left" :href="route('admin.timetable.manual.select')">{{ __('Back') }}</x-button>
+        <button onclick="checkAllConflicts()" class="btn-primary text-sm">
+            <i class="fas fa-search text-[10px]"></i> {{ __('Check Conflicts') }}
+        </button>
+    </x-slot>
 
-@section('content')
-<div class="min-h-screen bg-gray-50 dark:bg-[#18191a] py-6 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-    <div class="max-w-[98vw] mx-auto">
+    <div class="flex gap-4">
+        {{-- Sidebar: Course List --}}
+        <div class="w-72 shrink-0">
+            <div class="card p-4 sticky top-4">
+                <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3">{{ __('Courses to Schedule') }}</h3>
+                <div class="space-y-2 max-h-[70vh] overflow-y-auto" id="course-list">
+                    @foreach($openedCourses as $oc)
+                    @php
+                        $colorIdx = ($oc->course->subject_group_id ?? 0) % 8;
+                        $placed = $entries->where('opened_course_id', $oc->id)->count();
+                        $needed = $oc->course->periods_per_week ?? 1;
+                        $remaining = max(0, $needed - $placed);
 
-        {{-- Header --}}
-        <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center space-x-4">
-                <a href="{{ route('admin.timetable.manual.select') }}"
-                   class="group flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#242526] shadow-sm border border-gray-200 dark:border-[#3a3b3c] text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 transition-all duration-200">
-                    <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
-                </a>
-                <div>
-                    <h1 class="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-                        {{ __('Schedule') }} {{ $grade->name_th }} / {{ $classroom->name }}
-                    </h1>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Click empty cell to place | Drag to move | Right-click to remove') }}</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <button onclick="checkAllConflicts()" class="btn-app text-sm">
-                    <i class="fas fa-search text-[10px]"></i> {{ __('Check Conflicts') }}
-                </button>
-            </div>
-        </div>
-
-        <div class="flex gap-4">
-            {{-- Sidebar: Course List --}}
-            <div class="w-72 shrink-0">
-                <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-4 sticky top-4">
-                    <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">{{ __('Courses to Schedule') }}</h3>
-                    <div class="space-y-2 max-h-[70vh] overflow-y-auto" id="course-list">
-                        @foreach($openedCourses as $oc)
-                        @php
-                            $colorIdx = ($oc->course->subject_group_id ?? 0) % 8;
-                            $placed = $entries->where('opened_course_id', $oc->id)->count();
-                            $needed = $oc->course->periods_per_week ?? 1;
-                            $remaining = max(0, $needed - $placed);
-
-                            // Use term courses if available, otherwise fallback to global
-                            $termTeachersForCourse = $termCourseTeachers[$oc->course_id] ?? null;
-                            if ($termTeachersForCourse && $termTeachersForCourse->isNotEmpty()) {
-                                $teachersJson = $termTeachersForCourse->map(fn($tc) => [
-                                    'id' => $tc->teacher_id,
-                                    'name' => $tc->teacher->name,
-                                    'schedulable' => in_array($tc->teacher_id, $schedulableTeacherIds),
-                                ])->values();
-                            } else {
-                                $teachersJson = $oc->course->teachers->map(fn($t) => [
-                                    'id' => $t->id,
-                                    'name' => $t->name,
-                                    'schedulable' => in_array($t->id, $schedulableTeacherIds),
-                                ])->values();
-                            }
-                        @endphp
-                        <div class="course-item p-3 rounded-xl border cursor-pointer transition-all
-                                    {{ $remaining === 0 ? 'bg-gray-50 dark:bg-[#3a3b3c]/50 border-gray-200 dark:border-[#3a3b3c] opacity-60' : 'bg-white dark:bg-[#3a3b3c] border-gray-200 dark:border-[#4a4b4c] hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-sm' }}"
-                             data-oc-id="{{ $oc->id }}"
-                             data-course-id="{{ $oc->course_id }}"
-                             data-course-name="{{ $oc->course->name }}"
-                             data-subject-group="{{ $oc->course->subjectGroup->name_th ?? '' }}"
-                             data-subject-group-id="{{ $oc->course->subject_group_id ?? 0 }}"
-                             data-periods-needed="{{ $needed }}"
-                             data-periods-per-session="{{ $oc->course->periods_per_session ?? 1 }}"
-                             data-color-idx="{{ $colorIdx }}"
-                             data-teachers='@json($teachersJson)'
-                             data-rooms='@json($oc->course->rooms->map(function($r) { return ["id" => $r->id, "label" => $r->room_number . ($r->building ? " (".$r->building->name_th.")" : "")]; }))'
-                             data-preferred-days='@json($oc->course->preferred_days ?? [])'
-                             onclick="selectCourse(this)">
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm font-bold text-gray-800 dark:text-white truncate">{{ $oc->course->name }}</span>
-                                <span class="text-[10px] font-bold {{ $remaining === 0 ? 'text-emerald-600' : 'text-indigo-600' }} whitespace-nowrap ml-2"
-                                      id="remaining-{{ $oc->id }}">{{ $placed }}/{{ $needed }}</span>
-                            </div>
-                            <div class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
-                                {{ $oc->course->subjectGroup->name_th ?? '-' }}
-                                @if(($oc->course->periods_per_session ?? 1) > 1)
-                                    <span class="text-indigo-500 dark:text-indigo-400 ml-1">| {{ $oc->course->periods_per_session }} {{ __('periods/session') }}</span>
-                                @endif
-                            </div>
-                            @if(!empty($oc->course->preferred_days))
-                            @php
-                                $dNames = [1=>__('Mon'), 2=>__('Tue'), 3=>__('Wed'), 4=>__('Thu'), 5=>__('Fri'), 6=>__('Sat'), 7=>__('Sun')];
-                                $pDays = collect($oc->course->preferred_days)->map(fn($d) => $dNames[$d] ?? $d)->join(' ');
-                            @endphp
-                            <div class="text-[10px] text-emerald-500 dark:text-emerald-400 mt-0.5">
-                                <i class="fas fa-calendar-check text-[8px]"></i> {{ __('Available') }}: {{ $pDays }}
-                            </div>
-                            @endif
-                            <div class="text-[10px] text-gray-400 dark:text-gray-500">
-                                {{ __('Teacher') }}:
-                                @php $displayTeachers = $teachersJson; @endphp
-                                @forelse($displayTeachers as $t)
-                                    @if($t['schedulable'])
-                                        <span>{{ $t['name'] }}</span>{{ !$loop->last ? ',' : '' }}
-                                    @else
-                                        <span class="line-through text-rose-400" title="{{ __('Cannot schedule this term') }}">{{ $t['name'] }}</span>{{ !$loop->last ? ',' : '' }}
-                                    @endif
-                                @empty
-                                    -
-                                @endforelse
-                            </div>
+                        // Use term courses if available, otherwise fallback to global
+                        $termTeachersForCourse = $termCourseTeachers[$oc->course_id] ?? null;
+                        if ($termTeachersForCourse && $termTeachersForCourse->isNotEmpty()) {
+                            $teachersJson = $termTeachersForCourse->map(fn($tc) => [
+                                'id' => $tc->teacher_id,
+                                'name' => $tc->teacher->name,
+                                'schedulable' => in_array($tc->teacher_id, $schedulableTeacherIds),
+                            ])->values();
+                        } else {
+                            $teachersJson = $oc->course->teachers->map(fn($t) => [
+                                'id' => $t->id,
+                                'name' => $t->name,
+                                'schedulable' => in_array($t->id, $schedulableTeacherIds),
+                            ])->values();
+                        }
+                    @endphp
+                    <div class="course-item p-3 rounded-xl border cursor-pointer transition-all
+                                {{ $remaining === 0 ? 'bg-slate-50 border-slate-200 opacity-60' : 'bg-white border-slate-200 hover:border-brand-300 hover:shadow-sm' }}"
+                         data-oc-id="{{ $oc->id }}"
+                         data-course-id="{{ $oc->course_id }}"
+                         data-course-name="{{ $oc->course->name }}"
+                         data-subject-group="{{ $oc->course->subjectGroup->name_th ?? '' }}"
+                         data-subject-group-id="{{ $oc->course->subject_group_id ?? 0 }}"
+                         data-periods-needed="{{ $needed }}"
+                         data-periods-per-session="{{ $oc->course->periods_per_session ?? 1 }}"
+                         data-color-idx="{{ $colorIdx }}"
+                         data-teachers='@json($teachersJson)'
+                         data-rooms='@json($oc->course->rooms->map(function($r) { return ["id" => $r->id, "label" => $r->room_number . ($r->building ? " (".$r->building->name_th.")" : "")]; }))'
+                         data-preferred-days='@json($oc->course->preferred_days ?? [])'
+                         onclick="selectCourse(this)">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-bold text-slate-800 truncate">{{ $oc->course->name }}</span>
+                            <span class="text-[10px] font-bold {{ $remaining === 0 ? 'text-emerald-600' : 'text-indigo-600' }} whitespace-nowrap ml-2"
+                                  id="remaining-{{ $oc->id }}">{{ $placed }}/{{ $needed }}</span>
                         </div>
-                        @endforeach
+                        <div class="text-[10px] text-slate-400 mt-0.5">
+                            {{ $oc->course->subjectGroup->name_th ?? '-' }}
+                            @if(($oc->course->periods_per_session ?? 1) > 1)
+                                <span class="text-brand-500 ml-1">| {{ $oc->course->periods_per_session }} {{ __('periods/session') }}</span>
+                            @endif
+                        </div>
+                        @if(!empty($oc->course->preferred_days))
+                        @php
+                            $dNames = [1=>__('Mon'), 2=>__('Tue'), 3=>__('Wed'), 4=>__('Thu'), 5=>__('Fri'), 6=>__('Sat'), 7=>__('Sun')];
+                            $pDays = collect($oc->course->preferred_days)->map(fn($d) => $dNames[$d] ?? $d)->join(' ');
+                        @endphp
+                        <div class="text-[10px] text-emerald-500 mt-0.5">
+                            <i class="fas fa-calendar-check text-[8px]"></i> {{ __('Available') }}: {{ $pDays }}
+                        </div>
+                        @endif
+                        <div class="text-[10px] text-slate-400">
+                            {{ __('Teacher') }}:
+                            @php $displayTeachers = $teachersJson; @endphp
+                            @forelse($displayTeachers as $t)
+                                @if($t['schedulable'])
+                                    <span>{{ $t['name'] }}</span>{{ !$loop->last ? ',' : '' }}
+                                @else
+                                    <span class="line-through text-rose-400" title="{{ __('Cannot schedule this term') }}">{{ $t['name'] }}</span>{{ !$loop->last ? ',' : '' }}
+                                @endif
+                            @empty
+                                -
+                            @endforelse
+                        </div>
                     </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        {{-- Grid --}}
+        <div class="flex-1 min-w-0">
+            <div class="card p-4 overflow-x-auto">
+                <div id="grid-container">
+                    {{-- Rendered by JS --}}
                 </div>
             </div>
 
-            {{-- Grid --}}
-            <div class="flex-1 min-w-0">
-                <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-4 overflow-x-auto">
-                    <div id="grid-container">
-                        {{-- Rendered by JS --}}
-                    </div>
-                </div>
-
-                {{-- Conflict panel --}}
-                <div id="conflict-panel" class="mt-4 hidden">
-                    <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-4">
-                        <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">{{ __('Conflict Check Results') }}</h3>
-                        <div id="conflict-list" class="space-y-2"></div>
-                    </div>
+            {{-- Conflict panel --}}
+            <div id="conflict-panel" class="mt-4 hidden">
+                <div class="card p-4">
+                    <h3 class="text-sm font-semibold text-slate-700 mb-2">{{ __('Conflict Check Results') }}</h3>
+                    <div id="conflict-list" class="space-y-2"></div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-{{-- Place Course Modal --}}
-<div id="placeModal" style="display:none" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm" onclick="if(event.target===this)closePlaceModal()">
-    <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
-        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4" id="modal-title">{{ __('Place Course') }}</h3>
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Course') }}</label>
-                <div id="modal-course-name" class="px-4 py-2 bg-gray-50 dark:bg-[#3a3b3c] rounded-xl text-sm text-gray-800 dark:text-white font-medium"></div>
+    {{-- Place Course Modal --}}
+    <div id="placeModal" style="display:none" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" onclick="if(event.target===this)closePlaceModal()">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
+            <h3 class="text-lg font-semibold text-slate-800 mb-4" id="modal-title">{{ __('Place Course') }}</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="form-label">{{ __('Course') }}</label>
+                    <div id="modal-course-name" class="px-4 py-2 bg-slate-50 rounded-lg text-sm text-slate-800 font-medium"></div>
+                </div>
+                <div>
+                    <label class="form-label">{{ __('Teacher') }}</label>
+                    <select id="modal-teacher" class="form-select"></select>
+                </div>
+                <div>
+                    <label class="form-label">{{ __('Room / Lab') }}</label>
+                    <select id="modal-room" class="form-select">
+                        <option value="">{{ __('Not specified') }}</option>
+                    </select>
+                </div>
+                <div id="modal-conflicts" class="hidden p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700"></div>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Teacher') }}</label>
-                <select id="modal-teacher" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-xl text-sm text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none">
-                </select>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closePlaceModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition-colors">{{ __('Cancel') }}</button>
+                <button onclick="confirmPlace()" id="btn-confirm" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-semibold transition-colors">{{ __('Place Course') }}</button>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Room / Lab') }}</label>
-                <select id="modal-room" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-xl text-sm text-gray-800 dark:text-white focus:border-indigo-500 focus:outline-none">
-                    <option value="">{{ __('Not specified') }}</option>
-                </select>
-            </div>
-            <div id="modal-conflicts" class="hidden p-3 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-xl text-sm text-rose-700 dark:text-rose-300"></div>
-        </div>
-        <div class="flex gap-3 mt-6">
-            <button onclick="closePlaceModal()" class="flex-1 py-2.5 bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4a4b4c] text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold transition-colors">{{ __('Cancel') }}</button>
-            <button onclick="confirmPlace()" id="btn-confirm" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-colors">{{ __('Place Course') }}</button>
         </div>
     </div>
-</div>
 
-{{-- Alert Modal --}}
-<div id="alertModal" style="display:none" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 backdrop-blur-sm" onclick="if(event.target===this)closeAlertModal()">
-    <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 text-center">
-        <div id="alert-icon" class="mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-4"></div>
-        <h3 id="alert-title" class="text-lg font-bold text-gray-800 dark:text-white mb-2"></h3>
-        <p id="alert-message" class="text-sm text-gray-600 dark:text-gray-400 mb-6 whitespace-pre-line"></p>
-        <button onclick="closeAlertModal()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-colors">{{ __('OK') }}</button>
-    </div>
-</div>
-
-{{-- Confirm Modal --}}
-<div id="confirmModal" style="display:none" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 backdrop-blur-sm" onclick="if(event.target===this)closeConfirmModal(false)">
-    <div class="bg-white dark:bg-[#242526] rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 text-center">
-        <div class="mx-auto w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-4">
-            <i class="fas fa-question text-amber-600 dark:text-amber-400 text-xl"></i>
-        </div>
-        <h3 id="confirm-title" class="text-lg font-bold text-gray-800 dark:text-white mb-2"></h3>
-        <p id="confirm-message" class="text-sm text-gray-600 dark:text-gray-400 mb-6 whitespace-pre-line"></p>
-        <div class="flex gap-3">
-            <button onclick="closeConfirmModal(false)" class="flex-1 py-2.5 bg-gray-100 dark:bg-[#3a3b3c] hover:bg-gray-200 dark:hover:bg-[#4a4b4c] text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold transition-colors">{{ __('Cancel') }}</button>
-            <button onclick="closeConfirmModal(true)" id="confirm-yes-btn" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-semibold transition-colors">{{ __('Confirm') }}</button>
+    {{-- Alert Modal --}}
+    <div id="alertModal" style="display:none" class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" onclick="if(event.target===this)closeAlertModal()">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 text-center">
+            <div id="alert-icon" class="mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-4"></div>
+            <h3 id="alert-title" class="text-lg font-semibold text-slate-800 mb-2"></h3>
+            <p id="alert-message" class="text-sm text-slate-600 mb-6 whitespace-pre-line"></p>
+            <button onclick="closeAlertModal()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-semibold transition-colors">{{ __('OK') }}</button>
         </div>
     </div>
-</div>
+
+    {{-- Confirm Modal --}}
+    <div id="confirmModal" style="display:none" class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" onclick="if(event.target===this)closeConfirmModal(false)">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 text-center">
+            <div class="mx-auto w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+                <i class="fas fa-question text-amber-600 text-xl"></i>
+            </div>
+            <h3 id="confirm-title" class="text-lg font-semibold text-slate-800 mb-2"></h3>
+            <p id="confirm-message" class="text-sm text-slate-600 mb-6 whitespace-pre-line"></p>
+            <div class="flex gap-3">
+                <button onclick="closeConfirmModal(false)" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition-colors">{{ __('Cancel') }}</button>
+                <button onclick="closeConfirmModal(true)" id="confirm-yes-btn" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-colors">{{ __('Confirm') }}</button>
+            </div>
+        </div>
+    </div>
 
 <script>
 // ==================== Modal Alert / Confirm ====================
@@ -750,4 +728,4 @@ function checkAllConflicts() {
 // Init
 renderGrid();
 </script>
-@endsection
+</x-layouts.admin>

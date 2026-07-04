@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
 use App\Models\Course;
 use App\Models\CurrentAcademicSetting;
+use App\Models\Grade;
 use App\Models\OpenedClassroom;
 use App\Models\OpenedCourse;
 use App\Models\OpenedGrade;
@@ -29,15 +30,64 @@ class OpenedCourseController extends Controller
         return [$yearId, $semId];
     }
 
-    public function index()
+    public function index(Request $request)
     {
         [$academicYearId, $semesterId] = $this->currentYearSemester();
 
         $currentYear     = $academicYearId ? AcademicYear::find($academicYearId) : null;
         $currentSemester = $semesterId ? Semester::find($semesterId) : null;
 
+        $query = OpenedCourse::with(['grade', 'classroom', 'course'])
+            ->where('academic_year_id', $academicYearId)
+            ->where('semester_id', $semesterId);
+
+        if ($request->filled('grade_id')) {
+            $query->where('grade_id', $request->grade_id);
+        }
+
+        if ($request->filled('course_id')) {
+            $query->where('course_id', $request->course_id);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->whereHas('course', fn ($c) => $c->where('name', 'like', "%{$s}%"))
+                  ->orWhereHas('grade', fn ($c) => $c->where('name_th', 'like', "%{$s}%"))
+                  ->orWhereHas('classroom', fn ($c) => $c->where('name', 'like', "%{$s}%"));
+            });
+        }
+
+        $sortBy = in_array($request->get('sort_by'), ['id', 'grade_id', 'classroom_id', 'course_id'])
+            ? $request->get('sort_by') : 'id';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $openedCourses = $query->paginate($perPage)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.opened-courses._rows', compact('openedCourses'))->render(),
+                'meta' => [
+                    'total'        => $openedCourses->total(),
+                    'per_page'     => $openedCourses->perPage(),
+                    'current_page' => $openedCourses->currentPage(),
+                    'last_page'    => $openedCourses->lastPage(),
+                    'from'         => $openedCourses->firstItem() ?? 0,
+                    'to'           => $openedCourses->lastItem() ?? 0,
+                ],
+            ]);
+        }
+
+        $grades = Grade::where('status', 1)->get();
+        $courses = $semesterId
+            ? Course::where('status', 1)->where('semester_id', $semesterId)->orderBy('name')->get()
+            : collect();
+
         return view('admin.opened-courses.index', compact(
-            'currentYear', 'currentSemester', 'academicYearId', 'semesterId'
+            'openedCourses', 'currentYear', 'currentSemester',
+            'academicYearId', 'semesterId', 'grades', 'courses'
         ));
     }
 
@@ -86,8 +136,20 @@ class OpenedCourseController extends Controller
                 ->get()
             : collect();
 
-        return view('admin.opened-courses.save', compact(
-            'currentYear', 'currentSemester', 'academicYearId', 'semesterId', 'openedGrades'
+        $classrooms = ($academicYearId && $semesterId)
+            ? OpenedClassroom::with('classroom')
+                ->where('academic_year_id', $academicYearId)
+                ->where('semester_id', $semesterId)
+                ->get()
+            : collect();
+
+        $courses = $semesterId
+            ? Course::where('semester_id', $semesterId)->where('status', 1)->orderBy('name')->get()
+            : collect();
+
+        return view('admin.opened-courses.create', compact(
+            'currentYear', 'currentSemester', 'academicYearId', 'semesterId',
+            'openedGrades', 'classrooms', 'courses'
         ));
     }
 
@@ -144,18 +206,18 @@ class OpenedCourseController extends Controller
                 ->get()
             : collect();
 
-        $classrooms = OpenedClassroom::with('classroom')
-            ->where('academic_year_id', $academicYearId)
-            ->where('semester_id', $semesterId)
-            ->where('grade_id', $openedCourse->grade_id)
-            ->get();
+        $classrooms = ($academicYearId && $semesterId)
+            ? OpenedClassroom::with('classroom')
+                ->where('academic_year_id', $academicYearId)
+                ->where('semester_id', $semesterId)
+                ->get()
+            : collect();
 
-        $courses = Course::where('grade_id', $openedCourse->grade_id)
-            ->where('semester_id', $semesterId)
-            ->where('status', 1)
-            ->get();
+        $courses = $semesterId
+            ? Course::where('semester_id', $semesterId)->where('status', 1)->orderBy('name')->get()
+            : collect();
 
-        return view('admin.opened-courses.save', compact(
+        return view('admin.opened-courses.edit', compact(
             'openedCourse', 'currentYear', 'currentSemester',
             'academicYearId', 'semesterId', 'openedGrades', 'classrooms', 'courses'
         ));

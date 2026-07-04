@@ -10,9 +10,51 @@ use Yajra\DataTables\Facades\DataTables;
 
 class FloorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.floors.index');
+        $query = Floor::with('building');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('building_id')) {
+            $query->where('building_id', $request->building_id);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('name_th', 'like', "%{$s}%")
+                  ->orWhere('name_en', 'like', "%{$s}%");
+            });
+        }
+
+        $sortBy = in_array($request->get('sort_by'), ['name_en', 'name_th', 'status', 'id'])
+            ? $request->get('sort_by') : 'id';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $floors = $query->paginate($perPage)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.floors._rows', compact('floors'))->render(),
+                'meta' => [
+                    'total'        => $floors->total(),
+                    'per_page'     => $floors->perPage(),
+                    'current_page' => $floors->currentPage(),
+                    'last_page'    => $floors->lastPage(),
+                    'from'         => $floors->firstItem() ?? 0,
+                    'to'           => $floors->lastItem() ?? 0,
+                ],
+            ]);
+        }
+
+        $buildings = Building::where('status', 1)->orderBy('name_th')->get();
+
+        return view('admin.floors.index', compact('floors', 'buildings'));
     }
 
     public function data(Request $request)

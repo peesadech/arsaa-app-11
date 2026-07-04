@@ -10,9 +10,46 @@ use Yajra\DataTables\Facades\DataTables;
 
 class LanguageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.languages.index');
+        $query = Language::query();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('code', 'like', "%{$s}%")
+                  ->orWhere('name', 'like', "%{$s}%")
+                  ->orWhere('native_name', 'like', "%{$s}%");
+            });
+        }
+
+        $sortBy = in_array($request->get('sort_by'), ['code', 'name', 'status', 'sort_order', 'id'])
+            ? $request->get('sort_by') : 'sort_order';
+        $sortOrder = $request->get('sort_order') === 'desc' ? 'desc' : 'asc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $languages = $query->paginate($perPage)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.languages._rows', compact('languages'))->render(),
+                'meta' => [
+                    'total'        => $languages->total(),
+                    'per_page'     => $languages->perPage(),
+                    'current_page' => $languages->currentPage(),
+                    'last_page'    => $languages->lastPage(),
+                    'from'         => $languages->firstItem() ?? 0,
+                    'to'           => $languages->lastItem() ?? 0,
+                ],
+            ]);
+        }
+
+        return view('admin.languages.index', compact('languages'));
     }
 
     public function data(Request $request)

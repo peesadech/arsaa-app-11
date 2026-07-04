@@ -22,13 +22,67 @@ use Yajra\DataTables\Facades\DataTables;
 
 class StudentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = Student::with([
+            'enrollments' => function ($q) {
+                $q->where('status', 'enrolled')
+                    ->with(['grade', 'classroom', 'academicYear', 'semester'])
+                    ->orderByDesc('id');
+            },
+        ]);
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('student_code', 'like', "%{$s}%")
+                    ->orWhere('name_th', 'like', "%{$s}%")
+                    ->orWhere('name_cn', 'like', "%{$s}%")
+                    ->orWhere('phone', 'like', "%{$s}%")
+                    ->orWhere('mobile', 'like', "%{$s}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('students.status', $request->status);
+        }
+
+        if ($request->filled('academic_year_id') || $request->filled('semester_id') || $request->filled('classroom_id')) {
+            $query->whereHas('enrollments', function ($q) use ($request) {
+                $q->where('status', 'enrolled');
+                if ($request->filled('academic_year_id')) $q->where('academic_year_id', $request->academic_year_id);
+                if ($request->filled('semester_id')) $q->where('semester_id', $request->semester_id);
+                if ($request->filled('classroom_id')) $q->where('classroom_id', $request->classroom_id);
+            });
+        }
+
+        $sortBy = in_array($request->get('sort_by'), ['student_code', 'name_th', 'status', 'id'])
+            ? $request->get('sort_by') : 'id';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $students = $query->paginate($perPage)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.students._rows', compact('students'))->render(),
+                'meta' => [
+                    'total'        => $students->total(),
+                    'per_page'     => $students->perPage(),
+                    'current_page' => $students->currentPage(),
+                    'last_page'    => $students->lastPage(),
+                    'from'         => $students->firstItem() ?? 0,
+                    'to'           => $students->lastItem() ?? 0,
+                ],
+            ]);
+        }
+
         $academicYears = AcademicYear::orderByDesc('year')->get();
         $semesters = Semester::where('status', 1)->get();
         $classrooms = Classroom::where('status', 1)->get();
 
-        return view('admin.students.index', compact('academicYears', 'semesters', 'classrooms'));
+        return view('admin.students.index', compact('students', 'academicYears', 'semesters', 'classrooms'));
     }
 
     public function data(Request $request)
@@ -112,7 +166,7 @@ class StudentController extends Controller
 
     public function create()
     {
-        return view('admin.students.save', $this->formData());
+        return view('admin.students.create', $this->formData());
     }
 
     public function store(StudentRequest $request)
@@ -146,7 +200,7 @@ class StudentController extends Controller
             'scores.openedCourse.course', 'scores.openedCourse.academicYear', 'scores.openedCourse.semester',
         ])->findOrFail($id);
 
-        return view('admin.students.save', array_merge($this->formData(), compact('student')));
+        return view('admin.students.edit', array_merge($this->formData(), compact('student')));
     }
 
     public function update(StudentRequest $request, $id)

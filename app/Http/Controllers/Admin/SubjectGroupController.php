@@ -9,9 +9,45 @@ use Yajra\DataTables\Facades\DataTables;
 
 class SubjectGroupController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.subject-groups.index');
+        $query = SubjectGroup::query();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('name_th', 'like', "%{$s}%")
+                  ->orWhere('name_en', 'like', "%{$s}%");
+            });
+        }
+
+        $sortBy = in_array($request->get('sort_by'), ['name_en', 'name_th', 'status', 'id'])
+            ? $request->get('sort_by') : 'id';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $subjectGroups = $query->paginate($perPage)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.subject-groups._rows', compact('subjectGroups'))->render(),
+                'meta' => [
+                    'total'        => $subjectGroups->total(),
+                    'per_page'     => $subjectGroups->perPage(),
+                    'current_page' => $subjectGroups->currentPage(),
+                    'last_page'    => $subjectGroups->lastPage(),
+                    'from'         => $subjectGroups->firstItem() ?? 0,
+                    'to'           => $subjectGroups->lastItem() ?? 0,
+                ],
+            ]);
+        }
+
+        return view('admin.subject-groups.index', compact('subjectGroups'));
     }
 
     public function data(Request $request)
@@ -42,7 +78,7 @@ class SubjectGroupController extends Controller
 
     public function create()
     {
-        return view('admin.subject-groups.save');
+        return view('admin.subject-groups.create');
     }
 
     public function store(Request $request)
@@ -62,7 +98,7 @@ class SubjectGroupController extends Controller
     public function edit($id)
     {
         $subjectGroup = SubjectGroup::findOrFail($id);
-        return view('admin.subject-groups.save', compact('subjectGroup'));
+        return view('admin.subject-groups.edit', compact('subjectGroup'));
     }
 
     public function update(Request $request, $id)

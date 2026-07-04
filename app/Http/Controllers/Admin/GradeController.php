@@ -10,9 +10,49 @@ use Yajra\DataTables\Facades\DataTables;
 
 class GradeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.grades.index');
+        $query = Grade::with('educationLevel');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('education_level_id')) {
+            $query->where('education_level_id', $request->education_level_id);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('name_th', 'like', "%{$s}%")
+                  ->orWhere('name_en', 'like', "%{$s}%");
+            });
+        }
+
+        $sortBy = in_array($request->get('sort_by'), ['name_en', 'name_th', 'status', 'id'])
+            ? $request->get('sort_by') : 'id';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $grades = $query->paginate($perPage)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.grades._rows', compact('grades'))->render(),
+                'meta' => [
+                    'total'        => $grades->total(),
+                    'per_page'     => $grades->perPage(),
+                    'current_page' => $grades->currentPage(),
+                    'last_page'    => $grades->lastPage(),
+                    'from'         => $grades->firstItem() ?? 0,
+                    'to'           => $grades->lastItem() ?? 0,
+                ],
+            ]);
+        }
+
+        return view('admin.grades.index', compact('grades'));
     }
 
     public function data(Request $request)
@@ -54,7 +94,7 @@ class GradeController extends Controller
     public function create()
     {
         $educationLevels = EducationLevel::where('status', 1)->get();
-        return view('admin.grades.save', compact('educationLevels'));
+        return view('admin.grades.create', compact('educationLevels'));
     }
 
     public function store(Request $request)
@@ -76,7 +116,7 @@ class GradeController extends Controller
     {
         $grade = Grade::findOrFail($id);
         $educationLevels = EducationLevel::where('status', 1)->get();
-        return view('admin.grades.save', compact('grade', 'educationLevels'));
+        return view('admin.grades.edit', compact('grade', 'educationLevels'));
     }
 
     public function update(Request $request, $id)

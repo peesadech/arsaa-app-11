@@ -12,10 +12,51 @@ use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = User::with('roles');
+
+        if ($request->filled('role')) {
+            $query->role($request->role);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('name', 'like', "%{$s}%")
+                  ->orWhere('email', 'like', "%{$s}%");
+            });
+        }
+
+        $sortBy = in_array($request->get('sort_by'), ['name', 'email', 'id'])
+            ? $request->get('sort_by') : 'id';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $users = $query->paginate($perPage)->withQueryString();
+
         $roles = Role::all();
-        return view('admin.users.index', compact('roles'));
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.users._rows', compact('users'))->render(),
+                'meta' => [
+                    'total'        => $users->total(),
+                    'per_page'     => $users->perPage(),
+                    'current_page' => $users->currentPage(),
+                    'last_page'    => $users->lastPage(),
+                    'from'         => $users->firstItem() ?? 0,
+                    'to'           => $users->lastItem() ?? 0,
+                ],
+            ]);
+        }
+
+        return view('admin.users.index', compact('users', 'roles'));
     }
 
     public function data(Request $request)
@@ -85,7 +126,7 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::all();
-        return view('admin.users.save', compact('roles'));
+        return view('admin.users.create', compact('roles'));
     }
 
     public function store(Request $request)
@@ -119,7 +160,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $roles = Role::all();
         $userRoles = $user->roles->pluck('name')->toArray();
-        return view('admin.users.save', compact('user', 'roles', 'userRoles'));
+        return view('admin.users.edit', compact('user', 'roles', 'userRoles'));
     }
 
     public function update(Request $request, $id)

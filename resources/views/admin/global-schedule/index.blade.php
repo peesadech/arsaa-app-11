@@ -1,118 +1,92 @@
-@extends('layouts.app')
+<x-layouts.admin :header="__('Global Schedule')" :subheader="__('Select an education level to configure its schedule')">
+    <x-slot name="actions">
+        <x-button variant="secondary" icon="arrow-left" :href="route('admin.dashboard')">{{ __('Back') }}</x-button>
+    </x-slot>
 
-@section('content')
-<div class="min-h-screen bg-gray-50 dark:bg-[#18191a] py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-    <div class="max-w-6xl mx-auto">
+    {{-- Flash --}}
+    @if(session('success'))
+    <div id="flashMsg" class="fixed bottom-4 right-4 z-50 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl shadow-soft transform transition-all duration-500 opacity-100">
+        <i class="fas fa-check-circle text-emerald-500 mr-3 text-xl"></i>
+        <span class="text-sm font-bold text-emerald-700">{{ session('success') }}</span>
+    </div>
+    <script>
+        setTimeout(() => {
+            const el = document.getElementById('flashMsg');
+            if (el) {
+                el.classList.remove('opacity-100');
+                el.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => el.remove(), 500);
+            }
+        }, 2000);
+    </script>
+    @endif
 
-        {{-- Header --}}
-        <div class="flex items-center space-x-4 mb-8">
-            <a href="{{ route('admin.dashboard') }}"
-               class="group flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#242526] shadow-sm border border-gray-200 dark:border-[#3a3b3c] text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 transition-all duration-200">
-                <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
-            </a>
-            <div>
-                <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ __('Global Schedule') }}</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">{{ __('Select an education level to configure its schedule') }}</p>
+    @if($educationLevels->isEmpty())
+    <x-card>
+        <div class="p-12 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-school text-2xl text-slate-300"></i>
             </div>
+            <h3 class="text-lg font-semibold text-slate-800 mb-2">{{ __('No Education Levels Found') }}</h3>
+            <p class="text-sm text-slate-500 mb-6">{{ __('Please create education levels first before configuring schedules.') }}</p>
+            <x-button icon="plus" :href="route('admin.education-levels.create')">{{ __('Create Education Level') }}</x-button>
         </div>
-
-        {{-- Flash --}}
-        @if(session('success'))
-        <div id="flashMsg" class="fixed bottom-4 right-4 z-50 flex items-center p-4 bg-emerald-50 dark:bg-emerald-900/30 border-l-4 border-emerald-500 rounded-r-2xl shadow-xl transform transition-all duration-500 opacity-100">
-            <i class="fas fa-check-circle text-emerald-500 mr-3 text-xl"></i>
-            <span class="text-sm font-bold text-emerald-700 dark:text-emerald-400">{{ session('success') }}</span>
-        </div>
-        <script>
-            setTimeout(() => {
-                const el = document.getElementById('flashMsg');
-                if (el) {
-                    el.classList.remove('opacity-100');
-                    el.classList.add('opacity-0', 'translate-y-4');
-                    setTimeout(() => el.remove(), 500);
-                }
-            }, 2000);
-        </script>
-        @endif
-
-        @if($educationLevels->isEmpty())
-        <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-12 text-center">
-            <div class="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-[#3a3b3c] flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-school text-2xl text-gray-300 dark:text-gray-600"></i>
-            </div>
-            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2">{{ __('No Education Levels Found') }}</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{ __('Please create education levels first before configuring schedules.') }}</p>
-            <a href="{{ route('admin.education-levels.create') }}"
-               class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 transition-all duration-200">
-                <i class="fas fa-plus mr-2"></i> {{ __('Create Education Level') }}
-            </a>
-        </div>
-        @else
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($educationLevels as $level)
-                @php
-                    $schedule = $scheduleMap[$level->id] ?? null;
-                    $hasSchedule = $schedule !== null;
-                    $periods = 0;
-                    $activeDays = 0;
-                    if ($hasSchedule && is_array($schedule->day_configs)) {
-                        foreach ($schedule->day_configs as $cfg) {
-                            if (($cfg['periods'] ?? 0) > 0) $activeDays++;
-                            $periods = max($periods, $cfg['periods'] ?? 0);
-                        }
+    </x-card>
+    @else
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach($educationLevels as $level)
+            @php
+                $schedule = $scheduleMap[$level->id] ?? null;
+                $hasSchedule = $schedule !== null;
+                $periods = 0;
+                $activeDays = 0;
+                if ($hasSchedule && is_array($schedule->day_configs)) {
+                    foreach ($schedule->day_configs as $cfg) {
+                        if (($cfg['periods'] ?? 0) > 0) $activeDays++;
+                        $periods = max($periods, $cfg['periods'] ?? 0);
                     }
-                @endphp
-                <a href="{{ route('admin.global-schedule.edit', $level->id) }}"
-                   class="group block bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] overflow-hidden hover:shadow-lg hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-300 transform hover:-translate-y-1">
+                }
+            @endphp
+            <a href="{{ route('admin.global-schedule.edit', $level->id) }}"
+               class="group block card overflow-hidden hover:shadow-soft hover:border-brand-200 transition-all duration-300">
 
-                    {{-- Top color bar --}}
-                    <div class="h-1.5 {{ $hasSchedule ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500' : 'bg-gray-200 dark:bg-[#3a3b3c]' }}"></div>
+                {{-- Top color bar --}}
+                <div class="h-1.5 {{ $hasSchedule ? 'bg-brand-600' : 'bg-slate-200' }}"></div>
 
-                    <div class="p-6">
-                        {{-- Icon + Title --}}
-                        <div class="flex items-start space-x-4 mb-4">
-                            <div class="w-12 h-12 rounded-xl {{ $hasSchedule ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/50' : 'bg-gray-50 dark:bg-[#3a3b3c] text-gray-400 dark:text-gray-500 border-gray-100 dark:border-[#3a3b3c]' }} border flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-school text-lg"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h3 class="text-base font-extrabold text-gray-900 dark:text-white tracking-tight truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ $level->name_th }}</h3>
-                                <p class="text-xs text-gray-400 dark:text-gray-500 font-medium truncate">{{ $level->name_en }}</p>
-                            </div>
+                <div class="p-6">
+                    {{-- Icon + Title --}}
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-12 h-12 rounded-xl border {{ $hasSchedule ? 'bg-brand-50 text-brand-600 border-brand-100' : 'bg-slate-50 text-slate-400 border-slate-100' }} flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-school text-lg"></i>
                         </div>
-
-                        {{-- Stats --}}
-                        @if($hasSchedule)
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="flex items-center px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-900/20">
-                                <i class="fas fa-calendar-day text-[10px] text-indigo-500 mr-1.5"></i>
-                                <span class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">{{ $activeDays }} {{ __('days') }}</span>
-                            </div>
-                            <div class="flex items-center px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-900/20">
-                                <i class="fas fa-clock text-[10px] text-purple-500 mr-1.5"></i>
-                                <span class="text-[11px] font-bold text-purple-600 dark:text-purple-400">{{ $periods }} {{ __('periods max') }}</span>
-                            </div>
-                        </div>
-                        @endif
-
-                        {{-- Status badge --}}
-                        <div class="flex items-center justify-between">
-                            @if($hasSchedule)
-                                <span class="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                                    <i class="fas fa-check-circle mr-1"></i>{{ __('Configured') }}
-                                </span>
-                            @else
-                                <span class="px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                                    <i class="fas fa-exclamation-circle mr-1"></i>{{ __('Not Configured') }}
-                                </span>
-                            @endif
-                            <span class="text-xs font-bold text-gray-300 dark:text-gray-600 group-hover:text-indigo-400 transition-colors">
-                                <i class="fas fa-arrow-right"></i>
-                            </span>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-base font-semibold text-slate-900 truncate group-hover:text-brand-600 transition-colors">{{ $level->name_th }}</h3>
+                            <p class="text-xs text-slate-400 font-medium truncate">{{ $level->name_en }}</p>
                         </div>
                     </div>
-                </a>
-            @endforeach
-        </div>
-        @endif
+
+                    {{-- Stats --}}
+                    @if($hasSchedule)
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="badge-blue"><i class="fas fa-calendar-day text-[10px]"></i>{{ $activeDays }} {{ __('days') }}</span>
+                        <span class="badge-gray"><i class="fas fa-clock text-[10px]"></i>{{ $periods }} {{ __('periods max') }}</span>
+                    </div>
+                    @endif
+
+                    {{-- Status badge --}}
+                    <div class="flex items-center justify-between">
+                        @if($hasSchedule)
+                            <span class="badge-green uppercase"><i class="fas fa-check-circle"></i>{{ __('Configured') }}</span>
+                        @else
+                            <span class="badge-amber uppercase"><i class="fas fa-exclamation-circle"></i>{{ __('Not Configured') }}</span>
+                        @endif
+                        <span class="text-xs font-bold text-slate-300 group-hover:text-brand-400 transition-colors">
+                            <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </div>
+                </div>
+            </a>
+        @endforeach
     </div>
-</div>
-@endsection
+    @endif
+</x-layouts.admin>

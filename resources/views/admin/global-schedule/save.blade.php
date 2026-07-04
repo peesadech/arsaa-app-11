@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @php
     $dayMeta = [
         1 => ['label' => __('Monday'),    'short' => __('Mon')],
@@ -12,6 +10,69 @@
     ];
     $savedConfigs = $schedule->day_configs ?? [];
 @endphp
+
+<x-layouts.admin :header="$educationLevel->name_th" :subheader="$educationLevel->name_en . ' — ' . __('Schedule Configuration')">
+    <x-slot name="actions">
+        <x-button variant="secondary" icon="arrow-left" :href="route('admin.global-schedule.index')">{{ __('Back') }}</x-button>
+    </x-slot>
+
+    @if($errors->any())
+    <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl text-sm text-red-700 font-medium">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        @foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach
+    </div>
+    @endif
+
+    <form action="{{ route('admin.global-schedule.update', $educationLevel->id) }}" method="POST" id="scheduleForm">
+        @csrf @method('PUT')
+        <input type="hidden" name="day_configs" id="dayConfigsInput">
+        <div id="teachingDaysInputs"></div>
+
+        {{-- Global Settings --}}
+        <x-card class="mb-5">
+            <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">{{ __('General Settings') }}</h3>
+            <div class="flex flex-wrap gap-6">
+                <div class="space-y-2">
+                    <label class="form-label">{{ __('Start Time') }}</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400"><i class="fas fa-clock text-sm"></i></div>
+                        <input type="time" id="start_time" name="start_time"
+                            value="{{ old('start_time', $schedule->start_time ? \Carbon\Carbon::parse($schedule->start_time)->format('H:i') : '08:00') }}"
+                            class="form-input pl-10 w-40" oninput="renderTable()" required>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="form-label">{{ __('Period Duration') }}</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400"><i class="fas fa-hourglass-half text-sm"></i></div>
+                        <input type="number" id="period_duration" name="period_duration" min="1" max="240"
+                            value="{{ old('period_duration', $schedule->period_duration ?? 50) }}"
+                            class="form-input pl-10 pr-14 w-40" oninput="renderTable()" required>
+                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400 text-xs font-bold">{{ __('minutes') }}</div>
+                    </div>
+                </div>
+            </div>
+        </x-card>
+
+        {{-- Schedule Table --}}
+        <x-card padded="false" class="mb-5">
+            <div class="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wide">{{ __('Timetable') }}</h3>
+                <span class="text-[10px] text-amber-500 font-bold">{{ __('Click break row to toggle') }} | [-/+] {{ __('Add/remove periods per day') }}</span>
+            </div>
+            <div class="overflow-x-auto p-4">
+                <table id="scheduleTable" class="schedule-table">
+                    <tbody id="scheduleBody"></tbody>
+                </table>
+            </div>
+        </x-card>
+
+        {{-- Save --}}
+        <button type="submit" onclick="prepareSubmit()" class="btn-primary w-full py-4 text-base">
+            <i class="fas fa-save mr-1"></i>
+            {{ __('Save Schedule') }}
+        </button>
+    </form>
 
 @push('styles')
 <style>
@@ -26,88 +87,6 @@
     }
 </style>
 @endpush
-
-@section('content')
-<div class="min-h-screen bg-gray-50 dark:bg-[#18191a] py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-    <div class="max-w-6xl mx-auto">
-
-        {{-- Header --}}
-        <div class="flex items-center space-x-4 mb-8">
-            <a href="{{ route('admin.global-schedule.index') }}"
-               class="group flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#242526] shadow-sm border border-gray-200 dark:border-[#3a3b3c] text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 transition-all duration-200">
-                <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i>
-            </a>
-            <div>
-                <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{{ $educationLevel->name_th }}</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium px-1">{{ $educationLevel->name_en }} — {{ __('Schedule Configuration') }}</p>
-            </div>
-        </div>
-
-        @if($errors->any())
-        <div class="mb-6 p-4 bg-rose-50 dark:bg-rose-900/20 border-l-4 border-rose-500 rounded-r-2xl text-sm text-rose-700 dark:text-rose-400 font-medium">
-            <i class="fas fa-exclamation-triangle mr-2"></i>
-            @foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach
-        </div>
-        @endif
-
-        <form action="{{ route('admin.global-schedule.update', $educationLevel->id) }}" method="POST" id="scheduleForm">
-            @csrf @method('PUT')
-            <input type="hidden" name="day_configs" id="dayConfigsInput">
-            <div id="teachingDaysInputs"></div>
-
-            {{-- Global Settings --}}
-            <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] p-6 mb-5">
-                <h3 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4">{{ __('General Settings') }}</h3>
-                <div class="flex flex-wrap gap-6">
-                    <div class="space-y-2">
-                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">{{ __('Start Time') }}</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400"><i class="fas fa-clock text-sm"></i></div>
-                            <input type="time" id="start_time" name="start_time"
-                                value="{{ old('start_time', $schedule->start_time ? \Carbon\Carbon::parse($schedule->start_time)->format('H:i') : '08:00') }}"
-                                class="pl-10 pr-4 py-3 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white focus:outline-none focus:border-indigo-500 transition-all w-40"
-                                oninput="renderTable()" required>
-                        </div>
-                    </div>
-                    <div class="space-y-2">
-                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1">{{ __('Period Duration') }}</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400"><i class="fas fa-hourglass-half text-sm"></i></div>
-                            <input type="number" id="period_duration" name="period_duration" min="1" max="240"
-                                value="{{ old('period_duration', $schedule->period_duration ?? 50) }}"
-                                class="pl-10 pr-14 py-3 bg-gray-50 dark:bg-[#3a3b3c] border-2 border-transparent rounded-2xl text-gray-900 dark:text-white focus:outline-none focus:border-indigo-500 transition-all w-40"
-                                oninput="renderTable()" required>
-                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400 text-xs font-bold">{{ __('minutes') }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Schedule Table --}}
-            <div class="bg-white dark:bg-[#242526] rounded-[2rem] shadow-sm border border-gray-100 dark:border-[#3a3b3c] overflow-hidden mb-5">
-                <div class="px-6 py-3 border-b border-gray-100 dark:border-[#3a3b3c] flex items-center justify-between">
-                    <h3 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{{ __('Timetable') }}</h3>
-                    <span class="text-[10px] text-amber-500 font-bold">{{ __('Click break row to toggle') }} | [-/+] {{ __('Add/remove periods per day') }}</span>
-                </div>
-                <div class="overflow-x-auto p-4">
-                    <table id="scheduleTable" class="schedule-table">
-                        <tbody id="scheduleBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            {{-- Save --}}
-            <button type="submit" onclick="prepareSubmit()"
-                class="w-full group relative flex items-center justify-center px-8 py-4 bg-indigo-600 text-white hover:bg-indigo-700 font-bold rounded-2xl active:scale-95 transition-all duration-200 shadow-lg shadow-indigo-200 dark:shadow-none overflow-hidden">
-                <span class="relative z-10 flex items-center">
-                    <i class="fas fa-save mr-2 opacity-50 group-hover:opacity-100 transition-opacity"></i>
-                    {{ __('Save Schedule') }}
-                </span>
-                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
-            </button>
-        </form>
-    </div>
-</div>
 
 @push('scripts')
 <script>
@@ -334,4 +313,4 @@ document.getElementById('period_duration').addEventListener('input', renderTable
 renderTable();
 </script>
 @endpush
-@endsection
+</x-layouts.admin>

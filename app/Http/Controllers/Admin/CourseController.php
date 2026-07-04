@@ -14,15 +14,53 @@ use Yajra\DataTables\Facades\DataTables;
 
 class CourseController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = Course::with(['grade', 'semester', 'subjectGroup', 'gradingScheme', 'courseType.gradingScheme']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('subject_group_id')) {
+            $query->where('subject_group_id', $request->subject_group_id);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where('name', 'like', "%{$s}%");
+        }
+
+        $sortBy = in_array($request->get('sort_by'), ['name', 'status', 'id'])
+            ? $request->get('sort_by') : 'id';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        $perPage = (int) $request->get('per_page', 10);
+        $courses = $query->paginate($perPage)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'html' => view('admin.courses._rows', compact('courses'))->render(),
+                'meta' => [
+                    'total'        => $courses->total(),
+                    'per_page'     => $courses->perPage(),
+                    'current_page' => $courses->currentPage(),
+                    'last_page'    => $courses->lastPage(),
+                    'from'         => $courses->firstItem() ?? 0,
+                    'to'           => $courses->lastItem() ?? 0,
+                ],
+            ]);
+        }
+
         $subjectGroups = SubjectGroup::where('status', 1)->get();
-        return view('admin.courses.index', compact('subjectGroups'));
+
+        return view('admin.courses.index', compact('courses', 'subjectGroups'));
     }
 
     public function data(Request $request)
     {
-        $courses = Course::with(['grade', 'semester', 'subjectGroup'])->select('courses.*');
+        $courses = Course::with(['grade', 'semester', 'subjectGroup', 'gradingScheme', 'courseType.gradingScheme'])->select('courses.*');
 
         if ($request->filled('status')) {
             $courses->where('courses.status', $request->status);
@@ -43,6 +81,27 @@ class CourseController extends Controller
                 if (! $course->subjectGroup) return '<span class="text-gray-400 text-[10px] italic">-</span>';
                 return '<span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-bold">' . e($course->subjectGroup->name_th) . '</span>';
             })
+            ->addColumn('grading_scheme', function ($course) {
+                $scheme = $course->resolveGradingScheme();
+
+                if (! $scheme) {
+                    return '<span class="px-2 py-1 rounded-lg bg-rose-50 text-rose-500 text-[10px] font-bold">' . e(__('Grading not set')) . '</span>';
+                }
+
+                // ที่มา: กำหนดเองในรายวิชา (override) หรือสืบทอดจากประเภทวิชา
+                $fromCourse = $course->grading_scheme_id !== null;
+                $source = $fromCourse ? __('From subject course') : __('From course type');
+
+                // สีตามชนิดผล: เกรด = indigo, ผ่าน/ไม่ผ่าน = emerald
+                $isPassFail = $scheme->result_type === \App\Models\GradingScheme::RESULT_TYPE_PASS_FAIL;
+                $badgeColor = $isPassFail ? 'bg-emerald-50 text-emerald-600' : 'bg-indigo-50 text-indigo-600';
+                $srcColor = $fromCourse ? 'text-indigo-400' : 'text-gray-400';
+
+                return '<div class="flex flex-col gap-1">'
+                    . '<span class="w-fit px-2 py-0.5 rounded-full ' . $badgeColor . ' text-[10px] font-bold">' . e($scheme->name) . '</span>'
+                    . '<span class="text-[9px] font-bold uppercase tracking-wide ' . $srcColor . '">' . e($source) . '</span>'
+                    . '</div>';
+            })
             ->addColumn('status', function ($course) {
                 $statusText = $course->status == 1 ? 'Active' : 'Not Active';
                 $colorClass = $course->status == 1 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
@@ -56,7 +115,7 @@ class CourseController extends Controller
                 $btn .= '</div>';
                 return $btn;
             })
-            ->rawColumns(['subject_group_name', 'status', 'action'])
+            ->rawColumns(['subject_group_name', 'grading_scheme', 'status', 'action'])
             ->make(true);
     }
 
@@ -67,7 +126,7 @@ class CourseController extends Controller
         $subjectGroups = SubjectGroup::where('status', 1)->get();
         $courseTypes = CourseType::where('status', 1)->get();
         $gradingSchemes = GradingScheme::where('status', 1)->get();
-        return view('admin.courses.save', compact('grades', 'semesters', 'subjectGroups', 'courseTypes', 'gradingSchemes'));
+        return view('admin.courses.create', compact('grades', 'semesters', 'subjectGroups', 'courseTypes', 'gradingSchemes'));
     }
 
     public function store(Request $request)
@@ -99,7 +158,7 @@ class CourseController extends Controller
         $subjectGroups = SubjectGroup::where('status', 1)->get();
         $courseTypes = CourseType::where('status', 1)->get();
         $gradingSchemes = GradingScheme::where('status', 1)->get();
-        return view('admin.courses.save', compact('course', 'grades', 'semesters', 'subjectGroups', 'courseTypes', 'gradingSchemes'));
+        return view('admin.courses.edit', compact('course', 'grades', 'semesters', 'subjectGroups', 'courseTypes', 'gradingSchemes'));
     }
 
     public function update(Request $request, $id)
