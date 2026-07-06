@@ -37,4 +37,14 @@ class OpenedCourse extends Model
     {
         return $this->hasMany(TimetableEntry::class);
     }
+
+    public function scoreItems()
+    {
+        return $this->hasMany(ScoreItem::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function studentScores()
+    {
+        return $this->hasMany(StudentScore::class);
+    }
 }

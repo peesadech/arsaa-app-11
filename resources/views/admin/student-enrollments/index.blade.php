@@ -29,6 +29,59 @@
         @endforeach
     </div>
 
+    {{-- Homeroom teachers for selected room --}}
+    @if($selectedGradeId && $selectedClassroomId)
+    <x-card class="mb-6">
+        <h2 class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4 flex items-center gap-1.5">
+            <x-icon name="academic" class="h-4 w-4" /> {{ __('Homeroom Teachers') }}
+        </h2>
+        @if($selectedClassroom)
+            <div class="flex flex-wrap items-center gap-2 mb-4">
+                @forelse($selectedClassroom->homeroomTeachers as $t)
+                <span class="inline-flex items-center gap-2 pl-3 pr-1.5 py-1.5 rounded-xl bg-slate-50 border border-slate-100 text-sm">
+                    <span class="font-medium text-slate-800">{{ $t->name }}</span>
+                    <x-badge :color="$t->pivot->role === 'main' ? 'green' : 'blue'">{{ \App\Models\OpenedClassroom::HOMEROOM_ROLES[$t->pivot->role] ?? $t->pivot->role }}</x-badge>
+                    <form action="{{ route('admin.student-enrollments.homeroom.remove', [$selectedClassroom->id, $t->id]) }}" method="POST" class="inline"
+                          onsubmit="return confirm('{{ __('Remove this homeroom teacher?') }}')">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="inline-flex items-center justify-center w-6 h-6 rounded-lg text-red-500 hover:bg-red-50 transition" title="{{ __('Remove') }}">
+                            <x-icon name="x" class="h-4 w-4" />
+                        </button>
+                    </form>
+                </span>
+                @empty
+                <span class="text-sm text-slate-400">{{ __('No homeroom teacher assigned yet') }}</span>
+                @endforelse
+            </div>
+
+            <form action="{{ route('admin.student-enrollments.homeroom.assign') }}" method="POST" class="flex flex-wrap items-end gap-2">
+                @csrf
+                <input type="hidden" name="opened_classroom_id" value="{{ $selectedClassroom->id }}">
+                <div class="flex-1 min-w-48">
+                    <label class="text-xs text-slate-400">{{ __('Teacher') }}</label>
+                    <select name="teacher_id" class="form-select text-sm" required>
+                        <option value="">{{ __('Select teacher') }}</option>
+                        @foreach($teachers as $teacher)
+                        <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="w-40">
+                    <label class="text-xs text-slate-400">{{ __('Role') }}</label>
+                    <select name="role" class="form-select text-sm">
+                        @foreach(\App\Models\OpenedClassroom::HOMEROOM_ROLES as $key => $label)
+                        <option value="{{ $key }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary"><x-icon name="plus" class="h-4 w-4" /> {{ __('Assign') }}</button>
+            </form>
+        @else
+            <p class="text-sm text-slate-400">{{ __('This classroom is not opened for the term — open it from the dashboard first.') }}</p>
+        @endif
+    </x-card>
+    @endif
+
     {{-- Student list in selected room --}}
     @if($selectedGradeId && $selectedClassroomId)
     <x-card>

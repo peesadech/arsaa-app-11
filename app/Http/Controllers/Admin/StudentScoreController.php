@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\HandlesScoreEntry;
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
 use App\Models\CurrentAcademicSetting;
-use App\Models\GradeSetting;
 use App\Models\OpenedClassroom;
 use App\Models\OpenedCourse;
 use App\Models\Semester;
@@ -15,9 +15,36 @@ use Illuminate\Http\Request;
 
 class StudentScoreController extends Controller
 {
+    use HandlesScoreEntry;
+
     public function __construct(private StudentScoreService $scoreService)
     {
     }
+
+    /* ---- hooks for HandlesScoreEntry ---- */
+
+    protected function authorizeCourse(OpenedCourse $openedCourse): void
+    {
+        // แอดมิน/งานทะเบียน เข้าถึงได้ทุกวิชา (route group จำกัดสิทธิ์ระดับหน้าแล้ว)
+    }
+
+    protected function routePrefix(): string
+    {
+        return 'admin.student-scores';
+    }
+
+    protected function gridView(): string
+    {
+        return 'admin.student-scores.entry';
+    }
+
+    protected function summaryTeacherId(OpenedCourse $openedCourse, Request $request): ?int
+    {
+        $teacherId = $request->input('teacher_id');
+        return $teacherId !== null && $teacherId !== '' ? (int) $teacherId : null;
+    }
+
+    /* ---- listing ---- */
 
     private function resolveYearSemester(Request $request): array
     {
@@ -73,43 +100,5 @@ class StudentScoreController extends Controller
             'academicYear', 'semester', 'openedClassrooms',
             'selectedGradeId', 'selectedClassroomId', 'openedCourses'
         ));
-    }
-
-    /**
-     * หน้ากรอกคะแนนของวิชาหนึ่ง — แสดงนักเรียนทุกคนในห้องนั้น
-     */
-    public function entry($openedCourseId)
-    {
-        $openedCourse = OpenedCourse::with('course.teachers', 'grade', 'classroom', 'academicYear', 'semester')
-            ->findOrFail($openedCourseId);
-
-        $enrollments = $this->scoreService->enrollmentsForCourse($openedCourse);
-
-        $scores = StudentScore::where('opened_course_id', $openedCourse->id)
-            ->get()
-            ->keyBy('student_id');
-
-        $gradeSettings = GradeSetting::orderBy('sort_order')->get();
-
-        return view('admin.student-scores.entry', compact('openedCourse', 'enrollments', 'scores', 'gradeSettings'));
-    }
-
-    public function save(Request $request, $openedCourseId)
-    {
-        $openedCourse = OpenedCourse::findOrFail($openedCourseId);
-
-        $data = $request->validate([
-            'teacher_id' => 'nullable|exists:teachers,id',
-            'scores' => 'required|array',
-            'scores.*.score_collect' => 'nullable|numeric|min:0|max:100',
-            'scores.*.score_midterm' => 'nullable|numeric|min:0|max:100',
-            'scores.*.score_final' => 'nullable|numeric|min:0|max:100',
-            'scores.*.remark' => 'nullable|string|max:255',
-        ]);
-
-        $saved = $this->scoreService->saveScores($openedCourse, $data['scores'], $data['teacher_id'] ?? null);
-
-        return redirect()->route('admin.student-scores.entry', $openedCourse->id)
-            ->with('status', __(':count scores saved', ['count' => $saved]));
     }
 }

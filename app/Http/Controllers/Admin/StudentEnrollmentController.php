@@ -9,6 +9,7 @@ use App\Models\OpenedClassroom;
 use App\Models\Semester;
 use App\Models\Student;
 use App\Models\StudentEnrollment;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -55,6 +56,8 @@ class StudentEnrollmentController extends Controller
         $selectedClassroomId = (int) $request->query('classroom_id');
 
         $enrollments = collect();
+        $selectedClassroom = null;
+        $teachers = collect();
         if ($selectedGradeId && $selectedClassroomId) {
             $enrollments = StudentEnrollment::where('academic_year_id', $yearId)
                 ->where('semester_id', $semesterId)
@@ -64,12 +67,52 @@ class StudentEnrollmentController extends Controller
                 ->with('student')
                 ->orderBy(Student::select('name_th')->whereColumn('students.id', 'student_enrollments.student_id'))
                 ->get();
+
+            // ห้องที่เปิด (สำหรับผูกครูประจำชั้น) + ครูที่พร้อมให้เลือก
+            $selectedClassroom = OpenedClassroom::where('academic_year_id', $yearId)
+                ->where('semester_id', $semesterId)
+                ->where('grade_id', $selectedGradeId)
+                ->where('classroom_id', $selectedClassroomId)
+                ->with('homeroomTeachers')
+                ->first();
+
+            $teachers = Teacher::where('status', 1)->orderBy('name')->get(['id', 'name']);
         }
 
         return view('admin.student-enrollments.index', compact(
             'academicYear', 'semester', 'yearId', 'semesterId',
-            'openedClassrooms', 'counts', 'selectedGradeId', 'selectedClassroomId', 'enrollments'
+            'openedClassrooms', 'counts', 'selectedGradeId', 'selectedClassroomId', 'enrollments',
+            'selectedClassroom', 'teachers'
         ));
+    }
+
+    /** ผูกครูประจำชั้น (หลัก/ร่วม) กับห้อง */
+    public function assignHomeroom(Request $request)
+    {
+        $data = $request->validate([
+            'opened_classroom_id' => 'required|exists:opened_classrooms,id',
+            'teacher_id' => 'required|exists:teachers,id',
+            'role' => 'required|in:main,co',
+        ]);
+
+        $openedClassroom = OpenedClassroom::findOrFail($data['opened_classroom_id']);
+        $nextSort = (int) $openedClassroom->homeroomTeachers()->max('sort_order') + 1;
+
+        // มีอยู่แล้ว → อัปเดตบทบาท, ไม่มี → เพิ่ม
+        $openedClassroom->homeroomTeachers()->syncWithoutDetaching([
+            $data['teacher_id'] => ['role' => $data['role'], 'sort_order' => $nextSort],
+        ]);
+
+        return back()->with('status', __('Homeroom teacher assigned'));
+    }
+
+    /** ลบครูประจำชั้นออกจากห้อง */
+    public function removeHomeroom($openedClassroomId, $teacherId)
+    {
+        $openedClassroom = OpenedClassroom::findOrFail($openedClassroomId);
+        $openedClassroom->homeroomTeachers()->detach($teacherId);
+
+        return back()->with('status', __('Homeroom teacher removed'));
     }
 
     /**

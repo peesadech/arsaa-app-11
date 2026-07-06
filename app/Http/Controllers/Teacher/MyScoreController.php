@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers\Teacher;
 
+use App\Http\Controllers\Concerns\HandlesScoreEntry;
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
 use App\Models\CurrentAcademicSetting;
-use App\Models\GradeSetting;
 use App\Models\OpenedCourse;
 use App\Models\Semester;
 use App\Models\StudentScore;
 use App\Models\Teacher;
-use App\Models\TeacherTermCourse;
 use App\Services\StudentScoreService;
 use App\Services\TeacherAccountService;
 use Illuminate\Http\Request;
@@ -18,11 +17,43 @@ use Illuminate\Support\Facades\Auth;
 
 class MyScoreController extends Controller
 {
+    use HandlesScoreEntry;
+
     public function __construct(
         private StudentScoreService $scoreService,
         private TeacherAccountService $accountService,
     ) {
     }
+
+    /* ---- hooks for HandlesScoreEntry ---- */
+
+    protected function authorizeCourse(OpenedCourse $openedCourse): void
+    {
+        $teacher = $this->currentTeacher();
+        abort_unless(
+            $this->myOpenedCourses($teacher, $openedCourse->academic_year_id, $openedCourse->semester_id)
+                ->contains('id', $openedCourse->id),
+            403,
+            __('You can only record scores for your own courses')
+        );
+    }
+
+    protected function routePrefix(): string
+    {
+        return 'teacher.scores';
+    }
+
+    protected function gridView(): string
+    {
+        return 'teacher.scores.entry';
+    }
+
+    protected function summaryTeacherId(OpenedCourse $openedCourse, Request $request): ?int
+    {
+        return $this->currentTeacher()->id;
+    }
+
+    /* ---- helpers ---- */
 
     private function resolveYearSemester(Request $request): array
     {
@@ -46,13 +77,12 @@ class MyScoreController extends Controller
         return $teacher;
     }
 
-    /**
-     * วิชาที่ครูคนนี้สอนในเทอมปัจจุบัน (ห้อง × วิชา)
-     */
     private function myOpenedCourses(Teacher $teacher, int $yearId, int $semesterId)
     {
         return $teacher->openedCoursesForTerm($yearId, $semesterId);
     }
+
+    /* ---- listing ---- */
 
     public function index(Request $request)
     {
@@ -66,7 +96,6 @@ class MyScoreController extends Controller
             ? $this->myOpenedCourses($teacher, $yearId, $semesterId)
             : collect();
 
-        // จำนวนนักเรียนที่มีคะแนนแล้ว ต่อวิชา
         $scored = StudentScore::whereIn('opened_course_id', $openedCourses->pluck('id'))
             ->selectRaw('opened_course_id, count(*) as total')
             ->groupBy('opened_course_id')
@@ -75,51 +104,5 @@ class MyScoreController extends Controller
         $openedCourses->each(fn($oc) => $oc->scored_count = $scored[$oc->id] ?? 0);
 
         return view('teacher.scores.index', compact('teacher', 'academicYear', 'semester', 'openedCourses'));
-    }
-
-    public function entry(Request $request, $openedCourseId)
-    {
-        $teacher = $this->currentTeacher();
-        $openedCourse = OpenedCourse::with('course.subjectGroup', 'grade', 'classroom', 'academicYear', 'semester')
-            ->findOrFail($openedCourseId);
-
-        // เข้าได้เฉพาะวิชาของตัวเอง
-        abort_unless(
-            $this->myOpenedCourses($teacher, $openedCourse->academic_year_id, $openedCourse->semester_id)->contains('id', $openedCourse->id),
-            403,
-            __('You can only record scores for your own courses')
-        );
-
-        $enrollments = $this->scoreService->enrollmentsForCourse($openedCourse);
-        $scores = StudentScore::where('opened_course_id', $openedCourse->id)->get()->keyBy('student_id');
-        $gradeSettings = GradeSetting::orderBy('sort_order')->get();
-
-        return view('teacher.scores.entry', compact('teacher', 'openedCourse', 'enrollments', 'scores', 'gradeSettings'));
-    }
-
-    public function save(Request $request, $openedCourseId)
-    {
-        $teacher = $this->currentTeacher();
-        $openedCourse = OpenedCourse::findOrFail($openedCourseId);
-
-        abort_unless(
-            $this->myOpenedCourses($teacher, $openedCourse->academic_year_id, $openedCourse->semester_id)->contains('id', $openedCourse->id),
-            403,
-            __('You can only record scores for your own courses')
-        );
-
-        $data = $request->validate([
-            'scores' => 'required|array',
-            'scores.*.score_collect' => 'nullable|numeric|min:0|max:100',
-            'scores.*.score_midterm' => 'nullable|numeric|min:0|max:100',
-            'scores.*.score_final' => 'nullable|numeric|min:0|max:100',
-            'scores.*.remark' => 'nullable|string|max:255',
-        ]);
-
-        // teacher_id บังคับเป็นตัวเอง
-        $saved = $this->scoreService->saveScores($openedCourse, $data['scores'], $teacher->id);
-
-        return redirect()->route('teacher.scores.entry', $openedCourse->id)
-            ->with('status', __(':count scores saved', ['count' => $saved]));
     }
 }

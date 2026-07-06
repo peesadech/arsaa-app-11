@@ -96,6 +96,13 @@ Route::middleware(['auth', 'role:Teacher'])->group(function () {
     Route::get('/teacher/scores', [MyScoreController::class, 'index'])->name('teacher.scores.index');
     Route::get('/teacher/scores/{openedCourseId}', [MyScoreController::class, 'entry'])->name('teacher.scores.entry');
     Route::post('/teacher/scores/{openedCourseId}', [MyScoreController::class, 'save'])->name('teacher.scores.save');
+    Route::post('/teacher/scores/{openedCourseId}/items', [MyScoreController::class, 'storeItem'])->name('teacher.scores.items.store');
+    Route::post('/teacher/scores/{openedCourseId}/items/reorder', [MyScoreController::class, 'reorderItems'])->name('teacher.scores.items.reorder');
+    Route::put('/teacher/scores/{openedCourseId}/items/{itemId}', [MyScoreController::class, 'updateItem'])->name('teacher.scores.items.update');
+    Route::delete('/teacher/scores/{openedCourseId}/items/{itemId}', [MyScoreController::class, 'destroyItem'])->name('teacher.scores.items.destroy');
+    Route::post('/teacher/scores/{openedCourseId}/cell', [MyScoreController::class, 'cell'])->name('teacher.scores.cell');
+    Route::get('/teacher/scores/{openedCourseId}/export', [MyScoreController::class, 'export'])->name('teacher.scores.export');
+    Route::post('/teacher/scores/{openedCourseId}/import', [MyScoreController::class, 'import'])->name('teacher.scores.import');
 });
 
 // Class Session & Attendance — ใช้ได้ทั้งครูและ admin
@@ -371,10 +378,19 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::post('/admin/student-enrollments', [StudentEnrollmentController::class, 'store'])->name('admin.student-enrollments.store');
     Route::post('/admin/student-enrollments/{id}/move', [StudentEnrollmentController::class, 'move'])->name('admin.student-enrollments.move');
     Route::post('/admin/student-enrollments/{id}/remove', [StudentEnrollmentController::class, 'remove'])->name('admin.student-enrollments.remove');
+    Route::post('/admin/student-enrollments/homeroom', [StudentEnrollmentController::class, 'assignHomeroom'])->name('admin.student-enrollments.homeroom.assign');
+    Route::delete('/admin/student-enrollments/homeroom/{openedClassroomId}/{teacherId}', [StudentEnrollmentController::class, 'removeHomeroom'])->name('admin.student-enrollments.homeroom.remove');
 
     Route::get('/admin/student-scores', [StudentScoreController::class, 'index'])->name('admin.student-scores.index');
     Route::get('/admin/student-scores/{openedCourseId}', [StudentScoreController::class, 'entry'])->name('admin.student-scores.entry');
     Route::post('/admin/student-scores/{openedCourseId}', [StudentScoreController::class, 'save'])->name('admin.student-scores.save');
+    Route::post('/admin/student-scores/{openedCourseId}/items', [StudentScoreController::class, 'storeItem'])->name('admin.student-scores.items.store');
+    Route::post('/admin/student-scores/{openedCourseId}/items/reorder', [StudentScoreController::class, 'reorderItems'])->name('admin.student-scores.items.reorder');
+    Route::put('/admin/student-scores/{openedCourseId}/items/{itemId}', [StudentScoreController::class, 'updateItem'])->name('admin.student-scores.items.update');
+    Route::delete('/admin/student-scores/{openedCourseId}/items/{itemId}', [StudentScoreController::class, 'destroyItem'])->name('admin.student-scores.items.destroy');
+    Route::post('/admin/student-scores/{openedCourseId}/cell', [StudentScoreController::class, 'cell'])->name('admin.student-scores.cell');
+    Route::get('/admin/student-scores/{openedCourseId}/export', [StudentScoreController::class, 'export'])->name('admin.student-scores.export');
+    Route::post('/admin/student-scores/{openedCourseId}/import', [StudentScoreController::class, 'import'])->name('admin.student-scores.import');
 
     Route::get('/admin/student-reports', [StudentReportController::class, 'index'])->name('admin.student-reports.index');
     Route::get('/admin/student-reports/students-csv', [StudentReportController::class, 'studentsCsv'])->name('admin.student-reports.students-csv');
