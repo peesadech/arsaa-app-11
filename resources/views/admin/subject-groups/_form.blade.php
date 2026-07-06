@@ -10,6 +10,15 @@
                 <div class="md:col-span-2">
                     <x-form.textarea :label="__('Description')" name="description" rows="3" :value="$group->description ?? null" />
                 </div>
+                <div class="md:col-span-2">
+                    <x-form.select
+                        :label="__('Head of Subject Group')"
+                        name="head_teacher_id"
+                        :options="($teachers ?? collect())->pluck('name', 'id')->toArray()"
+                        :selected="$group->head_teacher_id ?? null"
+                        :placeholder="__('-- None --')"
+                        :help="__('Reviews academic results for this subject group in the approval workflow.')" />
+                </div>
             </div>
         </x-card>
     </div>

@@ -9,12 +9,14 @@
     <div class="space-y-6">
 
         {{-- Stats --}}
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach([
                 ['icon' => 'building', 'color' => 'text-brand-600 bg-brand-50', 'value' => $stats['rooms'], 'label' => __('Classrooms taught')],
                 ['icon' => 'book', 'color' => 'text-emerald-600 bg-emerald-50', 'value' => $stats['courses'], 'label' => __('Courses taught')],
                 ['icon' => 'calendar', 'color' => 'text-amber-600 bg-amber-50', 'value' => $stats['periods_per_week'], 'label' => __('Periods / week')],
                 ['icon' => 'clipboard', 'color' => 'text-violet-600 bg-violet-50', 'value' => $stats['scores_recorded'], 'label' => __('Scores recorded')],
+                ['icon' => 'edit', 'color' => 'text-rose-600 bg-rose-50', 'value' => $stats['pending_scores'], 'label' => __('Pending scores')],
+                ['icon' => 'clipboard', 'color' => 'text-amber-600 bg-amber-50', 'value' => $stats['pending_submit'], 'label' => __('Pending submission')],
             ] as $stat)
             <x-card>
                 <div class="flex items-center justify-between">

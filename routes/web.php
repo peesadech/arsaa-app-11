@@ -46,10 +46,12 @@ use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\TimetableController;
 use App\Http\Controllers\Admin\TimetableExportController;
 use App\Http\Controllers\Admin\AttendanceStatusController;
+use App\Http\Controllers\Admin\ConductCriterionController;
 use App\Http\Controllers\Admin\BehaviorScoreController;
 use App\Http\Controllers\Admin\AttendanceReportController;
 use App\Http\Controllers\ClassSessionController;
 use App\Http\Controllers\BehaviorRecordController;
+use App\Http\Controllers\ResultWorkflowController;
 use App\Http\Controllers\Api\RoleController as ApiRoleController;
 use App\Http\Controllers\Api\PermissionController as ApiPermissionController;
 use App\Http\Controllers\Api\UserRoleController as ApiUserRoleController;
@@ -105,6 +107,7 @@ Route::middleware(['auth', 'role:Teacher'])->group(function () {
     Route::put('/teacher/scores/{openedCourseId}/items/{itemId}', [MyScoreController::class, 'updateItem'])->name('teacher.scores.items.update');
     Route::delete('/teacher/scores/{openedCourseId}/items/{itemId}', [MyScoreController::class, 'destroyItem'])->name('teacher.scores.items.destroy');
     Route::post('/teacher/scores/{openedCourseId}/cell', [MyScoreController::class, 'cell'])->name('teacher.scores.cell');
+    Route::post('/teacher/scores/{openedCourseId}/override', [MyScoreController::class, 'overrideGrade'])->name('teacher.scores.override');
     Route::get('/teacher/scores/{openedCourseId}/export', [MyScoreController::class, 'export'])->name('teacher.scores.export');
     Route::post('/teacher/scores/{openedCourseId}/import', [MyScoreController::class, 'import'])->name('teacher.scores.import');
 });
@@ -127,7 +130,15 @@ Route::middleware(['auth', 'role:Teacher|admin|SuperAdmin'])->group(function () 
     // Behavior records — คะแนนความดี/ความชั่ว รายนักเรียน (admin + ครูประจำชั้น)
     Route::get('/behavior-records', [BehaviorRecordController::class, 'index'])->name('behavior-records.index');
     Route::post('/behavior-records', [BehaviorRecordController::class, 'store'])->name('behavior-records.store');
+    Route::post('/behavior-records/conduct', [BehaviorRecordController::class, 'storeConduct'])->name('behavior-records.conduct');
     Route::delete('/behavior-records/{id}', [BehaviorRecordController::class, 'destroy'])->whereNumber('id')->name('behavior-records.destroy');
+
+    // Result approval workflow — อนุมัติผลการเรียน (ครู/หัวหน้ากลุ่มสาระ/งานทะเบียน)
+    Route::get('/result-workflow', [ResultWorkflowController::class, 'index'])->name('result-workflow.index');
+    Route::get('/result-workflow/{openedCourseId}', [ResultWorkflowController::class, 'show'])->whereNumber('openedCourseId')->name('result-workflow.show');
+    Route::post('/result-workflow/{openedCourseId}/{action}', [ResultWorkflowController::class, 'transition'])
+        ->whereNumber('openedCourseId')->whereIn('action', ['submit', 'review', 'approve', 'publish', 'reject'])
+        ->name('result-workflow.transition');
 });
 
 // SuperAdmin only
@@ -279,6 +290,14 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::put('/admin/behavior-scores/{type}/{id}', [BehaviorScoreController::class, 'update'])->whereIn('type', ['merit', 'demerit'])->name('admin.behavior-scores.update');
     Route::delete('/admin/behavior-scores/{type}/{id}', [BehaviorScoreController::class, 'destroy'])->whereIn('type', ['merit', 'demerit'])->name('admin.behavior-scores.destroy');
 
+    // Conduct criteria (操行评量) master
+    Route::get('/admin/conduct-criteria', [ConductCriterionController::class, 'index'])->name('admin.conduct-criteria.index');
+    Route::get('/admin/conduct-criteria/create', [ConductCriterionController::class, 'create'])->name('admin.conduct-criteria.create');
+    Route::post('/admin/conduct-criteria', [ConductCriterionController::class, 'store'])->name('admin.conduct-criteria.store');
+    Route::get('/admin/conduct-criteria/{id}/edit', [ConductCriterionController::class, 'edit'])->name('admin.conduct-criteria.edit');
+    Route::put('/admin/conduct-criteria/{id}', [ConductCriterionController::class, 'update'])->name('admin.conduct-criteria.update');
+    Route::delete('/admin/conduct-criteria/{id}', [ConductCriterionController::class, 'destroy'])->name('admin.conduct-criteria.destroy');
+
     // Attendance Report
     Route::get('/admin/attendance-reports', [AttendanceReportController::class, 'index'])->name('admin.attendance-reports.index');
     Route::get('/admin/attendance-reports/student/{studentId}', [AttendanceReportController::class, 'student'])->whereNumber('studentId')->name('admin.attendance-reports.student');
@@ -413,6 +432,7 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::put('/admin/student-scores/{openedCourseId}/items/{itemId}', [StudentScoreController::class, 'updateItem'])->name('admin.student-scores.items.update');
     Route::delete('/admin/student-scores/{openedCourseId}/items/{itemId}', [StudentScoreController::class, 'destroyItem'])->name('admin.student-scores.items.destroy');
     Route::post('/admin/student-scores/{openedCourseId}/cell', [StudentScoreController::class, 'cell'])->name('admin.student-scores.cell');
+    Route::post('/admin/student-scores/{openedCourseId}/override', [StudentScoreController::class, 'overrideGrade'])->name('admin.student-scores.override');
     Route::get('/admin/student-scores/{openedCourseId}/export', [StudentScoreController::class, 'export'])->name('admin.student-scores.export');
     Route::post('/admin/student-scores/{openedCourseId}/import', [StudentScoreController::class, 'import'])->name('admin.student-scores.import');
 
@@ -420,6 +440,10 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::get('/admin/student-reports/students-csv', [StudentReportController::class, 'studentsCsv'])->name('admin.student-reports.students-csv');
     Route::get('/admin/student-reports/profile/{id}', [StudentReportController::class, 'profile'])->name('admin.student-reports.profile');
     Route::get('/admin/student-reports/transcript/{id}', [StudentReportController::class, 'transcript'])->name('admin.student-reports.transcript');
+    Route::get('/admin/student-reports/report-card/{studentId}', [StudentReportController::class, 'reportCard'])->name('admin.student-reports.report-card');
+    Route::get('/admin/student-reports/report-card-year/{studentId}', [StudentReportController::class, 'reportCardYear'])->name('admin.student-reports.report-card-year');
+    Route::get('/admin/student-reports/class-report', [StudentReportController::class, 'classReport'])->name('admin.student-reports.class-report');
+    Route::get('/admin/student-reports/class-report-csv', [StudentReportController::class, 'classReportCsv'])->name('admin.student-reports.class-report-csv');
     Route::get('/admin/student-reports/class-scores', [StudentReportController::class, 'classScores'])->name('admin.student-reports.class-scores');
     Route::get('/admin/student-reports/incomplete-documents', [StudentReportController::class, 'incompleteDocuments'])->name('admin.student-reports.incomplete-documents');
 

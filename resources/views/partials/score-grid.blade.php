@@ -46,6 +46,43 @@
     </div>
 </div>
 
+@php $submission = $submission ?? null; $locked = $locked ?? false; $canSubmit = $canSubmit ?? false; @endphp
+@if($submission)
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50">
+    <div class="flex items-center gap-2 text-sm">
+        <span class="text-slate-500">{{ __('Result status') }}:</span>
+        <x-badge :color="$submission->badgeColor()">{{ $submission->statusLabel() }}</x-badge>
+        @if($submission->status === 'rejected' && $submission->reject_reason)
+            <span class="text-xs text-red-500">({{ __('Reason') }}: {{ $submission->reject_reason }})</span>
+        @endif
+    </div>
+    @if($canSubmit)
+    <form method="POST" action="{{ route('result-workflow.transition', [$openedCourse->id, 'submit']) }}"
+          onsubmit="return confirm('{{ __('Submit results for approval? Scores will be locked.') }}')">
+        @csrf
+        <button type="submit" class="btn-primary"><x-icon name="check" class="h-4 w-4" /> {{ __('Submit results') }}</button>
+    </form>
+    @endif
+</div>
+@endif
+
+@if($locked)
+<div class="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm flex items-center gap-2">
+    <x-icon name="shield" class="h-4 w-4" /> {{ __('Results have been submitted and are locked for editing.') }}
+</div>
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    ['score-form', 'manage-items-panel', 'score-import-form'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.querySelectorAll('input, select, textarea, button').forEach(function (x) { x.disabled = true; });
+    });
+});
+</script>
+@endpush
+@endif
+
 {{-- Manage score items panel --}}
 <div id="manage-items-panel" class="hidden mb-6">
     <x-card>
@@ -298,6 +335,7 @@
 </x-card>
 @else
 
+<div x-data="{ ov: null, ovMode: 'grade' }">
 <form id="score-form" action="{{ route($routePrefix . '.save', $openedCourse->id) }}" method="POST">
     @csrf
     <x-card padded="false">
@@ -345,7 +383,15 @@
                         </td>
                         @endforeach
                         <td class="px-3 py-2 text-right font-semibold text-sm text-slate-800" data-total>{{ $summary && $summary->total_score !== null ? $summary->total_score + 0 : '-' }}</td>
-                        <td class="px-3 py-2 text-center font-semibold text-sm text-brand-600" data-grade>{{ $summary?->grade ?? '-' }}</td>
+                        <td class="px-3 py-2 text-center whitespace-nowrap">
+                            <span class="font-semibold text-sm {{ $summary?->special_result ? 'text-amber-600' : 'text-brand-600' }}" data-grade>{{ $summary ? $summary->displayGrade() : '-' }}</span>
+                            @if($summary?->is_override)<span class="text-amber-500 text-xs" title="{{ __('Overridden') }}{{ $summary->override_reason ? ': '.$summary->override_reason : '' }}">*</span>@endif
+                            <button type="button" class="ml-1 text-slate-300 hover:text-brand-600 align-middle"
+                                    title="{{ __('Override grade') }}"
+                                    @click="ovMode = @js($summary?->special_result ? 'special' : 'grade'); ov = { id: {{ $student->id }}, name: @js($student->name_th), grade: @js((string)($summary?->grade ?? '')), special: @js((string)($summary?->special_result ?? '')), reason: @js((string)($summary?->override_reason ?? '')) }">
+                                <x-icon name="edit" class="h-3.5 w-3.5 inline" />
+                            </button>
+                        </td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -360,6 +406,48 @@
         </div>
     </x-card>
 </form>
+
+{{-- Override / special result modal --}}
+<div x-show="ov" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" x-transition.opacity>
+    <div class="absolute inset-0 bg-slate-900/50" @click="ov = null"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-1">{{ __('Override grade') }}</h3>
+        <p class="text-sm text-slate-500 mb-4" x-text="ov?.name"></p>
+        <form method="POST" action="{{ route($routePrefix . '.override', $openedCourse->id) }}" class="space-y-3">
+            @csrf
+            <input type="hidden" name="student_id" x-bind:value="ov?.id">
+            <div>
+                <label class="text-xs text-slate-400">{{ __('Type') }}</label>
+                <select name="mode" x-model="ovMode" class="form-select text-sm">
+                    <option value="grade">{{ __('Override grade') }}</option>
+                    <option value="special">{{ __('Special result') }} (ร/มส/มผ/ผ/ขส)</option>
+                    <option value="clear">{{ __('Clear override (recalculate)') }}</option>
+                </select>
+            </div>
+            <div x-show="ovMode === 'grade'">
+                <label class="text-xs text-slate-400">{{ __('Grade') }}</label>
+                <input type="text" name="grade" maxlength="10" x-bind:value="ov?.grade" class="form-input text-sm" placeholder="A / 4 / 3.5 ...">
+            </div>
+            <div x-show="ovMode === 'special'">
+                <label class="text-xs text-slate-400">{{ __('Special result') }}</label>
+                <select name="special_result" class="form-select text-sm">
+                    @foreach(\App\Models\StudentScore::SPECIAL_RESULTS as $sr)
+                    <option value="{{ $sr }}" x-bind:selected="ov?.special === '{{ $sr }}'">{{ $sr }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div x-show="ovMode !== 'clear'">
+                <label class="text-xs text-slate-400">{{ __('Reason') }}</label>
+                <input type="text" name="reason" maxlength="255" x-bind:value="ov?.reason" class="form-input text-sm">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" class="btn-secondary" @click="ov = null">{{ __('Cancel') }}</button>
+                <button type="submit" class="btn-primary"><x-icon name="check" class="h-4 w-4" /> {{ __('Save') }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+</div>{{-- /x-data override wrapper --}}
 
 @push('scripts')
 <script>

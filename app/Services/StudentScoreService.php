@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\StudentEnrollment;
 use App\Models\StudentScore;
 use App\Models\StudentScoreItem;
+use App\Models\StudentScoreLog;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -233,16 +234,12 @@ class StudentScoreService
             $total = ($total ?? 0) + $contribution;
         }
 
-        $grade = null;
-        $resultStatus = null;
         if ($total !== null) {
             $total = round($total, 2);
-            $setting = GradeSetting::gradeForScore($total);
-            $grade = $setting?->grade;
-            $resultStatus = $setting
-                ? ($setting->is_pass ? StudentScore::RESULT_PASS : StudentScore::RESULT_FAIL)
-                : null;
         }
+        [$grade, $resultStatus] = $total !== null
+            ? $this->gradeFor($openedCourse, $total)
+            : [null, null];
 
         // ไม่มีคะแนนเลย และไม่มีแถวสรุปเดิม → ไม่ต้องสร้าง
         $existing = StudentScore::where('student_id', $studentId)
@@ -254,20 +251,113 @@ class StudentScoreService
 
         $payload = [
             'total_score' => $total,
-            'grade' => $grade,
-            'result_status' => $resultStatus,
             'updated_by' => Auth::id(),
         ];
         if ($teacherId !== null) {
             $payload['teacher_id'] = $teacherId;
         }
+        // เกรด/ผล คำนวณทับเฉพาะเมื่อ "ไม่ถูก override / ไม่ใช่ผลพิเศษ"
+        if (!($existing && ($existing->is_override || $existing->special_result))) {
+            $payload['grade'] = $grade;
+            $payload['result_status'] = $resultStatus;
+        }
 
-        StudentScore::updateOrCreate(
+        $score = StudentScore::updateOrCreate(
             ['student_id' => $studentId, 'opened_course_id' => $openedCourse->id],
             $payload
         );
 
-        return ['total' => $total, 'grade' => $grade, 'result_status' => $resultStatus];
+        return [
+            'total' => $total,
+            'grade' => $score->displayGrade() === '-' ? null : $score->displayGrade(),
+            'result_status' => $score->result_status,
+        ];
+    }
+
+    /**
+     * หาเกรด+ผลจากคะแนนรวม — ใช้ grading scheme ของรายวิชา (fallback = GradeSetting global)
+     * @return array{0: ?string, 1: ?string}  [grade, result_status]
+     */
+    public function gradeFor(OpenedCourse $openedCourse, float $total): array
+    {
+        $scheme = $openedCourse->course?->resolveGradingScheme();
+
+        if ($scheme) {
+            $details = $scheme->details()->get();
+            $matched = $details->first(fn($d) => $total >= (float) $d->min_score && $total <= (float) $d->max_score);
+            if ($matched) {
+                $lowestMin = (float) $details->min('min_score');
+                // ช่วงต่ำสุด = ตก, ช่วงอื่น = ผ่าน
+                $pass = (float) $matched->min_score > $lowestMin;
+                return [$matched->result, $pass ? StudentScore::RESULT_PASS : StudentScore::RESULT_FAIL];
+            }
+            return [null, null];
+        }
+
+        $setting = GradeSetting::gradeForScore($total);
+        return [
+            $setting?->grade,
+            $setting ? ($setting->is_pass ? StudentScore::RESULT_PASS : StudentScore::RESULT_FAIL) : null,
+        ];
+    }
+
+    /**
+     * ตั้ง override เกรด หรือผลพิเศษ (ร/มส/มผ/ผ/ขส) พร้อมเหตุผล + เก็บ log
+     * $data: ['mode' => 'grade'|'special'|'clear', 'grade' => ?, 'special_result' => ?, 'reason' => ?]
+     */
+    public function setOverride(OpenedCourse $openedCourse, int $studentId, array $data): StudentScore
+    {
+        $score = StudentScore::firstOrNew([
+            'student_id' => $studentId,
+            'opened_course_id' => $openedCourse->id,
+        ]);
+
+        $before = $score->displayGrade();
+        $mode = $data['mode'] ?? 'grade';
+
+        if ($mode === 'clear') {
+            $score->is_override = false;
+            $score->special_result = null;
+            $score->override_reason = null;
+            // คำนวณเกรดใหม่จากคะแนน
+            if ($score->total_score !== null) {
+                [$g, $rs] = $this->gradeFor($openedCourse, (float) $score->total_score);
+                $score->grade = $g;
+                $score->result_status = $rs;
+            }
+        } elseif ($mode === 'special') {
+            $special = $data['special_result'] ?? null;
+            $score->special_result = in_array($special, StudentScore::SPECIAL_RESULTS, true) ? $special : null;
+            $score->is_override = true;
+            $score->override_reason = $data['reason'] ?? null;
+            $score->result_status = in_array($score->special_result, StudentScore::SPECIAL_PASS, true)
+                ? StudentScore::RESULT_PASS
+                : StudentScore::RESULT_FAIL;
+        } else { // grade override
+            $score->grade = $data['grade'] ?? null;
+            $score->special_result = null;
+            $score->is_override = true;
+            $score->override_reason = $data['reason'] ?? null;
+            if ($score->total_score !== null) {
+                [, $rs] = $this->gradeFor($openedCourse, (float) $score->total_score);
+                $score->result_status = $rs;
+            }
+        }
+
+        $score->graded_by = Auth::id();
+        $score->updated_by = Auth::id();
+        $score->save();
+
+        StudentScoreLog::create([
+            'student_score_id' => $score->id,
+            'action' => $mode === 'clear' ? 'clear_override' : ($mode === 'special' ? 'special' : 'override'),
+            'from_value' => $before,
+            'to_value' => $score->displayGrade(),
+            'reason' => $data['reason'] ?? null,
+            'changed_by' => Auth::id(),
+        ]);
+
+        return $score;
     }
 
     /**

@@ -94,11 +94,19 @@ class TeacherDashboardController extends Controller
             }
         }
 
+        // งานค้าง: บันทึกคะแนนยังไม่ครบ + ยังไม่ส่งผล (draft/rejected)
+        $submissions = \App\Models\CourseResultSubmission::whereIn('opened_course_id', $openedCourses->pluck('id'))
+            ->pluck('status', 'opened_course_id');
+        $pendingScores = $openedCourses->filter(fn($oc) => $oc->student_count > 0 && $oc->scored_count < $oc->student_count)->count();
+        $pendingSubmit = $openedCourses->filter(fn($oc) => in_array($submissions[$oc->id] ?? 'draft', ['draft', 'rejected'], true))->count();
+
         $stats = [
             'rooms' => $rooms->count(),
             'courses' => $openedCourses->count(),
             'periods_per_week' => $entries->count(),
             'scores_recorded' => $openedCourses->sum('scored_count'),
+            'pending_scores' => $pendingScores,
+            'pending_submit' => $pendingSubmit,
         ];
 
         return view('teacher.dashboard', compact(

@@ -118,10 +118,15 @@ class CourseWeightController extends Controller
                 ->values();
         }
 
+        // สัดส่วนช่วงคะแนน กลางภาค/ปลายภาค/เก็บ ต่อระดับชั้น (default 35/35/30)
+        $sectionWeight = ($selectedGradeId && $yearId && $semesterId)
+            ? \App\Models\GradeSectionWeight::forGrade($yearId, $semesterId, $selectedGradeId)
+            : null;
+
         return view('admin.course-weights.index', compact(
             'academicYear', 'semester', 'yearId', 'semesterId',
             'academicYears', 'semesters',
-            'grades', 'selectedGradeId', 'courses', 'weights', 'existingSources'
+            'grades', 'selectedGradeId', 'courses', 'weights', 'existingSources', 'sectionWeight'
         ));
     }
 
@@ -156,11 +161,24 @@ class CourseWeightController extends Controller
             'grade_id'         => 'required|exists:grades,id',
             'weights'          => 'required|array',
             'weights.*'        => 'nullable|numeric|min:0|max:100',
+            'midterm_weight'   => 'nullable|numeric|min:0|max:100',
+            'final_weight'     => 'nullable|numeric|min:0|max:100',
+            'collect_weight'   => 'nullable|numeric|min:0|max:100',
         ]);
 
         $yearId     = (int) $data['academic_year_id'];
         $semesterId = (int) $data['semester_id'];
         $gradeId    = (int) $data['grade_id'];
+
+        // สัดส่วนช่วง กลางภาค/ปลายภาค/เก็บ ต่อระดับชั้น
+        \App\Models\GradeSectionWeight::updateOrCreate(
+            ['academic_year_id' => $yearId, 'semester_id' => $semesterId, 'grade_id' => $gradeId],
+            [
+                'midterm_weight' => $request->filled('midterm_weight') ? $data['midterm_weight'] : 35,
+                'final_weight'   => $request->filled('final_weight') ? $data['final_weight'] : 35,
+                'collect_weight' => $request->filled('collect_weight') ? $data['collect_weight'] : 30,
+            ]
+        );
 
         // รวมน้ำหนักต้องเท่ากับ 100 เท่านั้นจึงจะบันทึกได้
         $sum = collect($data['weights'])->reduce(

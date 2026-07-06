@@ -10,6 +10,7 @@ class StudentScore extends Model
         'student_id', 'opened_course_id', 'teacher_id',
         'score_collect', 'score_midterm', 'score_final',
         'total_score', 'grade', 'result_status', 'remark', 'updated_by',
+        'special_result', 'is_override', 'override_reason', 'graded_by',
     ];
 
     protected $casts = [
@@ -17,10 +18,28 @@ class StudentScore extends Model
         'score_midterm' => 'decimal:2',
         'score_final' => 'decimal:2',
         'total_score' => 'decimal:2',
+        'is_override' => 'boolean',
     ];
 
     const RESULT_PASS = 'pass';
     const RESULT_FAIL = 'fail';
+
+    /** ผลพิเศษ (ตั้งเอง): ร มส มผ ผ ขส */
+    const SPECIAL_RESULTS = ['ร', 'มส', 'มผ', 'ผ', 'ขส'];
+
+    /** เกรดที่นับเป็น "ผ่าน" เมื่อเป็นผลพิเศษ */
+    const SPECIAL_PASS = ['ผ'];
+
+    /** เกรดสุดท้ายที่ใช้แสดง: ผลพิเศษ > เกรด */
+    public function displayGrade(): string
+    {
+        return $this->special_result ?: ($this->grade ?? '-');
+    }
+
+    public function logs()
+    {
+        return $this->hasMany(StudentScoreLog::class)->latest();
+    }
 
     public function student()
     {

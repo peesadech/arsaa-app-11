@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Concerns;
 
+use App\Models\CourseResultSubmission;
 use App\Models\GradeSetting;
 use App\Models\OpenedCourse;
 use App\Models\ScoreItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -36,6 +38,14 @@ trait HandlesScoreEntry
         $summaries = $openedCourse->studentScores()->get()->keyBy('student_id');
         $gradeSettings = GradeSetting::orderBy('sort_order')->get();
 
+        $submission = CourseResultSubmission::firstOrNew(
+            ['opened_course_id' => $openedCourse->id],
+            ['status' => CourseResultSubmission::STATUS_DRAFT]
+        );
+        // แก้คะแนนได้เมื่อร่าง/ตีกลับ (ครู) หรือเป็น admin
+        $locked = $submission->isLockedForTeacher() && !$this->userIsAdmin();
+        $canSubmit = in_array($submission->status, [CourseResultSubmission::STATUS_DRAFT, CourseResultSubmission::STATUS_REJECTED], true);
+
         return view($this->gridView(), [
             'routePrefix' => $this->routePrefix(),
             'openedCourse' => $openedCourse,
@@ -45,7 +55,27 @@ trait HandlesScoreEntry
             'summaries' => $summaries,
             'gradeSettings' => $gradeSettings,
             'categories' => ScoreItem::CATEGORIES,
+            'submission' => $submission,
+            'locked' => $locked,
+            'canSubmit' => $canSubmit,
         ]);
+    }
+
+    private function userIsAdmin(): bool
+    {
+        return Auth::user()->getRoleNames()
+            ->map(fn($r) => strtoupper($r))
+            ->intersect(['ADMIN', 'SUPERADMIN'])
+            ->isNotEmpty();
+    }
+
+    /** กันแก้คะแนนเมื่อส่งผลแล้ว (ยกเว้น admin) */
+    private function assertEditable(OpenedCourse $openedCourse): void
+    {
+        $sub = CourseResultSubmission::where('opened_course_id', $openedCourse->id)->first();
+        if ($sub && $sub->isLockedForTeacher() && !$this->userIsAdmin()) {
+            abort(423, __('Results have been submitted and are locked for editing.'));
+        }
     }
 
     /** เพิ่มรายการคะแนน */
@@ -53,6 +83,7 @@ trait HandlesScoreEntry
     {
         $openedCourse = OpenedCourse::findOrFail($openedCourseId);
         $this->authorizeCourse($openedCourse);
+        $this->assertEditable($openedCourse);
 
         $data = $request->validate([
             'category' => 'required|string|in:' . implode(',', array_keys(ScoreItem::CATEGORIES)),
@@ -72,6 +103,7 @@ trait HandlesScoreEntry
     {
         $openedCourse = OpenedCourse::findOrFail($openedCourseId);
         $this->authorizeCourse($openedCourse);
+        $this->assertEditable($openedCourse);
 
         $item = ScoreItem::where('opened_course_id', $openedCourse->id)->findOrFail($itemId);
 
@@ -94,6 +126,7 @@ trait HandlesScoreEntry
     {
         $openedCourse = OpenedCourse::findOrFail($openedCourseId);
         $this->authorizeCourse($openedCourse);
+        $this->assertEditable($openedCourse);
 
         $categories = implode(',', array_keys(ScoreItem::CATEGORIES));
         $validated = $request->validate([
@@ -145,6 +178,7 @@ trait HandlesScoreEntry
     {
         $openedCourse = OpenedCourse::findOrFail($openedCourseId);
         $this->authorizeCourse($openedCourse);
+        $this->assertEditable($openedCourse);
 
         $data = $request->validate([
             'order' => 'required|array',
@@ -169,6 +203,7 @@ trait HandlesScoreEntry
     {
         $openedCourse = OpenedCourse::findOrFail($openedCourseId);
         $this->authorizeCourse($openedCourse);
+        $this->assertEditable($openedCourse);
 
         $item = ScoreItem::where('opened_course_id', $openedCourse->id)->findOrFail($itemId);
         $this->scoreService->deleteItem($item);
@@ -181,6 +216,7 @@ trait HandlesScoreEntry
     {
         $openedCourse = OpenedCourse::findOrFail($openedCourseId);
         $this->authorizeCourse($openedCourse);
+        $this->assertEditable($openedCourse);
 
         $data = $request->validate([
             'scores' => 'nullable|array',
@@ -200,11 +236,32 @@ trait HandlesScoreEntry
             ->with('status', __(':count scores saved', ['count' => $saved]));
     }
 
+    /** Override เกรด / ตั้งผลพิเศษ (ร/มส/มผ/ผ/ขส) + เหตุผล */
+    public function overrideGrade(Request $request, $openedCourseId)
+    {
+        $openedCourse = OpenedCourse::findOrFail($openedCourseId);
+        $this->authorizeCourse($openedCourse);
+        $this->assertEditable($openedCourse);
+
+        $data = $request->validate([
+            'student_id'     => 'required|integer',
+            'mode'           => 'required|in:grade,special,clear',
+            'grade'          => 'nullable|string|max:10',
+            'special_result' => 'nullable|string|max:10',
+            'reason'         => 'nullable|string|max:255',
+        ]);
+
+        $this->scoreService->setOverride($openedCourse, (int) $data['student_id'], $data);
+
+        return back()->with('status', __('Grade updated'));
+    }
+
     /** Auto Save รายช่อง (JSON) */
     public function cell(Request $request, $openedCourseId)
     {
         $openedCourse = OpenedCourse::findOrFail($openedCourseId);
         $this->authorizeCourse($openedCourse);
+        $this->assertEditable($openedCourse);
 
         $data = $request->validate([
             'score_item_id' => 'required|integer',
@@ -277,6 +334,7 @@ trait HandlesScoreEntry
     {
         $openedCourse = OpenedCourse::findOrFail($openedCourseId);
         $this->authorizeCourse($openedCourse);
+        $this->assertEditable($openedCourse);
 
         $request->validate([
             'file' => 'required|file|mimes:csv,txt|max:5120',

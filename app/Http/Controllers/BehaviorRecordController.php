@@ -82,6 +82,8 @@ class BehaviorRecordController extends Controller
         $records = collect();
         $meritItems = collect();
         $demeritItems = collect();
+        $conductCriteria = collect();
+        $conductScores = collect();
 
         if ($selectedGradeId && $selectedClassroomId
             && $this->canAccess($selectedGradeId, $selectedClassroomId, $yearId, $semesterId)) {
@@ -106,13 +108,65 @@ class BehaviorRecordController extends Controller
 
             $meritItems = BehaviorScore::type(BehaviorScore::TYPE_MERIT)->active()->orderBy('sort_order')->orderBy('id')->get();
             $demeritItems = BehaviorScore::type(BehaviorScore::TYPE_DEMERIT)->active()->orderBy('sort_order')->orderBy('id')->get();
+
+            $conductCriteria = \App\Models\ConductCriterion::active()->orderBy('sort_order')->orderBy('id')->get();
+            $conductScores = \App\Models\StudentConductScore::where('academic_year_id', $yearId)
+                ->where('semester_id', $semesterId)
+                ->whereIn('student_id', $enrollments->pluck('student_id'))
+                ->get()
+                ->groupBy('student_id')
+                ->map(fn($rows) => $rows->keyBy('conduct_criterion_id'));
         }
 
         return view('behavior-records.index', compact(
             'academicYear', 'semester', 'yearId', 'semesterId', 'openedClassrooms',
             'selectedGradeId', 'selectedClassroomId', 'enrollments', 'records',
-            'meritItems', 'demeritItems'
+            'meritItems', 'demeritItems', 'conductCriteria', 'conductScores'
         ));
+    }
+
+    /** บันทึกคะแนนความประพฤติ (操行评量) รายคน */
+    public function storeConduct(Request $request)
+    {
+        [$yearId, $semesterId] = $this->resolveYearSemester($request);
+
+        $data = $request->validate([
+            'grade_id'     => 'required|integer',
+            'classroom_id' => 'required|integer',
+            'student_id'   => 'required|exists:students,id',
+            'scores'       => 'nullable|array',
+            'scores.*'     => 'nullable|numeric|min:0|max:1000',
+        ]);
+
+        abort_unless(
+            $this->canAccess((int) $data['grade_id'], (int) $data['classroom_id'], $yearId, $semesterId),
+            403,
+            __('You can only record for your own classrooms')
+        );
+
+        foreach ($data['scores'] ?? [] as $criterionId => $score) {
+            if (!\App\Models\ConductCriterion::whereKey($criterionId)->exists()) {
+                continue;
+            }
+            if ($score === null || $score === '') {
+                \App\Models\StudentConductScore::where([
+                    'student_id' => $data['student_id'], 'academic_year_id' => $yearId,
+                    'semester_id' => $semesterId, 'conduct_criterion_id' => $criterionId,
+                ])->delete();
+                continue;
+            }
+            \App\Models\StudentConductScore::updateOrCreate(
+                [
+                    'student_id' => $data['student_id'], 'academic_year_id' => $yearId,
+                    'semester_id' => $semesterId, 'conduct_criterion_id' => $criterionId,
+                ],
+                ['score' => $score, 'updated_by' => Auth::id()]
+            );
+        }
+
+        return redirect()->route('behavior-records.index', [
+            'grade_id' => $data['grade_id'], 'classroom_id' => $data['classroom_id'],
+        ])->with('status', __('Saved successfully'));
     }
 
     public function store(Request $request)

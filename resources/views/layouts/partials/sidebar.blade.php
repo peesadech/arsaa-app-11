@@ -12,6 +12,7 @@
         ['label' => __('Attendance'), 'route' => 'class-sessions.today', 'icon' => 'clipboard'],
         ['label' => __('My Scores'), 'route' => 'teacher.scores.index', 'icon' => 'award'],
         ['label' => __('Behavior Scores'), 'route' => 'behavior-records.index', 'icon' => 'shield'],
+        ['label' => __('Result Approval'), 'route' => 'result-workflow.index', 'icon' => 'clipboard'],
     ];
 
     // เมนูระบบโรงเรียน (admin) — จัดกลุ่มตามโครงสร้าง myTripsBackend
@@ -23,7 +24,8 @@
             ['label' => __('Attendance'),      'route' => 'class-sessions.today'],
             ['label' => __('Record Scores'),   'route' => 'admin.student-scores.index'],
             ['label' => __('Behavior Scores'), 'route' => 'behavior-records.index'],
-            ['label' => __('Academic Results'),'route' => 'admin.student-reports.class-scores'],
+            ['label' => __('Result Approval'), 'route' => 'result-workflow.index'],
+            // ['label' => __('Academic Results'),'route' => 'admin.student-reports.class-scores'], // ซ่อนไว้ก่อน
         ]],
 
         ['label' => __('Student'), 'icon' => 'users', 'children' => [
@@ -34,7 +36,7 @@
         ['label' => __('Reports'), 'icon' => 'chart', 'children' => [
             ['label' => __('Attendance Report'),    'route' => 'admin.attendance-reports.index'],
             ['label' => __('Student Reports'),      'route' => 'admin.student-reports.index'],
-            ['label' => __('Academic Results'),     'route' => 'admin.student-reports.class-scores'],
+            ['label' => __('Academic Results'),     'route' => 'admin.student-reports.class-report'],
             ['label' => __('Incomplete Documents'), 'route' => 'admin.student-reports.incomplete-documents'],
         ]],
 
@@ -70,6 +72,7 @@
             ['label' => __('Attendance Status'),   'route' => 'admin.attendance-statuses.index'],
             ['label' => __('Merit Scores'),        'route' => 'admin.behavior-scores.index', 'params' => ['type' => 'merit']],
             ['label' => __('Demerit Scores'),      'route' => 'admin.behavior-scores.index', 'params' => ['type' => 'demerit']],
+            ['label' => __('Conduct Criteria'),    'route' => 'admin.conduct-criteria.index'],
             ['label' => __('Student Status'),      'disabled' => true],
             ['label' => __('Score Type'),          'disabled' => true],
         ]],

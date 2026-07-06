@@ -1,7 +1,7 @@
 @php
     $subheader = __('Academic Year') . ' ' . ($academicYear->year ?? '?') . ' / ' . __('Semester') . ' ' . ($semester->semester_number ?? '?') . ' — ' . __('Select classroom then course to record scores');
 @endphp
-<x-layouts.admin :header="__('Academic Results')" :subheader="$subheader">
+<x-layouts.admin :header="__('Record Scores')" :subheader="$subheader">
     <x-slot name="actions">
         <x-button variant="secondary" icon="arrow-left" :href="route('admin.students.index')">{{ __('Back') }}</x-button>
     </x-slot>

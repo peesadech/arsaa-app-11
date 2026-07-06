@@ -76,6 +76,27 @@
         <input type="hidden" name="academic_year_id" value="{{ $yearId }}">
         <input type="hidden" name="semester_id" value="{{ $semesterId }}">
         <input type="hidden" name="grade_id" value="{{ $selectedGradeId }}">
+
+        {{-- สัดส่วนช่วงคะแนน กลางภาค/ปลายภาค/เก็บ (期中/期末/平时) --}}
+        <x-card class="mb-4">
+            <h2 class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">{{ __('Section weights') }} (期中 / 期末 / 平时)</h2>
+            <div class="flex flex-wrap items-end gap-3">
+                <div class="w-32">
+                    <label class="text-xs text-slate-400">{{ __('Midterm') }} (%)</label>
+                    <input type="number" name="midterm_weight" value="{{ $sectionWeight->midterm_weight + 0 }}" step="0.01" min="0" max="100" class="form-input text-sm text-right">
+                </div>
+                <div class="w-32">
+                    <label class="text-xs text-slate-400">{{ __('Final') }} (%)</label>
+                    <input type="number" name="final_weight" value="{{ $sectionWeight->final_weight + 0 }}" step="0.01" min="0" max="100" class="form-input text-sm text-right">
+                </div>
+                <div class="w-32">
+                    <label class="text-xs text-slate-400">{{ __('Collect') }} (%)</label>
+                    <input type="number" name="collect_weight" value="{{ $sectionWeight->collect_weight + 0 }}" step="0.01" min="0" max="100" class="form-input text-sm text-right">
+                </div>
+                <span class="text-xs text-slate-400 pb-2">{{ __('Used to weight midterm/final/collect into the term score (should total 100).') }}</span>
+            </div>
+        </x-card>
+
         <x-card padded="false">
             <div class="p-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100">
                 <div class="flex items-center gap-3">

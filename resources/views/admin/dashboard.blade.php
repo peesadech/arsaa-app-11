@@ -114,6 +114,39 @@
             </div>
         </div>
 
+        {{-- Students at risk --}}
+        @if($currentYear && $currentSemester)
+        <div class="card">
+            <div class="card-body">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
+                            <x-icon name="shield" class="h-5 w-5 text-red-600" />
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-900">{{ __('Students at risk') }}</p>
+                            <p class="text-xs text-slate-400">{{ __('Students with a failing subject this term') }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('admin.student-reports.class-report') }}" class="btn-secondary text-xs px-3 py-1.5">
+                        <x-icon name="chart" class="h-4 w-4" /> {{ __('View') }}
+                    </a>
+                </div>
+                <div class="flex items-center gap-6 mt-3 pl-[52px] flex-wrap">
+                    <div class="flex items-baseline gap-1.5">
+                        <span class="text-xl font-bold text-red-600">{{ $atRiskCount }}</span>
+                        <span class="text-[10px] text-slate-400">{{ __('Students at risk') }}</span>
+                    </div>
+                    <div class="w-px h-5 bg-slate-200"></div>
+                    <div class="flex items-baseline gap-1.5">
+                        <span class="text-xl font-bold text-slate-900">{{ $failingSubjectCount }}</span>
+                        <span class="text-[10px] text-slate-400">{{ __('Failing results') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         {{-- Teacher Term Status Block --}}
         @if($currentYear && $currentSemester)
         <div class="card">

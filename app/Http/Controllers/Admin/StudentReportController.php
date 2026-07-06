@@ -7,11 +7,13 @@ use App\Models\AcademicYear;
 use App\Models\Classroom;
 use App\Models\CurrentAcademicSetting;
 use App\Models\MasterOption;
+use App\Models\OpenedClassroom;
 use App\Models\OpenedCourse;
 use App\Models\Semester;
 use App\Models\Student;
 use App\Models\StudentEnrollment;
 use App\Models\StudentScore;
+use App\Services\ReportService;
 use Illuminate\Http\Request;
 
 class StudentReportController extends Controller
@@ -118,6 +120,99 @@ class StudentReportController extends Controller
             ->groupBy(fn($s) => ($s->openedCourse->academicYear->year ?? '?') . ' / ' . ($s->openedCourse->semester->semester_number ?? '?'));
 
         return view('admin.student-reports.transcript', compact('student', 'scores'));
+    }
+
+    /**
+     * ใบผลการเรียนรายคนต่อเทอม (สัดส่วนวิชา + คะแนนรวม + เกรด + GPA + ความประพฤติ)
+     */
+    public function reportCard(Request $request, $studentId, ReportService $reports)
+    {
+        [$yearId, $semesterId] = $this->resolveYearSemester($request);
+        if ($request->filled('academic_year_id')) $yearId = (int) $request->academic_year_id;
+        if ($request->filled('semester_id')) $semesterId = (int) $request->semester_id;
+
+        $card = $reports->studentTermCard((int) $studentId, (int) $yearId, (int) $semesterId);
+        abort_unless($card['student'], 404);
+
+        $academicYear = AcademicYear::find($yearId);
+        $semester = Semester::find($semesterId);
+
+        return view('admin.student-reports.report-card', compact('card', 'academicYear', 'semester'));
+    }
+
+    /** ใบผลการเรียนแบบทั้งปี (รวม 2 เทอม + total) */
+    public function reportCardYear(Request $request, $studentId, ReportService $reports)
+    {
+        [$yearId] = $this->resolveYearSemester($request);
+        if ($request->filled('academic_year_id')) $yearId = (int) $request->academic_year_id;
+
+        $card = $reports->studentYearCard((int) $studentId, (int) $yearId);
+        abort_unless($card['student'], 404);
+
+        $academicYear = AcademicYear::find($yearId);
+
+        return view('admin.student-reports.report-card-year', compact('card', 'academicYear'));
+    }
+
+    /**
+     * รายงานผลการเรียนรายห้อง + จัดอันดับ + GPA
+     */
+    public function classReport(Request $request, ReportService $reports)
+    {
+        [$yearId, $semesterId] = $this->resolveYearSemester($request);
+
+        $academicYear = AcademicYear::find($yearId);
+        $semester = Semester::find($semesterId);
+
+        $openedClassrooms = OpenedClassroom::where('academic_year_id', $yearId)
+            ->where('semester_id', $semesterId)
+            ->with('grade', 'classroom')
+            ->get();
+
+        $gradeId = (int) $request->query('grade_id');
+        $classroomId = (int) $request->query('classroom_id');
+
+        $rows = ($gradeId && $classroomId)
+            ? $reports->classReport((int) $yearId, (int) $semesterId, $gradeId, $classroomId)
+            : collect();
+
+        return view('admin.student-reports.class-report', compact(
+            'academicYear', 'semester', 'openedClassrooms', 'gradeId', 'classroomId', 'rows'
+        ));
+    }
+
+    /** Export ผลการเรียนรายห้อง (อันดับ+GPA) เป็น CSV */
+    public function classReportCsv(Request $request, ReportService $reports)
+    {
+        [$yearId, $semesterId] = $this->resolveYearSemester($request);
+        $gradeId = (int) $request->query('grade_id');
+        $classroomId = (int) $request->query('classroom_id');
+        abort_unless($gradeId && $classroomId, 404);
+
+        $rows = $reports->classReport((int) $yearId, (int) $semesterId, $gradeId, $classroomId);
+
+        $header = [__('Rank'), __('Student Code'), __('Name'), __('Weighted total'), __('Grade'), 'GPA', __('Result')];
+        $csv = "\xEF\xBB\xBF" . $this->csvLine($header);
+        foreach ($rows as $r) {
+            $csv .= $this->csvLine([
+                $r['rank'] ?? '',
+                $r['student']->student_code ?? '',
+                $r['student']->name_th ?? '',
+                $r['weighted_score'] ?? '',
+                $r['overall_grade'] ?? '',
+                $r['gpa'] ?? '',
+                $r['overall_pass'] === true ? __('Pass') : ($r['overall_pass'] === false ? __('Fail') : ''),
+            ]);
+        }
+
+        return response($csv)
+            ->header('Content-Type', 'text/csv; charset=utf-8')
+            ->header('Content-Disposition', 'attachment; filename="class_report.csv"');
+    }
+
+    private function csvLine(array $row): string
+    {
+        return implode(',', array_map(fn($v) => '"' . str_replace('"', '""', (string) $v) . '"', $row)) . "\r\n";
     }
 
     /**

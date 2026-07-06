@@ -78,7 +78,8 @@ class SubjectGroupController extends Controller
 
     public function create()
     {
-        return view('admin.subject-groups.create');
+        $teachers = \App\Models\Teacher::where('status', 1)->orderBy('name')->get(['id', 'name']);
+        return view('admin.subject-groups.create', compact('teachers'));
     }
 
     public function store(Request $request)
@@ -87,6 +88,7 @@ class SubjectGroupController extends Controller
             'name_th' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'head_teacher_id' => 'nullable|exists:teachers,id',
             'status' => 'required|in:1,2',
         ]);
 
@@ -98,7 +100,8 @@ class SubjectGroupController extends Controller
     public function edit($id)
     {
         $subjectGroup = SubjectGroup::findOrFail($id);
-        return view('admin.subject-groups.edit', compact('subjectGroup'));
+        $teachers = \App\Models\Teacher::where('status', 1)->orderBy('name')->get(['id', 'name']);
+        return view('admin.subject-groups.edit', compact('subjectGroup', 'teachers'));
     }
 
     public function update(Request $request, $id)
@@ -108,6 +111,7 @@ class SubjectGroupController extends Controller
             'name_th' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'head_teacher_id' => 'nullable|exists:teachers,id',
             'status' => 'required|in:1,2',
         ]);
 

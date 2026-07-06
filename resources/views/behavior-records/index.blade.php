@@ -131,6 +131,29 @@
                                 @else
                                 <p class="text-xs text-slate-400 py-2 border-t border-slate-100">{{ __('No records yet') }}</p>
                                 @endif
+
+                                {{-- 操行评量 / conduct assessment --}}
+                                @if($conductCriteria->isNotEmpty())
+                                @php $myConduct = $conductScores[$student->id] ?? collect(); @endphp
+                                <form action="{{ route('behavior-records.conduct') }}" method="POST" class="border-t border-slate-100 pt-3 mt-2">
+                                    @csrf
+                                    <input type="hidden" name="grade_id" value="{{ $selectedGradeId }}">
+                                    <input type="hidden" name="classroom_id" value="{{ $selectedClassroomId }}">
+                                    <input type="hidden" name="student_id" value="{{ $student->id }}">
+                                    <div class="text-xs font-semibold text-slate-500 mb-2">操行评量 / {{ __('Conduct') }}</div>
+                                    <div class="flex flex-wrap items-end gap-2">
+                                        @foreach($conductCriteria as $cc)
+                                        <div class="w-28">
+                                            <label class="text-xs text-slate-400">{{ $cc->name_cn ?: $cc->name }} <span class="text-slate-300">/{{ $cc->max_score + 0 }}</span></label>
+                                            <input type="number" name="scores[{{ $cc->id }}]" step="0.01" min="0" max="{{ $cc->max_score + 0 }}"
+                                                   value="{{ optional($myConduct->get($cc->id))->score !== null ? optional($myConduct->get($cc->id))->score + 0 : '' }}"
+                                                   class="form-input text-sm text-right">
+                                        </div>
+                                        @endforeach
+                                        <button type="submit" class="btn-secondary"><x-icon name="check" class="h-4 w-4" /> {{ __('Save') }}</button>
+                                    </div>
+                                </form>
+                                @endif
                             </td>
                         </tr>
                     </tbody>

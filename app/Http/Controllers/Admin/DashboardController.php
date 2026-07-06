@@ -85,12 +85,25 @@ class DashboardController extends Controller
         $teacherTermConfigured = $teacherTermCounts->total ?? 0;
         $teacherTermSchedulable = $teacherTermCounts->schedulable ?? 0;
 
+        // นักเรียนเสี่ยงตก: ผลรายวิชาที่ไม่ผ่าน (result_status = fail) ในเทอมนี้
+        $failingSubjectCount = 0;
+        $atRiskCount = 0;
+        if ($academicYearId && $semesterId) {
+            $failQuery = \App\Models\StudentScore::whereHas('openedCourse', fn($q) => $q
+                ->where('academic_year_id', $academicYearId)
+                ->where('semester_id', $semesterId))
+                ->where('result_status', 'fail');
+            $failingSubjectCount = (clone $failQuery)->count();
+            $atRiskCount = (clone $failQuery)->distinct('student_id')->count('student_id');
+        }
+
         return view('admin.dashboard', compact(
             'currentYear', 'currentSemester', 'openedGrades',
             'academicYearId', 'semesterId',
             'openedClassroomCount', 'openedCourseCount', 'openedCourseTotalCount',
             'yearlyScheduleTotal', 'yearlyScheduleConfigured',
-            'teacherActiveCount', 'teacherTermConfigured', 'teacherTermSchedulable'
+            'teacherActiveCount', 'teacherTermConfigured', 'teacherTermSchedulable',
+            'atRiskCount', 'failingSubjectCount'
         ));
     }
 
