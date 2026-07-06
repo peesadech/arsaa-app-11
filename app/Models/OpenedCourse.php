@@ -47,4 +47,16 @@ class OpenedCourse extends Model
     {
         return $this->hasMany(StudentScore::class);
     }
+
+    /** สัดส่วน/น้ำหนักของรายวิชานี้ ตามระดับชั้น+ปี+เทอม (คืน null ถ้ายังไม่กำหนด) */
+    public function subjectWeight(): ?float
+    {
+        $weight = CourseWeight::where('academic_year_id', $this->academic_year_id)
+            ->where('semester_id', $this->semester_id)
+            ->where('grade_id', $this->grade_id)
+            ->where('course_id', $this->course_id)
+            ->value('weight');
+
+        return $weight !== null ? (float) $weight : null;
+    }
 }

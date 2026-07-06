@@ -22,6 +22,8 @@
 {{-- Toolbar --}}
 <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
     <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+        @php $subjectWeight = $openedCourse->subjectWeight(); @endphp
+        <x-badge color="blue">{{ __('Subject Weight') }}: {{ $subjectWeight !== null ? $subjectWeight + 0 : '—' }}</x-badge>
         <span class="font-medium">{{ __('Grade Criteria') }}:</span>
         @foreach($gradeSettings as $gs)
         <x-badge :color="$gs->is_pass ? 'green' : 'red'">{{ $gs->grade }} = {{ $gs->min_score + 0 }}-{{ $gs->max_score + 0 }}</x-badge>
@@ -66,49 +68,63 @@
             </div>
         </div>
 
-        {{-- existing items (draggable to reorder) --}}
-        <div class="space-y-2 mb-5" id="items-sortable">
-            @foreach($items as $item)
-            <form action="{{ route($routePrefix . '.items.update', [$openedCourse->id, $item->id]) }}" method="POST"
-                  data-item-id="{{ $item->id }}"
-                  class="item-row flex flex-wrap items-end gap-2 p-3 rounded-xl border border-slate-100 bg-slate-50">
-                @csrf @method('PUT')
-                <span class="drag-handle cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 pb-2 select-none" title="{{ __('Drag to reorder') }}">
-                    <x-icon name="dots" class="h-4 w-4" />
+        {{-- existing items — แก้ได้หลาย row แล้วกดบันทึกปุ่มเดียว (draggable to reorder) --}}
+        @if($items->isNotEmpty())
+        <form action="{{ route($routePrefix . '.items.update-all', $openedCourse->id) }}" method="POST" class="mb-5" id="items-update-form">
+            @csrf @method('PUT')
+            <div class="space-y-2" id="items-sortable">
+                @foreach($items as $item)
+                <div data-item-id="{{ $item->id }}"
+                     class="item-row flex flex-wrap items-end gap-2 p-3 rounded-xl border border-slate-100 bg-slate-50">
+                    <span class="drag-handle cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 pb-2 select-none" title="{{ __('Drag to reorder') }}">
+                        <x-icon name="dots" class="h-4 w-4" />
+                    </span>
+                    <div class="w-36">
+                        <label class="text-xs text-slate-400">{{ __('Category') }}</label>
+                        <select name="items[{{ $item->id }}][category]" class="form-input text-sm">
+                            @foreach($categories as $key => $label)
+                            <option value="{{ $key }}" @selected($item->category === $key)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex-1 min-w-40">
+                        <label class="text-xs text-slate-400">{{ __('Name') }}</label>
+                        <input type="text" name="items[{{ $item->id }}][name]" value="{{ $item->name }}" class="form-input text-sm" required>
+                    </div>
+                    <div class="w-24">
+                        <label class="text-xs text-slate-400">{{ __('Full Score') }}</label>
+                        <input type="number" name="items[{{ $item->id }}][full_score]" value="{{ $item->full_score + 0 }}" step="0.01" min="0" class="form-input text-sm text-right" data-full required>
+                    </div>
+                    <div class="w-24">
+                        <label class="text-xs text-slate-400">{{ __('Weight') }}</label>
+                        <input type="number" name="items[{{ $item->id }}][weight]" value="{{ $item->weight !== null ? $item->weight + 0 : '' }}" step="0.01" min="0" placeholder="{{ __('raw') }}" class="form-input text-sm text-right" data-weight>
+                    </div>
+                    <label class="flex items-center gap-1.5 text-xs text-slate-500 pb-2">
+                        <input type="checkbox" name="items[{{ $item->id }}][counts_toward_total]" value="1" @checked($item->counts_toward_total) class="rounded border-slate-300" data-counts>
+                        {{ __('Counts to total') }}
+                    </label>
+                    <button type="button" class="btn-danger" title="{{ __('Delete') }}"
+                            data-delete-url="{{ route($routePrefix . '.items.destroy', [$openedCourse->id, $item->id]) }}">
+                        <span class="hidden">delete</span><x-icon name="trash" class="h-4 w-4" />
+                    </button>
+                </div>
+                @endforeach
+            </div>
+            <div class="mt-3 flex items-center justify-end gap-3">
+                <span id="weight-save-hint" class="hidden text-xs text-red-600">
+                    {{ __('Total that counts toward the grade must equal 100 before saving.') }}
                 </span>
-                <div class="w-36">
-                    <label class="text-xs text-slate-400">{{ __('Category') }}</label>
-                    <select name="category" class="form-input text-sm">
-                        @foreach($categories as $key => $label)
-                        <option value="{{ $key }}" @selected($item->category === $key)>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="flex-1 min-w-40">
-                    <label class="text-xs text-slate-400">{{ __('Name') }}</label>
-                    <input type="text" name="name" value="{{ $item->name }}" class="form-input text-sm" required>
-                </div>
-                <div class="w-24">
-                    <label class="text-xs text-slate-400">{{ __('Full Score') }}</label>
-                    <input type="number" name="full_score" value="{{ $item->full_score + 0 }}" step="0.01" min="0" class="form-input text-sm text-right" data-full required>
-                </div>
-                <div class="w-24">
-                    <label class="text-xs text-slate-400">{{ __('Weight') }}</label>
-                    <input type="number" name="weight" value="{{ $item->weight !== null ? $item->weight + 0 : '' }}" step="0.01" min="0" placeholder="{{ __('raw') }}" class="form-input text-sm text-right" data-weight>
-                </div>
-                <label class="flex items-center gap-1.5 text-xs text-slate-500 pb-2">
-                    <input type="checkbox" name="counts_toward_total" value="1" @checked($item->counts_toward_total) class="rounded border-slate-300" data-counts>
-                    {{ __('Counts to total') }}
-                </label>
-                <button type="submit" class="btn-secondary" title="{{ __('Save') }}"><x-icon name="check" class="h-4 w-4" /></button>
-                <button type="submit" formaction="{{ route($routePrefix . '.items.destroy', [$openedCourse->id, $item->id]) }}"
-                        formmethod="POST" class="btn-danger" title="{{ __('Delete') }}"
-                        onclick="return confirm('{{ __('Delete this score item and its scores?') }}')">
-                    <span class="hidden">delete</span><x-icon name="trash" class="h-4 w-4" />
+                <button type="submit" class="btn-primary">
+                    <x-icon name="check" class="h-4 w-4" /> {{ __('Save') }}
                 </button>
-            </form>
-            @endforeach
-        </div>
+            </div>
+        </form>
+
+        {{-- แบบฟอร์มลบ (แยกออกจากฟอร์มหลัก เพื่อไม่ให้ฟอร์มซ้อนกัน) --}}
+        <form id="item-delete-form" method="POST" class="hidden">
+            @csrf @method('DELETE')
+        </form>
+        @endif
 
         {{-- add new item --}}
         <form action="{{ route($routePrefix . '.items.store', $openedCourse->id) }}" method="POST"
@@ -157,7 +173,11 @@
     // ---- live sum of "counts to grade" (weight or full score) — must equal 100 ----
     const sumEl = document.getElementById('weight-sum');
     const badgeEl = document.getElementById('weight-sum-badge');
-    function recalcSum() {
+    const updateForm = document.getElementById('items-update-form');
+    const saveBtn = updateForm ? updateForm.querySelector('button[type="submit"]') : null;
+    const saveHint = document.getElementById('weight-save-hint');
+
+    function computeSum() {
         let sum = 0;
         container.querySelectorAll('.item-row').forEach(row => {
             const cb = row.querySelector('[data-counts]');
@@ -169,15 +189,48 @@
             const eff = wv !== null && !isNaN(wv) ? wv : (isNaN(fv) ? 0 : fv);
             sum += eff;
         });
-        sum = Math.round(sum * 100) / 100;
+        return Math.round(sum * 100) / 100;
+    }
+
+    function recalcSum() {
+        const sum = computeSum();
         sumEl.textContent = sum;
         const ok = Math.abs(sum - 100) < 0.01;
         badgeEl.textContent = ok ? '✓' : '≠ 100';
         badgeEl.className = 'inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold '
             + (ok ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700');
+        // ต้องรวม = 100 ถึงจะบันทึกได้
+        if (saveBtn) {
+            saveBtn.disabled = !ok;
+            saveBtn.classList.toggle('opacity-50', !ok);
+            saveBtn.classList.toggle('cursor-not-allowed', !ok);
+        }
+        if (saveHint) saveHint.classList.toggle('hidden', ok);
     }
     container.addEventListener('input', recalcSum);
     container.addEventListener('change', recalcSum);
+    recalcSum();
+
+    // ---- กันบันทึกถ้าคะแนนรวม (นับเข้าเกรด) ไม่เท่ากับ 100 ----
+    if (updateForm) {
+        updateForm.addEventListener('submit', e => {
+            if (Math.abs(computeSum() - 100) >= 0.01) {
+                e.preventDefault();
+                recalcSum();
+                alert('{{ __('Total that counts toward the grade must equal 100 before saving.') }}');
+            }
+        });
+    }
+
+    // ---- delete a single item (แยกออกจากฟอร์มหลักเพื่อไม่ให้ฟอร์มซ้อน) ----
+    const deleteForm = document.getElementById('item-delete-form');
+    container.querySelectorAll('[data-delete-url]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!confirm('{{ __('Delete this score item and its scores?') }}')) return;
+            deleteForm.action = btn.dataset.deleteUrl;
+            deleteForm.submit();
+        });
+    });
 
     // ---- drag & drop reorder (initiated from handle, follows mouse) ----
     let dragEl = null;

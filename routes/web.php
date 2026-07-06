@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\AdminDataController;
 use App\Http\Controllers\Admin\RoleManagementController;
 use App\Http\Controllers\Admin\UserAssignmentController;
 use App\Http\Controllers\Admin\OpenedCourseController;
+use App\Http\Controllers\Admin\CourseWeightController;
 use App\Http\Controllers\Admin\GlobalScheduleController;
 use App\Http\Controllers\Admin\YearlyScheduleController;
 use App\Http\Controllers\Admin\EducationLevelController;
@@ -45,8 +46,10 @@ use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\TimetableController;
 use App\Http\Controllers\Admin\TimetableExportController;
 use App\Http\Controllers\Admin\AttendanceStatusController;
+use App\Http\Controllers\Admin\BehaviorScoreController;
 use App\Http\Controllers\Admin\AttendanceReportController;
 use App\Http\Controllers\ClassSessionController;
+use App\Http\Controllers\BehaviorRecordController;
 use App\Http\Controllers\Api\RoleController as ApiRoleController;
 use App\Http\Controllers\Api\PermissionController as ApiPermissionController;
 use App\Http\Controllers\Api\UserRoleController as ApiUserRoleController;
@@ -98,6 +101,7 @@ Route::middleware(['auth', 'role:Teacher'])->group(function () {
     Route::post('/teacher/scores/{openedCourseId}', [MyScoreController::class, 'save'])->name('teacher.scores.save');
     Route::post('/teacher/scores/{openedCourseId}/items', [MyScoreController::class, 'storeItem'])->name('teacher.scores.items.store');
     Route::post('/teacher/scores/{openedCourseId}/items/reorder', [MyScoreController::class, 'reorderItems'])->name('teacher.scores.items.reorder');
+    Route::put('/teacher/scores/{openedCourseId}/items', [MyScoreController::class, 'updateItems'])->name('teacher.scores.items.update-all');
     Route::put('/teacher/scores/{openedCourseId}/items/{itemId}', [MyScoreController::class, 'updateItem'])->name('teacher.scores.items.update');
     Route::delete('/teacher/scores/{openedCourseId}/items/{itemId}', [MyScoreController::class, 'destroyItem'])->name('teacher.scores.items.destroy');
     Route::post('/teacher/scores/{openedCourseId}/cell', [MyScoreController::class, 'cell'])->name('teacher.scores.cell');
@@ -119,6 +123,11 @@ Route::middleware(['auth', 'role:Teacher|admin|SuperAdmin'])->group(function () 
     Route::post('/class-sessions/{id}/files', [ClassSessionController::class, 'uploadFile'])->whereNumber('id')->name('class-sessions.upload-file');
     Route::delete('/class-sessions/{id}/files/{fileId}', [ClassSessionController::class, 'deleteFile'])->whereNumber('id')->whereNumber('fileId')->name('class-sessions.delete-file');
     Route::post('/class-sessions/{id}/status', [ClassSessionController::class, 'updateStatus'])->whereNumber('id')->name('class-sessions.status');
+
+    // Behavior records — คะแนนความดี/ความชั่ว รายนักเรียน (admin + ครูประจำชั้น)
+    Route::get('/behavior-records', [BehaviorRecordController::class, 'index'])->name('behavior-records.index');
+    Route::post('/behavior-records', [BehaviorRecordController::class, 'store'])->name('behavior-records.store');
+    Route::delete('/behavior-records/{id}', [BehaviorRecordController::class, 'destroy'])->whereNumber('id')->name('behavior-records.destroy');
 });
 
 // SuperAdmin only
@@ -261,6 +270,15 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::put('/admin/attendance-statuses/{id}', [AttendanceStatusController::class, 'update'])->name('admin.attendance-statuses.update');
     Route::delete('/admin/attendance-statuses/{id}', [AttendanceStatusController::class, 'destroy'])->name('admin.attendance-statuses.destroy');
 
+    // Behavior Scores (merit / demerit) — คะแนนความดี / ความชั่ว
+    Route::get('/admin/behavior-scores/{type}', [BehaviorScoreController::class, 'index'])->whereIn('type', ['merit', 'demerit'])->name('admin.behavior-scores.index');
+    Route::get('/admin/behavior-scores/{type}/create', [BehaviorScoreController::class, 'create'])->whereIn('type', ['merit', 'demerit'])->name('admin.behavior-scores.create');
+    Route::post('/admin/behavior-scores/{type}', [BehaviorScoreController::class, 'store'])->whereIn('type', ['merit', 'demerit'])->name('admin.behavior-scores.store');
+    Route::post('/admin/behavior-scores/{type}/reorder', [BehaviorScoreController::class, 'reorder'])->whereIn('type', ['merit', 'demerit'])->name('admin.behavior-scores.reorder');
+    Route::get('/admin/behavior-scores/{type}/{id}/edit', [BehaviorScoreController::class, 'edit'])->whereIn('type', ['merit', 'demerit'])->name('admin.behavior-scores.edit');
+    Route::put('/admin/behavior-scores/{type}/{id}', [BehaviorScoreController::class, 'update'])->whereIn('type', ['merit', 'demerit'])->name('admin.behavior-scores.update');
+    Route::delete('/admin/behavior-scores/{type}/{id}', [BehaviorScoreController::class, 'destroy'])->whereIn('type', ['merit', 'demerit'])->name('admin.behavior-scores.destroy');
+
     // Attendance Report
     Route::get('/admin/attendance-reports', [AttendanceReportController::class, 'index'])->name('admin.attendance-reports.index');
     Route::get('/admin/attendance-reports/student/{studentId}', [AttendanceReportController::class, 'student'])->whereNumber('studentId')->name('admin.attendance-reports.student');
@@ -290,6 +308,11 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::get('/admin/opened-courses/{id}/edit', [OpenedCourseController::class, 'edit'])->name('admin.opened-courses.edit');
     Route::put('/admin/opened-courses/{id}', [OpenedCourseController::class, 'update'])->name('admin.opened-courses.update');
     Route::delete('/admin/opened-courses/{id}', [OpenedCourseController::class, 'destroy'])->name('admin.opened-courses.destroy');
+
+    // Subject weights per grade (สัดส่วนรายวิชา ตามปี+เทอม+ระดับชั้น)
+    Route::get('/admin/course-weights', [CourseWeightController::class, 'index'])->name('admin.course-weights.index');
+    Route::get('/admin/course-weights/copy-source', [CourseWeightController::class, 'copySource'])->name('admin.course-weights.copy-source');
+    Route::post('/admin/course-weights', [CourseWeightController::class, 'save'])->name('admin.course-weights.save');
 
     // Grades
     Route::get('/admin/grades', [GradeController::class, 'index'])->name('admin.grades.index');
@@ -386,6 +409,7 @@ Route::middleware(['auth', 'role:admin|SuperAdmin'])->group(function () {
     Route::post('/admin/student-scores/{openedCourseId}', [StudentScoreController::class, 'save'])->name('admin.student-scores.save');
     Route::post('/admin/student-scores/{openedCourseId}/items', [StudentScoreController::class, 'storeItem'])->name('admin.student-scores.items.store');
     Route::post('/admin/student-scores/{openedCourseId}/items/reorder', [StudentScoreController::class, 'reorderItems'])->name('admin.student-scores.items.reorder');
+    Route::put('/admin/student-scores/{openedCourseId}/items', [StudentScoreController::class, 'updateItems'])->name('admin.student-scores.items.update-all');
     Route::put('/admin/student-scores/{openedCourseId}/items/{itemId}', [StudentScoreController::class, 'updateItem'])->name('admin.student-scores.items.update');
     Route::delete('/admin/student-scores/{openedCourseId}/items/{itemId}', [StudentScoreController::class, 'destroyItem'])->name('admin.student-scores.items.destroy');
     Route::post('/admin/student-scores/{openedCourseId}/cell', [StudentScoreController::class, 'cell'])->name('admin.student-scores.cell');

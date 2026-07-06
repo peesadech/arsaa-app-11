@@ -11,6 +11,7 @@
         ['label' => __('Dashboard'), 'route' => 'teacher.dashboard', 'icon' => 'home'],
         ['label' => __('Attendance'), 'route' => 'class-sessions.today', 'icon' => 'clipboard'],
         ['label' => __('My Scores'), 'route' => 'teacher.scores.index', 'icon' => 'award'],
+        ['label' => __('Behavior Scores'), 'route' => 'behavior-records.index', 'icon' => 'shield'],
     ];
 
     // เมนูระบบโรงเรียน (admin) — จัดกลุ่มตามโครงสร้าง myTripsBackend
@@ -21,6 +22,7 @@
         ['label' => __('Teaching'), 'icon' => 'book', 'children' => [
             ['label' => __('Attendance'),      'route' => 'class-sessions.today'],
             ['label' => __('Record Scores'),   'route' => 'admin.student-scores.index'],
+            ['label' => __('Behavior Scores'), 'route' => 'behavior-records.index'],
             ['label' => __('Academic Results'),'route' => 'admin.student-reports.class-scores'],
         ]],
 
@@ -41,6 +43,7 @@
             ['label' => __('Yearly/Semester Schedule'),  'route' => 'admin.yearly-schedule.index'],
             ['label' => __('Semester Setup'),            'route' => 'admin.term-setup.index'],
             ['label' => __('Teacher Term Status'),       'route' => 'admin.teacher-term-status.index'],
+            ['label' => __('Subject Weights'),           'route' => 'admin.course-weights.index'],
         ]],
 
         // System Config — รวม Academic + Facilities + Master Data เดิม (อยู่เหนือ Settings)
@@ -65,6 +68,8 @@
             ['label' => __('Grading Schemes'),     'route' => 'admin.grading-schemes.index'],
             ['label' => __('Student Master Data'), 'route' => 'admin.student-master.index'],
             ['label' => __('Attendance Status'),   'route' => 'admin.attendance-statuses.index'],
+            ['label' => __('Merit Scores'),        'route' => 'admin.behavior-scores.index', 'params' => ['type' => 'merit']],
+            ['label' => __('Demerit Scores'),      'route' => 'admin.behavior-scores.index', 'params' => ['type' => 'demerit']],
             ['label' => __('Student Status'),      'disabled' => true],
             ['label' => __('Score Type'),          'disabled' => true],
         ]],
@@ -118,9 +123,16 @@
                         @foreach ($item['children'] as $child)
                             @php
                                 $disabled   = !empty($child['disabled']);
+                                $params     = $child['params'] ?? [];
                                 $hasRoute   = !$disabled && !empty($child['route']) && Route::has($child['route']);
-                                $href       = $hasRoute ? route($child['route']) : '#';
+                                $href       = $hasRoute ? route($child['route'], $params) : '#';
                                 $childActive= $hasRoute && request()->routeIs($child['route'].'*');
+                                // ถ้าเมนูใช้ route param เดียวกัน (เช่น type) ให้ active เฉพาะตัวที่ param ตรง
+                                foreach ($params as $pKey => $pVal) {
+                                    if ((string) request()->route($pKey) !== (string) $pVal) {
+                                        $childActive = false;
+                                    }
+                                }
                             @endphp
                             @if ($disabled)
                                 <span class="sidebar-link text-sm py-2 opacity-40 cursor-not-allowed"

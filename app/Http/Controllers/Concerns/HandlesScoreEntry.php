@@ -89,6 +89,57 @@ trait HandlesScoreEntry
         return back()->with('status', __('Score item updated'));
     }
 
+    /** แก้ไขหลายรายการคะแนนพร้อมกัน (บันทึกปุ่มเดียว) */
+    public function updateItems(Request $request, $openedCourseId)
+    {
+        $openedCourse = OpenedCourse::findOrFail($openedCourseId);
+        $this->authorizeCourse($openedCourse);
+
+        $categories = implode(',', array_keys(ScoreItem::CATEGORIES));
+        $validated = $request->validate([
+            'items' => 'required|array',
+            'items.*.category' => 'required|string|in:' . $categories,
+            'items.*.name' => 'required|string|max:150',
+            'items.*.full_score' => 'required|numeric|min:0|max:1000',
+            'items.*.weight' => 'nullable|numeric|min:0|max:1000',
+        ]);
+
+        // คะแนนรวม (เฉพาะรายการที่นับเข้าเกรด) ต้องเท่ากับ 100 ถึงจะบันทึกได้
+        $weightSum = 0.0;
+        foreach ($validated['items'] as $itemId => $row) {
+            if (!$request->boolean("items.$itemId.counts_toward_total")) {
+                continue;
+            }
+            $weight = ($row['weight'] ?? '') !== '' ? (float) $row['weight'] : (float) $row['full_score'];
+            $weightSum += $weight;
+        }
+        if (abs(round($weightSum, 2) - 100) >= 0.01) {
+            return back()->withInput()->withErrors([
+                'items' => __('Total that counts toward the grade must equal 100 before saving.'),
+            ]);
+        }
+
+        $items = $openedCourse->scoreItems()->get()->keyBy('id');
+
+        DB::transaction(function () use ($validated, $items, $request) {
+            foreach ($validated['items'] as $itemId => $row) {
+                $item = $items->get((int) $itemId);
+                if (!$item) {
+                    continue;
+                }
+                $this->scoreService->updateItem($item, [
+                    'category' => $row['category'],
+                    'name' => $row['name'],
+                    'full_score' => $row['full_score'],
+                    'weight' => $row['weight'] ?? null,
+                    'counts_toward_total' => $request->boolean("items.$itemId.counts_toward_total"),
+                ]);
+            }
+        });
+
+        return back()->with('status', __('Score items updated'));
+    }
+
     /** จัดเรียงลำดับรายการคะแนนใหม่ (drag & drop) */
     public function reorderItems(Request $request, $openedCourseId)
     {
