@@ -20,20 +20,10 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    @vite(['resources/css/app.css'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script>
-        // Suppress Tailwind CDN warning in development
-        tailwind.config = {
-            darkMode: 'class',
-            corePlugins: {
-                preflight: false, // Prevent conflicts with Bootstrap
-            }
-        }
-    </script>
     <style>
         /* Global Transitions & Reset */
         body {
@@ -196,6 +186,42 @@
             color: #4e4f50 !important;
             border-color: #3a3b3c !important;
         }
+        /* DataTables Bootstrap4 pagination — force horizontal layout (no Bootstrap CSS loaded) */
+        .dataTables_wrapper .dataTables_paginate ul.pagination {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        .dataTables_wrapper .dataTables_paginate ul.pagination li.page-item {
+            display: inline-block;
+        }
+        .dataTables_wrapper .dataTables_paginate ul.pagination li.page-item .page-link {
+            display: block;
+            padding: 6px 12px;
+            min-width: 38px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            color: #6366f1;
+            text-decoration: none;
+            line-height: 1.2;
+        }
+        .dataTables_wrapper .dataTables_paginate ul.pagination li.page-item.active .page-link {
+            background: #6366f1;
+            border-color: #6366f1;
+            color: #fff;
+        }
+        .dataTables_wrapper .dataTables_paginate ul.pagination li.page-item.disabled .page-link {
+            color: #c0c0c0;
+            pointer-events: none;
+        }
+
         /* Flash message slide-in animation */
         @keyframes fadeInUp {
             from {
