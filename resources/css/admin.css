@@ -49,3 +49,16 @@
     .peer:checked ~ .toggle { @apply bg-brand-600; }
     .peer:checked ~ .toggle .toggle-dot { @apply translate-x-5; }
 }
+
+/* DataTables Bootstrap4 pagination — force horizontal layout (no Bootstrap CSS loaded, preflight resets <ul>) */
+.dataTables_wrapper .dataTables_paginate ul.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+.dataTables_wrapper .dataTables_paginate ul.pagination li.page-item {
+    display: inline-block;
+}
