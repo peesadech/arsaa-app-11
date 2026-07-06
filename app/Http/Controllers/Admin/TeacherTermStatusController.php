@@ -15,7 +15,6 @@ use App\Models\TeacherTermStatus;
 use App\Services\TeacherSubstitutionService;
 use App\Services\TeacherTermStatusService;
 use Illuminate\Http\Request;
-use Yajra\DataTables\Facades\DataTables;
 
 class TeacherTermStatusController extends Controller
 {
@@ -39,20 +38,11 @@ class TeacherTermStatusController extends Controller
         return [$yearId, $semesterId];
     }
 
-    public function index(Request $request)
+    /**
+     * Build the teachers query (joined with term status) applying filters + sort.
+     */
+    private function buildTeacherQuery(Request $request, $yearId, $semesterId)
     {
-        [$yearId, $semesterId] = $this->resolveYearSemester($request);
-        $academicYear = $yearId ? AcademicYear::find($yearId) : null;
-        $semester = $semesterId ? Semester::find($semesterId) : null;
-        $summary = ($yearId && $semesterId) ? $this->service->getTermStatusSummary($yearId, $semesterId) : null;
-
-        return view('admin.teacher-term-status.index', compact('academicYear', 'semester', 'summary'));
-    }
-
-    public function data(Request $request)
-    {
-        [$yearId, $semesterId] = $this->resolveYearSemester($request);
-
         $teachers = Teacher::select('teachers.*')
             ->leftJoin('teacher_term_statuses as tts', function ($join) use ($yearId, $semesterId) {
                 $join->on('teachers.id', '=', 'tts.teacher_id')
@@ -92,54 +82,61 @@ class TeacherTermStatusController extends Controller
             }
         }
 
-        return DataTables::of($teachers)
-            ->addColumn('avatar', function ($teacher) {
-                $path = $teacher->image_path ? asset($teacher->image_path) : 'https://ui-avatars.com/api/?name=' . urlencode($teacher->name) . '&color=7F9CF5&background=EBF4FF';
-                return '<img src="' . $path . '" class="w-10 h-10 rounded-xl object-cover shadow-sm border border-gray-100" alt="">';
-            })
-            ->addColumn('master_status_badge', function ($teacher) {
-                $text = $teacher->status == 1 ? __('Active') : __('Not Active');
-                $color = $teacher->status == 1 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
-                return '<span class="px-2 py-1 rounded-lg ' . $color . ' text-[10px] font-bold uppercase tracking-wider">' . $text . '</span>';
-            })
-            ->addColumn('term_status_badge', function ($teacher) {
-                $status = $teacher->term_status;
-                if (!$status) {
-                    return '<span class="px-2 py-1 rounded-lg bg-gray-50 text-gray-400 text-[10px] font-bold uppercase tracking-wider">' . __('No Record') . '</span>';
-                }
-                $colors = [
-                    'available' => 'bg-emerald-50 text-emerald-600',
-                    'unavailable' => 'bg-rose-50 text-rose-600',
-                    'leave' => 'bg-amber-50 text-amber-600',
-                    'partial' => 'bg-blue-50 text-blue-600',
-                    'transferred' => 'bg-purple-50 text-purple-600',
-                    'resigned_term' => 'bg-gray-100 text-gray-600',
-                ];
-                $color = $colors[$status] ?? 'bg-gray-50 text-gray-500';
-                return '<span class="px-2 py-1 rounded-lg ' . $color . ' text-[10px] font-bold uppercase tracking-wider">' . __(ucfirst(str_replace('_', ' ', $status))) . '</span>';
-            })
-            ->addColumn('schedule_badge', function ($teacher) {
-                if ($teacher->term_status === null) {
-                    $can = $teacher->status == 1;
-                } else {
-                    $can = (bool) $teacher->can_be_scheduled;
-                }
-                $text = $can ? __('Yes') : __('No');
-                $color = $can ? 'text-emerald-600' : 'text-rose-600';
-                return '<span class="font-bold text-xs ' . $color . '">' . $text . '</span>';
-            })
-            ->addColumn('max_load', function ($teacher) {
-                $parts = [];
-                if ($teacher->max_periods_per_day) $parts[] = $teacher->max_periods_per_day . '/' . __('Day');
-                if ($teacher->max_periods_per_week) $parts[] = $teacher->max_periods_per_week . '/' . __('Week');
-                return $parts ? '<span class="text-xs text-gray-500">' . implode(', ', $parts) . '</span>' : '<span class="text-xs text-gray-300">-</span>';
-            })
-            ->addColumn('action', function ($teacher) {
-                $url = route('admin.teacher-term-status.edit', $teacher->id);
-                return '<a href="' . $url . '" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white border border-gray-100 text-amber-500 hover:bg-amber-50 transition-all shadow-sm" title="' . __('Edit') . '"><i class="fas fa-edit text-xs"></i></a>';
-            })
-            ->rawColumns(['avatar', 'master_status_badge', 'term_status_badge', 'schedule_badge', 'max_load', 'action'])
-            ->make(true);
+        // Search by teacher name
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $teachers->where('teachers.name', 'like', "%{$s}%");
+        }
+
+        // Sort
+        $sortMap = [
+            'name'             => 'teachers.name',
+            'status'           => 'teachers.status',
+            'term_status'      => 'tts.status',
+            'can_be_scheduled' => 'tts.can_be_scheduled',
+        ];
+        $sortBy = $sortMap[$request->get('sort_by')] ?? 'teachers.id';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
+        $teachers->orderBy($sortBy, $sortOrder);
+
+        return $teachers;
+    }
+
+    public function index(Request $request)
+    {
+        [$yearId, $semesterId] = $this->resolveYearSemester($request);
+        $academicYear = $yearId ? AcademicYear::find($yearId) : null;
+        $semester = $semesterId ? Semester::find($semesterId) : null;
+        $summary = ($yearId && $semesterId) ? $this->service->getTermStatusSummary($yearId, $semesterId) : null;
+
+        $teachers = null;
+        if ($yearId && $semesterId) {
+            $perPage = (int) $request->get('per_page', 10);
+            $teachers = $this->buildTeacherQuery($request, $yearId, $semesterId)
+                ->paginate($perPage)->withQueryString();
+        }
+
+        return view('admin.teacher-term-status.index', compact('academicYear', 'semester', 'summary', 'teachers'));
+    }
+
+    public function data(Request $request)
+    {
+        [$yearId, $semesterId] = $this->resolveYearSemester($request);
+        $perPage = (int) $request->get('per_page', 10);
+        $teachers = $this->buildTeacherQuery($request, $yearId, $semesterId)
+            ->paginate($perPage)->withQueryString();
+
+        return response()->json([
+            'html' => view('admin.teacher-term-status._rows', compact('teachers'))->render(),
+            'meta' => [
+                'total'        => $teachers->total(),
+                'per_page'     => $teachers->perPage(),
+                'current_page' => $teachers->currentPage(),
+                'last_page'    => $teachers->lastPage(),
+                'from'         => $teachers->firstItem() ?? 0,
+                'to'           => $teachers->lastItem() ?? 0,
+            ],
+        ]);
     }
 
     public function edit(Request $request, $teacherId)
