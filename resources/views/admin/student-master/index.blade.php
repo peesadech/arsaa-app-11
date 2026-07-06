@@ -21,7 +21,7 @@
             \App\Models\MasterOption::TYPE_GUARDIAN_TYPE => __('Guardian Type'),
             \App\Models\MasterOption::TYPE_DOCUMENT_TYPE => __('Document Type'),
             \App\Models\MasterOption::TYPE_PROVINCE => __('Province'),
-            'grade_setting' => __('Grade Criteria'),
+            // 'grade_setting' => __('Grade Criteria'), // ซ่อนไว้ก่อนตามคำขอ (2026-07-06)
         ];
     @endphp
     <div class="flex items-center gap-1 overflow-x-auto mb-6 pb-1 border-b border-slate-200">

@@ -12,7 +12,8 @@ class StudentMasterDataController extends Controller
     public function index(Request $request)
     {
         $type = $request->query('type', MasterOption::TYPE_NATIONALITY);
-        if (!in_array($type, MasterOption::TYPES) && $type !== 'grade_setting') {
+        // Grade Criteria ถูกซ่อนไว้ก่อน (2026-07-06) — เปิดกลับได้โดยเพิ่ม `|| $type === 'grade_setting'` และ uncomment แท็บใน view
+        if (!in_array($type, MasterOption::TYPES)) {
             $type = MasterOption::TYPE_NATIONALITY;
         }
 
