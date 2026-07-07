@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\FacebookController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\DatabaseBackupController;
 use App\Http\Controllers\Admin\GradeController;
 use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\SemesterController;
@@ -146,6 +147,10 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
     // Settings
     Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
     Route::post('/admin/settings', [SettingController::class, 'update'])->name('admin.settings.update');
+
+    // Database Backup
+    Route::get('/admin/database-backup', [DatabaseBackupController::class, 'index'])->name('admin.database-backup.index');
+    Route::post('/admin/database-backup/download', [DatabaseBackupController::class, 'download'])->name('admin.database-backup.download');
 
     // Global Schedule
     Route::get('/admin/global-schedule', [GlobalScheduleController::class, 'index'])->name('admin.global-schedule.index');

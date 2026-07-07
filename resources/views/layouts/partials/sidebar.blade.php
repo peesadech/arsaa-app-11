@@ -82,6 +82,7 @@
             ['label' => __('Permissions'), 'route' => 'admin.roles-permissions'],
             ['label' => __('Languages'),   'route' => 'admin.languages.index'],
             ['label' => __('System Settings'), 'route' => 'admin.settings.index'],
+            ['label' => __('Backup Database'), 'route' => 'admin.database-backup.index'],
         ]],
     ];
 
